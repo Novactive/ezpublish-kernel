@@ -47,6 +47,11 @@ class Renderer implements RendererInterface
     /**
      * @var string
      */
+    protected $styleConfigurationNamespace;
+
+    /**
+     * @var string
+     */
     protected $embedConfigurationNamespace;
 
     /**
@@ -70,14 +75,21 @@ class Renderer implements RendererInterface
     private $customTagsConfiguration;
 
     /**
+     * @var array
+     */
+    private $customStylesConfiguration;
+
+    /**
      * @param \eZ\Publish\API\Repository\Repository $repository
      * @param \Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface $authorizationChecker
      * @param \eZ\Publish\Core\MVC\ConfigResolverInterface $configResolver
      * @param \Symfony\Component\Templating\EngineInterface $templateEngine
      * @param string $tagConfigurationNamespace
+     * @param string $styleConfigurationNamespace
      * @param string $embedConfigurationNamespace
      * @param null|\Psr\Log\LoggerInterface $logger
      * @param array $customTagsConfiguration
+     * @param array $customStylesConfiguration
      */
     public function __construct(
         Repository $repository,
@@ -85,18 +97,49 @@ class Renderer implements RendererInterface
         ConfigResolverInterface $configResolver,
         EngineInterface $templateEngine,
         $tagConfigurationNamespace,
+        $styleConfigurationNamespace,
         $embedConfigurationNamespace,
         LoggerInterface $logger = null,
-        array $customTagsConfiguration = []
+        array $customTagsConfiguration = [],
+        array $customStylesConfiguration = []
     ) {
         $this->repository = $repository;
         $this->authorizationChecker = $authorizationChecker;
         $this->configResolver = $configResolver;
         $this->templateEngine = $templateEngine;
         $this->tagConfigurationNamespace = $tagConfigurationNamespace;
+        $this->styleConfigurationNamespace = $styleConfigurationNamespace;
         $this->embedConfigurationNamespace = $embedConfigurationNamespace;
         $this->logger = $logger;
         $this->customTagsConfiguration = $customTagsConfiguration;
+        $this->customStylesConfiguration = $customStylesConfiguration;
+    }
+
+    public function renderStyle($name, array $parameters, $isInline)
+    {
+        $templateName = $this->getStyleTemplateName($name, $isInline);
+
+        if ($templateName === null) {
+            if (isset($this->logger)) {
+                $this->logger->error(
+                    "Could not render template style '{$name}': no template configured"
+                );
+            }
+
+            return null;
+        }
+
+        if (!$this->templateEngine->exists($templateName)) {
+            if (isset($this->logger)) {
+                $this->logger->error(
+                    "Could not render template style '{$name}': template '{$templateName}' does not exists"
+                );
+            }
+
+            return null;
+        }
+
+        return $this->render($templateName, $parameters);
     }
 
     public function renderTag($name, array $parameters, $isInline)
@@ -277,6 +320,47 @@ class Renderer implements RendererInterface
             $templateReference,
             $parameters
         );
+    }
+
+    /**
+     * Returns configured template name for the given template tag identifier.
+     *
+     * @param string $identifier
+     * @param bool $isInline
+     *
+     * @return null|string
+     */
+    protected function getStyleTemplateName($identifier, $isInline)
+    {
+        if (isset($this->customStylesConfiguration[$identifier]) && !empty($this->customStylesConfiguration[$identifier]['template'])) {
+            return $this->customStylesConfiguration[$identifier]['template'];
+        }
+
+        if (isset($this->logger)) {
+            $this->logger->warning(
+                "Template style '{$identifier}' configuration was not found"
+            );
+        }
+
+        if ($isInline) {
+            $configurationReference = $this->styleConfigurationNamespace . '.default_inline';
+        } else {
+            $configurationReference = $this->styleConfigurationNamespace . '.default';
+        }
+
+        if ($this->configResolver->hasParameter($configurationReference)) {
+            $configuration = $this->configResolver->getParameter($configurationReference);
+
+            return $configuration['template'];
+        }
+
+        if (isset($this->logger)) {
+            $this->logger->warning(
+                "Template style '{$identifier}' default configuration was not found"
+            );
+        }
+
+        return null;
     }
 
     /**
