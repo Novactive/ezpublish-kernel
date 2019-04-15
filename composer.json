@@ -86,7 +86,8 @@
         "_ezplatform_branch_for_behat_tests": "master",
         "branch-alias": {
             "dev-master": "7.5.x-dev",
-            "dev-tmp_ci_branch": "7.5.x-dev"
+            "dev-tmp_ci_branch": "7.5.x-dev",
+            "dev-feature/68096-change-workflow-edition-mode-draft": "7.5.x-dev"
         },
         "thanks": {
             "name": "ezsystems/ezplatform",
