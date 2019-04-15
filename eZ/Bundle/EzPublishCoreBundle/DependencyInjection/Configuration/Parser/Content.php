@@ -28,6 +28,12 @@ class Content extends AbstractParser
             ->arrayNode('content')
                 ->info('Content related configuration')
                 ->children()
+                    ->enumNode('edit_object_mode')
+                        ->defaultValue('showversion')
+                        ->values(['show_version', 'use_current'])
+                        ->example("showversion | use_current")
+                        ->info('Showing all draft version available or let system to create new version based on published version.')
+                        ->end()
                     ->booleanNode('view_cache')->end()
                     ->booleanNode('ttl_cache')->end()
                     ->scalarNode('default_ttl')->info('Default value for TTL cache, in seconds')->end()
@@ -52,6 +58,11 @@ class Content extends AbstractParser
     public function mapConfig(array &$scopeSettings, $currentScope, ContextualizerInterface $contextualizer)
     {
         if (!empty($scopeSettings['content'])) {
+
+            if (isset($scopeSettings['content']['edit_object_mode'])) {
+                $contextualizer->setContextualParameter('content.edit_object_mode', $currentScope, $scopeSettings['content']['edit_object_mode']);
+            }
+
             if (isset($scopeSettings['content']['view_cache'])) {
                 $contextualizer->setContextualParameter('content.view_cache', $currentScope, $scopeSettings['content']['view_cache']);
             }
