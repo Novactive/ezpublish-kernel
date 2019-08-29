@@ -15,10 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Visitor
 {
-    /**
-     * @var \eZ\Publish\Core\REST\Common\Output\ValueObjectVisitorDispatcher
-     */
-    protected $valueObjectVisitorDispatcher = array();
+    /** @var \eZ\Publish\Core\REST\Common\Output\ValueObjectVisitorDispatcher */
+    protected $valueObjectVisitorDispatcher = [];
 
     /**
      * Generator.

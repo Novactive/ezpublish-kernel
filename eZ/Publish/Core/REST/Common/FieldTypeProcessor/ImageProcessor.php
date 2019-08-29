@@ -30,9 +30,7 @@ class ImageProcessor extends BinaryInputProcessor
      */
     protected $variations;
 
-    /**
-     * @var RouterInterface
-     */
+    /** @var RouterInterface */
     protected $router;
 
     /**
@@ -67,15 +65,15 @@ class ImageProcessor extends BinaryInputProcessor
 
         $outgoingValueHash['path'] = '/' . $outgoingValueHash['path'];
         foreach ($this->variations as $variationIdentifier) {
-            $outgoingValueHash['variations'][$variationIdentifier] = array(
+            $outgoingValueHash['variations'][$variationIdentifier] = [
                 'href' => $this->router->generate(
                     'ezpublish_rest_binaryContent_getImageVariation',
-                    array(
+                    [
                         'imageId' => $outgoingValueHash['imageId'],
                         'variationIdentifier' => $variationIdentifier,
-                    )
+                    ]
                 ),
-            );
+            ];
         }
 
         return $outgoingValueHash;
@@ -101,16 +99,16 @@ class ImageProcessor extends BinaryInputProcessor
         }
 
         return str_replace(
-            array(
+            [
                 '{variation}',
                 '{fieldId}',
                 '{versionNo}',
-            ),
-            array(
+            ],
+            [
                 $variation,
                 $fieldId,
                 $versionNo,
-            ),
+            ],
             $this->urlTemplate
         );
     }

@@ -61,6 +61,11 @@ class Mapper
      */
     protected function cleanUrl($url)
     {
+        // if given $url is an absolute URL, then it's not necessary to prepend it with slash
+        if (null !== parse_url($url, PHP_URL_SCHEME)) {
+            return trim($url);
+        }
+
         return '/' . trim($url, '/ ');
     }
 
@@ -73,7 +78,7 @@ class Mapper
      */
     public function extractUrlWildcardsFromRows(array $rows)
     {
-        $urlWildcards = array();
+        $urlWildcards = [];
 
         foreach ($rows as $row) {
             $urlWildcards[] = $this->extractUrlWildcardFromRow($row);

@@ -22,24 +22,16 @@ use Symfony\Component\Routing\RouterInterface;
 
 class RequestEventListener implements EventSubscriberInterface
 {
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
+    /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
-    /**
-     * @var \eZ\Publish\Core\MVC\ConfigResolverInterface
-     */
+    /** @var \eZ\Publish\Core\MVC\ConfigResolverInterface */
     private $configResolver;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $defaultSiteAccess;
 
-    /**
-     * @var \Symfony\Component\Routing\RouterInterface
-     */
+    /** @var \Symfony\Component\Routing\RouterInterface */
     private $router;
 
     public function __construct(ConfigResolverInterface $configResolver, RouterInterface $router, $defaultSiteAccess, LoggerInterface $logger = null)
@@ -52,12 +44,12 @@ class RequestEventListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::REQUEST => array(
-                array('onKernelRequestForward', 10),
-                array('onKernelRequestRedirect', 0),
-            ),
-        );
+        return [
+            KernelEvents::REQUEST => [
+                ['onKernelRequestForward', 10],
+                ['onKernelRequestRedirect', 0],
+            ],
+        ];
     }
 
     /**
@@ -91,7 +83,7 @@ class RequestEventListener implements EventSubscriberInterface
                 if (isset($this->logger)) {
                     $this->logger->info(
                         "URLAlias made request to be forwarded to $semanticPathinfo",
-                        array('pathinfo' => $request->getPathInfo())
+                        ['pathinfo' => $request->getPathInfo()]
                     );
                 }
             }
@@ -140,7 +132,7 @@ class RequestEventListener implements EventSubscriberInterface
                 if (isset($this->logger)) {
                     $this->logger->info(
                         "URLAlias made request to be redirected to $semanticPathinfo",
-                        array('pathinfo' => $request->getPathInfo())
+                        ['pathinfo' => $request->getPathInfo()]
                     );
                 }
             }

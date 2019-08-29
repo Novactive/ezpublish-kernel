@@ -44,9 +44,7 @@ class DoctrineDatabase extends Gateway
      */
     protected $handler;
 
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
+    /** @var \Doctrine\DBAL\Connection */
     protected $connection;
 
     /**
@@ -317,12 +315,15 @@ class DoctrineDatabase extends Gateway
                 $destinationNodeData['path_string'],
                 'prefix' . $row['path_string']
             );
+            $replace = rtrim($destinationNodeData['path_identification_string'], '/');
+            if (empty($oldParentPathIdentificationString)) {
+                $replace .= '/';
+            }
             $newPathIdentificationString = str_replace(
                 'prefix' . $oldParentPathIdentificationString,
-                $destinationNodeData['path_identification_string'] . '/',
+                $replace,
                 'prefix' . $row['path_identification_string']
             );
-
             $newParentId = $row['parent_node_id'];
             if ($row['path_string'] === $fromPathString) {
                 $newParentId = (int)implode('', array_slice(explode('/', $newPathString), -3, 1));
@@ -968,7 +969,7 @@ class DoctrineDatabase extends Gateway
             $isInvisible = $row['is_hidden'] || $parentLocationData['is_hidden'] || $parentLocationData['is_invisible'];
             $this->create(
                 new CreateStruct(
-                    array(
+                    [
                         'contentId' => $row['contentobject_id'],
                         'contentVersion' => $row['contentobject_version'],
                         'mainLocationId' => $mainLocationId,
@@ -978,7 +979,7 @@ class DoctrineDatabase extends Gateway
                         'priority' => $row['priority'],
                         'hidden' => $row['is_hidden'],
                         'invisible' => $isInvisible,
-                    )
+                    ]
                 ),
                 $parentLocationData
             );
@@ -1235,7 +1236,7 @@ class DoctrineDatabase extends Gateway
 
         $newLocation = $this->create(
             new CreateStruct(
-                array(
+                [
                     'priority' => $row['priority'],
                     'hidden' => $row['is_hidden'],
                     'invisible' => $row['is_invisible'],
@@ -1245,7 +1246,7 @@ class DoctrineDatabase extends Gateway
                     'mainLocationId' => true, // Restored location is always main location
                     'sortField' => $row['sort_field'],
                     'sortOrder' => $row['sort_order'],
-                )
+                ]
             ),
             $this->getBasicNodeData($newParentId ?: $row['parent_node_id'])
         );
@@ -1323,7 +1324,7 @@ class DoctrineDatabase extends Gateway
             ->select('*')
             ->from($this->handler->quoteTable('ezcontentobject_trash'));
 
-        $sort = $sort ?: array();
+        $sort = $sort ?: [];
         foreach ($sort as $condition) {
             $sortDirection = $condition->direction === Query::SORT_ASC ? SelectQuery::ASC : SelectQuery::DESC;
             switch (true) {
@@ -1355,7 +1356,7 @@ class DoctrineDatabase extends Gateway
         $statement = $query->prepare();
         $statement->execute();
 
-        $rows = array();
+        $rows = [];
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $rows[] = $row;
         }

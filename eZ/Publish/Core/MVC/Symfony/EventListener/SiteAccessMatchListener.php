@@ -26,14 +26,10 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 class SiteAccessMatchListener implements EventSubscriberInterface
 {
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\SiteAccess\Router
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\SiteAccess\Router */
     protected $siteAccessRouter;
 
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
+    /** @var \Symfony\Component\EventDispatcher\EventDispatcherInterface */
     protected $eventDispatcher;
 
     /**
@@ -55,10 +51,10 @@ class SiteAccessMatchListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             // Should take place just after FragmentListener (priority 48) in order to get rebuilt request attributes in case of subrequest
-            KernelEvents::REQUEST => array('onKernelRequest', 45),
-        );
+            KernelEvents::REQUEST => ['onKernelRequest', 45],
+        ];
     }
 
     /**
@@ -105,7 +101,7 @@ class SiteAccessMatchListener implements EventSubscriberInterface
     {
         return $this->siteAccessRouter->match(
             new SimplifiedRequest(
-                array(
+                [
                     'scheme' => $request->getScheme(),
                     'host' => $request->getHost(),
                     'port' => $request->getPort(),
@@ -113,7 +109,7 @@ class SiteAccessMatchListener implements EventSubscriberInterface
                     'queryParams' => $request->query->all(),
                     'languages' => $request->getLanguages(),
                     'headers' => $request->headers->all(),
-                )
+                ]
             )
         );
     }

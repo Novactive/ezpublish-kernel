@@ -18,9 +18,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  */
 class PersistenceCacheCollector extends DataCollector
 {
-    /**
-     * @var PersistenceLogger
-     */
+    /** @var PersistenceLogger */
     private $logger;
 
     public function __construct(PersistenceLogger $logger)
@@ -46,7 +44,7 @@ class PersistenceCacheCollector extends DataCollector
     /**
      * Returns call count.
      *
-     * @deprecaterd since 7.5, use getStats().
+     * @deprecated since 7.5, use getStats().
      *
      * @return int
      */
@@ -105,7 +103,7 @@ class PersistenceCacheCollector extends DataCollector
             // Get traces, and order them to have the most called first
             $calls[$hash]['traces'] = $call['traces'];
             $traceCount = [];
-            foreach ($traces as $traceHash => $traceData) {
+            foreach ($call['traces'] as $traceHash => $traceData) {
                 $traceCount[$traceHash] = $traceData['count'];
             }
             \array_multisort($traceCount, SORT_DESC, SORT_NUMERIC, $calls[$hash]['traces']);

@@ -18,9 +18,7 @@ use eZ\Publish\Core\Repository\Values\ContentType\FieldType;
  */
 class FieldTypeService implements FieldTypeServiceInterface
 {
-    /**
-     * @var Helper\FieldTypeRegistry
-     */
+    /** @var Helper\FieldTypeRegistry */
     protected $fieldTypeRegistry;
 
     /**
@@ -28,7 +26,7 @@ class FieldTypeService implements FieldTypeServiceInterface
      *
      * @var \eZ\Publish\API\Repository\FieldType[]
      */
-    protected $fieldTypes = array();
+    protected $fieldTypes = [];
 
     /**
      * Setups service with reference to repository object that created it & corresponding handler.

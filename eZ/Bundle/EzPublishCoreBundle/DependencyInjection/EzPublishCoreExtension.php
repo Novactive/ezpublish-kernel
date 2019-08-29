@@ -32,24 +32,16 @@ class EzPublishCoreExtension extends Extension implements PrependExtensionInterf
     const RICHTEXT_CUSTOM_STYLES_PARAMETER = 'ezplatform.ezrichtext.custom_styles';
     const RICHTEXT_CUSTOM_TAGS_PARAMETER = 'ezplatform.ezrichtext.custom_tags';
 
-    /**
-     * @var \eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\Suggestion\Collector\SuggestionCollector
-     */
+    /** @var \eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\Suggestion\Collector\SuggestionCollector */
     private $suggestionCollector;
 
-    /**
-     * @var \eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\ParserInterface
-     */
+    /** @var \eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\ParserInterface */
     private $mainConfigParser;
 
-    /**
-     * @var \eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\ParserInterface[]
-     */
+    /** @var \eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\ParserInterface[] */
     private $configParsers;
 
-    /**
-     * @var PolicyProviderInterface[]
-     */
+    /** @var PolicyProviderInterface[] */
     private $policyProviders = [];
 
     /**
@@ -60,12 +52,10 @@ class EzPublishCoreExtension extends Extension implements PrependExtensionInterf
      */
     private $defaultSettingsCollection = [];
 
-    /**
-     * @var \eZ\Bundle\EzPublishCoreBundle\SiteAccess\SiteAccessConfigurationFilter[]
-     */
+    /** @var \eZ\Bundle\EzPublishCoreBundle\SiteAccess\SiteAccessConfigurationFilter[] */
     private $siteaccessConfigurationFilters = [];
 
-    public function __construct(array $configParsers = array())
+    public function __construct(array $configParsers = [])
     {
         $this->configParsers = $configParsers;
         $this->suggestionCollector = new SuggestionCollector();
@@ -116,6 +106,7 @@ class EzPublishCoreExtension extends Extension implements PrependExtensionInterf
         $this->registerPageConfiguration($config, $container);
         $this->registerRichTextConfiguration($config, $container);
         $this->registerUrlAliasConfiguration($config, $container);
+        $this->registerUrlWildcardsConfiguration($config, $container);
 
         // Routing
         $this->handleRouting($config, $container, $loader);
@@ -128,6 +119,7 @@ class EzPublishCoreExtension extends Extension implements PrependExtensionInterf
         $this->handleHelpers($config, $container, $loader);
         $this->handleImage($config, $container, $loader);
         $this->handleUrlChecker($config, $container, $loader);
+        $this->handleUrlWildcards($config, $container, $loader);
 
         // Map settings
         $processor = new ConfigurationProcessor($container, 'ezsettings');
@@ -214,7 +206,7 @@ class EzPublishCoreExtension extends Extension implements PrependExtensionInterf
     private function registerRepositoriesConfiguration(array $config, ContainerBuilder $container)
     {
         if (!isset($config['repositories'])) {
-            $config['repositories'] = array();
+            $config['repositories'] = [];
         }
 
         foreach ($config['repositories'] as $name => &$repository) {
@@ -229,10 +221,10 @@ class EzPublishCoreExtension extends Extension implements PrependExtensionInterf
     private function registerSiteAccessConfiguration(array $config, ContainerBuilder $container)
     {
         if (!isset($config['siteaccess'])) {
-            $config['siteaccess'] = array();
-            $config['siteaccess']['list'] = array('setup');
+            $config['siteaccess'] = [];
+            $config['siteaccess']['list'] = ['setup'];
             $config['siteaccess']['default_siteaccess'] = 'setup';
-            $config['siteaccess']['groups'] = array();
+            $config['siteaccess']['groups'] = [];
             $config['siteaccess']['match'] = null;
         }
 
@@ -243,11 +235,11 @@ class EzPublishCoreExtension extends Extension implements PrependExtensionInterf
 
         // Register siteaccess groups + reverse
         $container->setParameter('ezpublish.siteaccess.groups', $config['siteaccess']['groups']);
-        $groupsBySiteaccess = array();
+        $groupsBySiteaccess = [];
         foreach ($config['siteaccess']['groups'] as $groupName => $groupMembers) {
             foreach ($groupMembers as $member) {
                 if (!isset($groupsBySiteaccess[$member])) {
-                    $groupsBySiteaccess[$member] = array();
+                    $groupsBySiteaccess[$member] = [];
                 }
 
                 $groupsBySiteaccess[$member][] = $groupName;
@@ -267,7 +259,7 @@ class EzPublishCoreExtension extends Extension implements PrependExtensionInterf
             }
         }
 
-        $filters = isset($config['imagemagick']['filters']) ? $config['imagemagick']['filters'] : array();
+        $filters = isset($config['imagemagick']['filters']) ? $config['imagemagick']['filters'] : [];
         $filters = $filters + $container->getParameter('ezpublish.image.imagemagick.filters');
         $container->setParameter('ezpublish.image.imagemagick.filters', $filters);
     }
@@ -386,6 +378,7 @@ class EzPublishCoreExtension extends Extension implements PrependExtensionInterf
         $coreLoader->load('policies.yml');
         $coreLoader->load('notification.yml');
         $coreLoader->load('user_preference.yml');
+        $coreLoader->load('slot.yml');
 
         // Load Core RichText settings
         if (!$this->isRichTextBundleEnabled($container)) {
@@ -487,18 +480,18 @@ class EzPublishCoreExtension extends Extension implements PrependExtensionInterf
         $configResolver = $container->get('ezpublish.config.resolver.core');
         $configResolver->setContainer($container);
 
-        $saRelationMap = array();
+        $saRelationMap = [];
         $saList = $container->getParameter('ezpublish.siteaccess.list');
         // First build the SiteAccess relation map, indexed by repository and rootLocationId.
         foreach ($saList as $sa) {
             $repository = $configResolver->getParameter('repository', 'ezsettings', $sa);
             if (!isset($saRelationMap[$repository])) {
-                $saRelationMap[$repository] = array();
+                $saRelationMap[$repository] = [];
             }
 
             $rootLocationId = $configResolver->getParameter('content.tree_root.location_id', 'ezsettings', $sa);
             if (!isset($saRelationMap[$repository][$rootLocationId])) {
-                $saRelationMap[$repository][$rootLocationId] = array();
+                $saRelationMap[$repository][$rootLocationId] = [];
             }
             $saRelationMap[$repository][$rootLocationId][] = $sa;
         }
@@ -659,6 +652,29 @@ class EzPublishCoreExtension extends Extension implements PrependExtensionInterf
 
         if ($fileSystem->exists($translationsPath)) {
             $container->prependExtensionConfig('framework', ['translator' => ['paths' => [$translationsPath]]]);
+        }
+    }
+
+    /**
+     * @param array $config
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     */
+    private function registerUrlWildcardsConfiguration(array $config, ContainerBuilder $container): void
+    {
+        $container->setParameter('ezpublish.url_wildcards.enabled', $config['url_wildcards']['enabled'] ?? false);
+    }
+
+    /**
+     * Loads configuration for UrlWildcardsRouter service if enabled.
+     *
+     * @param array $config
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @param \Symfony\Component\DependencyInjection\Loader\FileLoader $loader
+     */
+    private function handleUrlWildcards(array $config, ContainerBuilder $container, Loader\YamlFileLoader $loader)
+    {
+        if ($container->getParameter('ezpublish.url_wildcards.enabled')) {
+            $loader->load('url_wildcard.yml');
         }
     }
 }

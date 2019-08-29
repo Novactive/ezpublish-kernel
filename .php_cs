@@ -6,7 +6,7 @@ return PhpCsFixer\Config::create()
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'concat_space' => ['spacing' => 'one'],
-        'array_syntax' => false,
+        'array_syntax' => ['syntax' => 'short'],
         'simplified_null_return' => false,
         'phpdoc_align' => false,
         'phpdoc_separation' => false,
@@ -19,6 +19,14 @@ return PhpCsFixer\Config::create()
         'space_after_semicolon' => false,
         'yoda_style' => false,
         'no_break_comment' => false,
+        'native_function_invocation' => false,
+        'native_constant_invocation' => false,
+        'phpdoc_types_order' => false,
+        'php_unit_mock_short_will_return' => false,
+        'php_unit_construct' => false,
+        'standardize_increment' => false,
+        'fopen_flags' => false,
+        'self_accessor' => false,
     ])
     ->setRiskyAllowed(true)
     ->setFinder(

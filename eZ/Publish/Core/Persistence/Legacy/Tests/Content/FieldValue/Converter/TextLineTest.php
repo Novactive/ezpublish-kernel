@@ -22,9 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class TextLineTest extends TestCase
 {
-    /**
-     * @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\TextLineConverter
-     */
+    /** @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\TextLineConverter */
     protected $converter;
 
     protected function setUp()
@@ -81,25 +79,25 @@ class TextLineTest extends TestCase
         $defaultValue = new FieldValue();
         $defaultValue->data = $defaultText;
         $fieldTypeConstraints = new FieldTypeConstraints();
-        $fieldTypeConstraints->validators = array(
-            TextLineConverter::STRING_LENGTH_VALIDATOR_IDENTIFIER => array('maxStringLength' => 100),
-        );
+        $fieldTypeConstraints->validators = [
+            TextLineConverter::STRING_LENGTH_VALIDATOR_IDENTIFIER => ['maxStringLength' => 100],
+        ];
         $fieldTypeConstraints->fieldSettings = new FieldSettings(
-            array(
+            [
                 'defaultText' => $defaultText,
-            )
+            ]
         );
         $fieldDef = new PersistenceFieldDefinition(
-            array(
+            [
                 'fieldTypeConstraints' => $fieldTypeConstraints,
                 'defaultValue' => $defaultValue,
-            )
+            ]
         );
 
         $this->converter->toStorageFieldDefinition($fieldDef, $storageFieldDef);
         self::assertSame(
             $fieldDef->fieldTypeConstraints->validators[TextLineConverter::STRING_LENGTH_VALIDATOR_IDENTIFIER],
-            array('maxStringLength' => $storageFieldDef->dataInt1)
+            ['maxStringLength' => $storageFieldDef->dataInt1]
         );
         self::assertSame(
             $fieldDef->fieldTypeConstraints->fieldSettings['defaultText'],
@@ -120,10 +118,10 @@ class TextLineTest extends TestCase
         $defaultValue->data = $defaultText;
         $fieldTypeConstraints = new FieldTypeConstraints();
         $fieldDef = new PersistenceFieldDefinition(
-            array(
+            [
                 'fieldTypeConstraints' => $fieldTypeConstraints,
                 'defaultValue' => $defaultValue,
-            )
+            ]
         );
 
         $this->converter->toStorageFieldDefinition($fieldDef, $storageFieldDef);
@@ -147,17 +145,17 @@ class TextLineTest extends TestCase
         $defaultText = 'This is a default value';
         $fieldDef = new PersistenceFieldDefinition();
         $storageDef = new StorageFieldDefinition(
-            array(
+            [
                 'dataInt1' => 100,
                 'dataText1' => $defaultText,
-            )
+            ]
         );
 
         $this->converter->toFieldDefinition($storageDef, $fieldDef);
         self::assertSame(
-            array(
-                TextLineConverter::STRING_LENGTH_VALIDATOR_IDENTIFIER => array('maxStringLength' => 100),
-            ),
+            [
+                TextLineConverter::STRING_LENGTH_VALIDATOR_IDENTIFIER => ['maxStringLength' => 100],
+            ],
             $fieldDef->fieldTypeConstraints->validators
         );
         self::assertSame($defaultText, $fieldDef->defaultValue->data);

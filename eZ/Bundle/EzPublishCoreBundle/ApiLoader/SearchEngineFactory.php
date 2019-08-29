@@ -16,9 +16,7 @@ use eZ\Publish\SPI\Search\Handler as SearchHandler;
  */
 class SearchEngineFactory
 {
-    /**
-     * @var \eZ\Bundle\EzPublishCoreBundle\ApiLoader\RepositoryConfigurationProvider
-     */
+    /** @var \eZ\Bundle\EzPublishCoreBundle\ApiLoader\RepositoryConfigurationProvider */
     private $repositoryConfigurationProvider;
 
     /**
@@ -27,7 +25,7 @@ class SearchEngineFactory
      *
      * @var \eZ\Publish\SPI\Search\Handler[]
      */
-    protected $searchEngines = array();
+    protected $searchEngines = [];
 
     public function __construct(RepositoryConfigurationProvider $repositoryConfigurationProvider)
     {

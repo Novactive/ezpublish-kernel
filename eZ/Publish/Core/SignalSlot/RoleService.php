@@ -93,9 +93,9 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->createRole($roleCreateStruct);
         $this->signalDispatcher->emit(
             new CreateRoleSignal(
-                array(
+                [
                     'roleId' => $returnValue->id,
-                )
+                ]
             )
         );
 
@@ -120,9 +120,9 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->createRoleDraft($role);
         $this->signalDispatcher->emit(
             new CreateRoleDraftSignal(
-                array(
+                [
                     'roleId' => $returnValue->id,
-                )
+                ]
             )
         );
 
@@ -179,9 +179,9 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->updateRoleDraft($roleDraft, $roleUpdateStruct);
         $this->signalDispatcher->emit(
             new UpdateRoleDraftSignal(
-                array(
+                [
                     'roleId' => $roleDraft->id,
-                )
+                ]
             )
         );
 
@@ -208,10 +208,10 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->addPolicyByRoleDraft($roleDraft, $policyCreateStruct);
         $this->signalDispatcher->emit(
             new AddPolicyByRoleDraftSignal(
-                array(
+                [
                     'roleId' => $roleDraft->id,
                     'policyId' => $returnValue->id,
-                )
+                ]
             )
         );
 
@@ -235,10 +235,10 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->removePolicyByRoleDraft($roleDraft, $policyDraft);
         $this->signalDispatcher->emit(
             new RemovePolicyByRoleDraftSignal(
-                array(
+                [
                     'roleId' => $roleDraft->id,
                     'policyId' => $policyDraft->id,
-                )
+                ]
             )
         );
 
@@ -267,9 +267,9 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->updatePolicyByRoleDraft($roleDraft, $policy, $policyUpdateStruct);
         $this->signalDispatcher->emit(
             new UpdatePolicySignal(
-                array(
+                [
                     'policyId' => $policy->id,
-                )
+                ]
             )
         );
 
@@ -290,9 +290,9 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->deleteRoleDraft($roleDraft);
         $this->signalDispatcher->emit(
             new DeleteRoleDraftSignal(
-                array(
+                [
                     'roleId' => $roleDraft->id,
-                )
+                ]
             )
         );
 
@@ -313,9 +313,9 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->publishRoleDraft($roleDraft);
         $this->signalDispatcher->emit(
             new PublishRoleDraftSignal(
-                array(
+                [
                     'roleId' => $roleDraft->id,
-                )
+                ]
             )
         );
 
@@ -340,9 +340,9 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->updateRole($role, $roleUpdateStruct);
         $this->signalDispatcher->emit(
             new UpdateRoleSignal(
-                array(
+                [
                     'roleId' => $role->id,
-                )
+                ]
             )
         );
 
@@ -369,10 +369,10 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->addPolicy($role, $policyCreateStruct);
         $this->signalDispatcher->emit(
             new AddPolicySignal(
-                array(
+                [
                     'roleId' => $role->id,
                     'policyId' => $returnValue->id,
-                )
+                ]
             )
         );
 
@@ -393,10 +393,10 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->deletePolicy($policy);
         $this->signalDispatcher->emit(
             new RemovePolicySignal(
-                array(
+                [
                     'roleId' => $policy->roleId,
                     'policyId' => $policy->id,
-                )
+                ]
             )
         );
 
@@ -424,9 +424,9 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->updatePolicy($policy, $policyUpdateStruct);
         $this->signalDispatcher->emit(
             new UpdatePolicySignal(
-                array(
+                [
                     'policyId' => $policy->id,
-                )
+                ]
             )
         );
 
@@ -464,9 +464,7 @@ class RoleService implements RoleServiceInterface
     }
 
     /**
-     * Loads all roles.
-     *
-     * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException if the authenticated user is not allowed to read the roles
+     * Loads all roles, excluding the ones the current user is not allowed to read.
      *
      * @return \eZ\Publish\API\Repository\Values\User\Role[]
      */
@@ -487,9 +485,9 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->deleteRole($role);
         $this->signalDispatcher->emit(
             new DeleteRoleSignal(
-                array(
+                [
                     'roleId' => $role->id,
-                )
+                ]
             )
         );
 
@@ -525,11 +523,11 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->assignRoleToUserGroup($role, $userGroup, $roleLimitation);
         $this->signalDispatcher->emit(
             new AssignRoleToUserGroupSignal(
-                array(
+                [
                     'roleId' => $role->id,
                     'userGroupId' => $userGroup->id,
                     'roleLimitation' => $roleLimitation,
-                )
+                ]
             )
         );
 
@@ -550,10 +548,10 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->unassignRoleFromUserGroup($role, $userGroup);
         $this->signalDispatcher->emit(
             new UnassignRoleFromUserGroupSignal(
-                array(
+                [
                     'roleId' => $role->id,
                     'userGroupId' => $userGroup->id,
-                )
+                ]
             )
         );
 
@@ -575,11 +573,11 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->assignRoleToUser($role, $user, $roleLimitation);
         $this->signalDispatcher->emit(
             new AssignRoleToUserSignal(
-                array(
+                [
                     'roleId' => $role->id,
                     'userId' => $user->id,
                     'roleLimitation' => $roleLimitation,
-                )
+                ]
             )
         );
 
@@ -600,10 +598,10 @@ class RoleService implements RoleServiceInterface
         $returnValue = $this->service->unassignRoleFromUser($role, $user);
         $this->signalDispatcher->emit(
             new UnassignRoleFromUserSignal(
-                array(
+                [
                     'roleId' => $role->id,
                     'userId' => $user->id,
-                )
+                ]
             )
         );
 
@@ -667,9 +665,7 @@ class RoleService implements RoleServiceInterface
     }
 
     /**
-     * Returns the roles assigned to the given user group.
-     *
-     * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException if the authenticated user is not allowed to read a user group
+     * Returns the roles assigned to the given user group, excluding the ones the current user is not allowed to read.
      *
      * @param \eZ\Publish\API\Repository\Values\User\UserGroup $userGroup
      *

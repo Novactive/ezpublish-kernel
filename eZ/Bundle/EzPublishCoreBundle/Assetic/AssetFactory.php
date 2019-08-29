@@ -14,14 +14,10 @@ use Symfony\Bundle\AsseticBundle\Factory\AssetFactory as BaseAssetFactory;
 
 class AssetFactory extends BaseAssetFactory
 {
-    /**
-     * @var ConfigResolverInterface
-     */
+    /** @var ConfigResolverInterface */
     private $configResolver;
 
-    /**
-     * @var DynamicSettingParserInterface
-     */
+    /** @var DynamicSettingParserInterface */
     private $dynamicSettingParser;
 
     public function setConfigResolver(ConfigResolverInterface $configResolver)
@@ -39,7 +35,7 @@ class AssetFactory extends BaseAssetFactory
      *
      * {@inheritdoc}
      */
-    protected function parseInput($input, array $options = array())
+    protected function parseInput($input, array $options = [])
     {
         if ($this->dynamicSettingParser->isDynamicSetting($input)) {
             $parsedSettings = $this->dynamicSettingParser->parseDynamicSetting($input);
@@ -50,7 +46,7 @@ class AssetFactory extends BaseAssetFactory
             );
 
             if (is_array($input)) {
-                $collection = $this->createAssetCollection(array(), $options);
+                $collection = $this->createAssetCollection([], $options);
                 foreach ($input as $file) {
                     $collection->add(parent::parseInput($file, $options));
                 }

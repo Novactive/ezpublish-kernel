@@ -37,24 +37,16 @@ use eZ\Publish\Core\REST\Client\Exceptions\BadStateException;
  */
 class ContentTypeService implements APIContentTypeService, Sessionable
 {
-    /**
-     * @var \eZ\Publish\Core\REST\Client\HttpClient
-     */
+    /** @var \eZ\Publish\Core\REST\Client\HttpClient */
     private $client;
 
-    /**
-     * @var \eZ\Publish\Core\REST\Common\Input\Dispatcher
-     */
+    /** @var \eZ\Publish\Core\REST\Common\Input\Dispatcher */
     private $inputDispatcher;
 
-    /**
-     * @var \eZ\Publish\Core\REST\Common\Output\Visitor
-     */
+    /** @var \eZ\Publish\Core\REST\Common\Output\Visitor */
     private $outputVisitor;
 
-    /**
-     * @var \eZ\Publish\Core\REST\Common\RequestParser
-     */
+    /** @var \eZ\Publish\Core\REST\Common\RequestParser */
     private $requestParser;
 
     /**
@@ -368,11 +360,12 @@ class ContentTypeService implements APIContentTypeService, Sessionable
      *
      * @throws \eZ\Publish\API\Repository\Exceptions\NotFoundException If the content type draft owned by the current user can not be found
      *
-     * @param mixed $contentTypeId
+     * @param int $contentTypeId
+     * @param bool $ignoreOwnership not supported yet
      *
      * @return \eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft
      */
-    public function loadContentTypeDraft($contentTypeId)
+    public function loadContentTypeDraft($contentTypeId, bool $ignoreOwnership = false)
     {
         $response = $this->client->request(
             'GET',
@@ -866,4 +859,14 @@ class ContentTypeService implements APIContentTypeService, Sessionable
     ): ContentTypeDraft {
         throw new \Exception('@todo: Implement.');
     }
+
+    /**
+     * @todo Implement
+     */
+    public function deleteUserDrafts(int $userId): void
+    {
+        throw new \RuntimeException('Not implemented yet');
+    }
+
+
 }

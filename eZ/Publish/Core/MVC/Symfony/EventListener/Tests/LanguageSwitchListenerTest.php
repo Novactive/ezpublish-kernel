@@ -18,9 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class LanguageSwitchListenerTest extends TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $translationHelper;
 
     protected function setUp()
@@ -34,7 +32,7 @@ class LanguageSwitchListenerTest extends TestCase
     public function testGetSubscribedEvents()
     {
         $this->assertSame(
-            array(MVCEvents::ROUTE_REFERENCE_GENERATION => 'onRouteReferenceGeneration'),
+            [MVCEvents::ROUTE_REFERENCE_GENERATION => 'onRouteReferenceGeneration'],
             LanguageSwitchListener::getSubscribedEvents()
         );
     }
@@ -53,7 +51,7 @@ class LanguageSwitchListenerTest extends TestCase
     public function testOnRouteReferenceGeneration()
     {
         $language = 'fre-FR';
-        $routeReference = new RouteReference('foo', array('language' => $language));
+        $routeReference = new RouteReference('foo', ['language' => $language]);
         $event = new RouteReferenceGenerationEvent($routeReference, new Request());
         $expectedSiteAccess = 'phoenix_rises';
         $this->translationHelper
@@ -72,7 +70,7 @@ class LanguageSwitchListenerTest extends TestCase
     public function testOnRouteReferenceGenerationNoTranslationSiteAccess()
     {
         $language = 'fre-FR';
-        $routeReference = new RouteReference('foo', array('language' => $language));
+        $routeReference = new RouteReference('foo', ['language' => $language]);
         $event = new RouteReferenceGenerationEvent($routeReference, new Request());
         $this->translationHelper
             ->expects($this->once())

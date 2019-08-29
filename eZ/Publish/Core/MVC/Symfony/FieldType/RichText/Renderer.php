@@ -30,54 +30,34 @@ class Renderer implements RendererInterface
     const RESOURCE_TYPE_CONTENT = 0;
     const RESOURCE_TYPE_LOCATION = 1;
 
-    /**
-     * @var \eZ\Publish\Core\Repository\Repository
-     */
+    /** @var \eZ\Publish\Core\Repository\Repository */
     protected $repository;
 
-    /**
-     * @var \Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface
-     */
+    /** @var \Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface */
     private $authorizationChecker;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $tagConfigurationNamespace;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $styleConfigurationNamespace;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $embedConfigurationNamespace;
 
-    /**
-     * @var ConfigResolverInterface
-     */
+    /** @var ConfigResolverInterface */
     protected $configResolver;
 
-    /**
-     * @var \Symfony\Component\Templating\EngineInterface
-     */
+    /** @var \Symfony\Component\Templating\EngineInterface */
     protected $templateEngine;
 
-    /**
-     * @var null|\Psr\Log\LoggerInterface
-     */
+    /** @var null|\Psr\Log\LoggerInterface */
     protected $logger;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $customTagsConfiguration;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $customStylesConfiguration;
 
     /**
@@ -489,10 +469,10 @@ class Renderer implements RendererInterface
         // Check both 'content/read' and 'content/view_embed'.
         if (
             !$this->authorizationChecker->isGranted(
-                new AuthorizationAttribute('content', 'read', array('valueObject' => $content))
+                new AuthorizationAttribute('content', 'read', ['valueObject' => $content])
             )
             && !$this->authorizationChecker->isGranted(
-                new AuthorizationAttribute('content', 'view_embed', array('valueObject' => $content))
+                new AuthorizationAttribute('content', 'view_embed', ['valueObject' => $content])
             )
         ) {
             throw new AccessDeniedException();
@@ -502,7 +482,7 @@ class Renderer implements RendererInterface
         if (
             !$content->getVersionInfo()->isPublished()
             && !$this->authorizationChecker->isGranted(
-                new AuthorizationAttribute('content', 'versionread', array('valueObject' => $content))
+                new AuthorizationAttribute('content', 'versionread', ['valueObject' => $content])
             )
         ) {
             throw new AccessDeniedException();
@@ -533,14 +513,14 @@ class Renderer implements RendererInterface
                 new AuthorizationAttribute(
                     'content',
                     'read',
-                    array('valueObject' => $location->contentInfo, 'targets' => $location)
+                    ['valueObject' => $location->contentInfo, 'targets' => $location]
                 )
             )
             && !$this->authorizationChecker->isGranted(
                 new AuthorizationAttribute(
                     'content',
                     'view_embed',
-                    array('valueObject' => $location->contentInfo, 'targets' => $location)
+                    ['valueObject' => $location->contentInfo, 'targets' => $location]
                 )
             )
         ) {

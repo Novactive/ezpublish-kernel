@@ -14,9 +14,7 @@ use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration as BaseFilterConfigura
 
 class FilterConfiguration extends BaseFilterConfiguration
 {
-    /**
-     * @var ConfigResolverInterface
-     */
+    /** @var ConfigResolverInterface */
     private $configResolver;
 
     /**
@@ -34,15 +32,15 @@ class FilterConfiguration extends BaseFilterConfiguration
             return parent::get($filter);
         }
 
-        $filterConfig = isset($this->filters[$filter]) ? parent::get($filter) : array();
+        $filterConfig = isset($this->filters[$filter]) ? parent::get($filter) : [];
 
-        return array(
+        return [
             'cache' => 'ezpublish',
             'data_loader' => 'ezpublish',
             'reference' => isset($configuredVariations[$filter]['reference']) ? $configuredVariations[$filter]['reference'] : null,
             'filters' => $this->getVariationFilters($filter, $configuredVariations),
             'post_processors' => $this->getVariationPostProcessors($filter, $configuredVariations),
-        ) + $filterConfig;
+        ] + $filterConfig;
     }
 
     public function all()
@@ -99,6 +97,6 @@ class FilterConfiguration extends BaseFilterConfiguration
             return $this->filters[$variationName]['post_processors'];
         }
 
-        return array();
+        return [];
     }
 }

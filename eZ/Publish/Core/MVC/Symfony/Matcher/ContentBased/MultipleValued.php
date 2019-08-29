@@ -15,9 +15,7 @@ use eZ\Publish\Core\MVC\RepositoryAware;
  */
 abstract class MultipleValued extends RepositoryAware implements MatcherInterface
 {
-    /**
-     * @var array Values to test against with isset(). Key is the actual value.
-     */
+    /** @var array Values to test against with isset(). Key is the actual value. */
     protected $values;
 
     /**
@@ -30,7 +28,7 @@ abstract class MultipleValued extends RepositoryAware implements MatcherInterfac
      */
     public function setMatchingConfig($matchingConfig)
     {
-        $matchingConfig = !is_array($matchingConfig) ? array($matchingConfig) : $matchingConfig;
+        $matchingConfig = !is_array($matchingConfig) ? [$matchingConfig] : $matchingConfig;
         $this->values = array_fill_keys($matchingConfig, true);
     }
 

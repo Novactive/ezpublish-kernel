@@ -17,15 +17,11 @@ namespace eZ\Publish\Core\FieldType\Page\Parts;
  */
 class Zone extends Base
 {
-    /**
-     * @var \eZ\Publish\Core\FieldType\Page\Parts\Block[]
-     */
-    protected $blocks = array();
+    /** @var \eZ\Publish\Core\FieldType\Page\Parts\Block[] */
+    protected $blocks = [];
 
-    /**
-     * @var \eZ\Publish\Core\FieldType\Page\Parts\Block[]
-     */
-    protected $blocksById = array();
+    /** @var \eZ\Publish\Core\FieldType\Page\Parts\Block[] */
+    protected $blocksById = [];
 
     /**
      * Zone Id.
@@ -48,7 +44,7 @@ class Zone extends Base
      */
     protected $action;
 
-    public function __construct(array $properties = array())
+    public function __construct(array $properties = [])
     {
         parent::__construct($properties);
 

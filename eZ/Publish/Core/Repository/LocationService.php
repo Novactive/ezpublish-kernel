@@ -44,39 +44,25 @@ use eZ\Publish\API\Repository\Values\ContentType\ContentType;
  */
 class LocationService implements LocationServiceInterface
 {
-    /**
-     * @var \eZ\Publish\Core\Repository\Repository
-     */
+    /** @var \eZ\Publish\Core\Repository\Repository */
     protected $repository;
 
-    /**
-     * @var \eZ\Publish\SPI\Persistence\Handler
-     */
+    /** @var \eZ\Publish\SPI\Persistence\Handler */
     protected $persistenceHandler;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $settings;
 
-    /**
-     * @var \eZ\Publish\Core\Repository\Helper\DomainMapper
-     */
+    /** @var \eZ\Publish\Core\Repository\Helper\DomainMapper */
     protected $domainMapper;
 
-    /**
-     * @var \eZ\Publish\Core\Repository\Helper\NameSchemaService
-     */
+    /** @var \eZ\Publish\Core\Repository\Helper\NameSchemaService */
     protected $nameSchemaService;
 
-    /**
-     * @var \eZ\Publish\API\Repository\PermissionCriterionResolver
-     */
+    /** @var \eZ\Publish\API\Repository\PermissionCriterionResolver */
     protected $permissionCriterionResolver;
 
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
+    /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
     /**
@@ -96,7 +82,7 @@ class LocationService implements LocationServiceInterface
         Helper\DomainMapper $domainMapper,
         Helper\NameSchemaService $nameSchemaService,
         PermissionCriterionResolver $permissionCriterionResolver,
-        array $settings = array(),
+        array $settings = [],
         LoggerInterface $logger = null
     ) {
         $this->repository = $repository;
@@ -104,9 +90,9 @@ class LocationService implements LocationServiceInterface
         $this->domainMapper = $domainMapper;
         $this->nameSchemaService = $nameSchemaService;
         // Union makes sure default settings are ignored if provided in argument
-        $this->settings = $settings + array(
+        $this->settings = $settings + [
             //'defaultSetting' => array(),
-        );
+        ];
         $this->permissionCriterionResolver = $permissionCriterionResolver;
         $this->logger = null !== $logger ? $logger : new NullLogger();
     }
@@ -148,17 +134,17 @@ class LocationService implements LocationServiceInterface
         } elseif ($contentReadCriterion !== true) {
             // Query if there are any content in subtree current user don't have access to
             $query = new Query(
-                array(
+                [
                     'limit' => 0,
                     'filter' => new CriterionLogicalAnd(
-                        array(
+                        [
                             new CriterionSubtree($loadedSubtree->pathString),
                             new CriterionLogicalNot($contentReadCriterion),
-                        )
+                        ]
                     ),
-                )
+                ]
             );
-            $result = $this->repository->getSearchService()->findContent($query, array(), false);
+            $result = $this->repository->getSearchService()->findContent($query, [], false);
             if ($result->totalCount > 0) {
                 throw new UnauthorizedException('content', 'read');
             }
@@ -325,17 +311,17 @@ class LocationService implements LocationServiceInterface
             throw new InvalidArgumentValue('limit', $limit);
         }
 
-        $childLocations = array();
+        $childLocations = [];
         $searchResult = $this->searchChildrenLocations($location, $offset, $limit, $prioritizedLanguages ?: []);
         foreach ($searchResult->searchHits as $searchHit) {
             $childLocations[] = $searchHit->valueObject;
         }
 
         return new LocationList(
-            array(
+            [
                 'locations' => $childLocations,
                 'totalCount' => $searchResult->totalCount,
-            )
+            ]
         );
     }
 
@@ -433,21 +419,29 @@ class LocationService implements LocationServiceInterface
      */
     public function createLocation(ContentInfo $contentInfo, LocationCreateStruct $locationCreateStruct)
     {
-        $content = $this->repository->getContentService()->loadContent($contentInfo->id);
-        $parentLocation = $this->loadLocation($locationCreateStruct->parentLocationId);
+        $content = $this->domainMapper->buildContentDomainObjectFromPersistence(
+            $this->persistenceHandler->contentHandler()->load($contentInfo->id),
+            $this->persistenceHandler->contentTypeHandler()->load($contentInfo->contentTypeId)
+        );
 
-        if (!$this->repository->canUser('content', 'manage_locations', $content->contentInfo)) {
+        $parentLocation = $this->domainMapper->buildLocation(
+            $this->persistenceHandler->locationHandler()->load($locationCreateStruct->parentLocationId)
+        );
+
+        $contentInfo = $content->contentInfo;
+
+        if (!$this->repository->canUser('content', 'manage_locations', $contentInfo, $parentLocation)) {
             throw new UnauthorizedException('content', 'manage_locations', ['contentId' => $contentInfo->id]);
         }
 
-        if (!$this->repository->canUser('content', 'create', $content->contentInfo, $parentLocation)) {
+        if (!$this->repository->canUser('content', 'create', $contentInfo, $parentLocation)) {
             throw new UnauthorizedException('content', 'create', ['locationId' => $parentLocation->id]);
         }
 
         // Check if the parent is a sub location of one of the existing content locations (this also solves the
         // situation where parent location actually one of the content locations),
         // or if the content already has location below given location create struct parent
-        $existingContentLocations = $this->loadLocations($content->contentInfo);
+        $existingContentLocations = $this->loadLocations($contentInfo);
         if (!empty($existingContentLocations)) {
             foreach ($existingContentLocations as $existingContentLocation) {
                 if (stripos($parentLocation->pathString, $existingContentLocation->pathString) !== false) {
@@ -468,15 +462,14 @@ class LocationService implements LocationServiceInterface
         $spiLocationCreateStruct = $this->domainMapper->buildSPILocationCreateStruct(
             $locationCreateStruct,
             $parentLocation,
-            $content->contentInfo->mainLocationId !== null ? $content->contentInfo->mainLocationId : true,
-            $content->contentInfo->id,
-            $content->contentInfo->currentVersionNo
+            $contentInfo->mainLocationId ?? true,
+            $contentInfo->id,
+            $contentInfo->currentVersionNo
         );
 
         $this->repository->beginTransaction();
         try {
             $newLocation = $this->persistenceHandler->locationHandler()->create($spiLocationCreateStruct);
-
             $urlAliasNames = $this->nameSchemaService->resolveUrlAliasSchema($content);
             foreach ($urlAliasNames as $languageCode => $name) {
                 $this->persistenceHandler->urlAliasHandler()->publishUrlAliasForLocation(
@@ -484,9 +477,9 @@ class LocationService implements LocationServiceInterface
                     $newLocation->parentId,
                     $name,
                     $languageCode,
-                    $content->contentInfo->alwaysAvailable,
+                    $contentInfo->alwaysAvailable,
                     // @todo: this is legacy storage specific for updating ezcontentobject_tree.path_identification_string, to be removed
-                    $languageCode === $content->contentInfo->mainLanguageCode
+                    $languageCode === $contentInfo->mainLanguageCode
                 );
             }
 
@@ -688,17 +681,17 @@ class LocationService implements LocationServiceInterface
         } elseif ($contentReadCriterion !== true) {
             // Query if there are any content in subtree current user don't have access to
             $query = new Query(
-                array(
+                [
                     'limit' => 0,
                     'filter' => new CriterionLogicalAnd(
-                        array(
+                        [
                             new CriterionSubtree($location->pathString),
                             new CriterionLogicalNot($contentReadCriterion),
-                        )
+                        ]
                     ),
-                )
+                ]
             );
-            $result = $this->repository->getSearchService()->findContent($query, array(), false);
+            $result = $this->repository->getSearchService()->findContent($query, [], false);
             if ($result->totalCount > 0) {
                 throw new UnauthorizedException('content', 'read');
             }
@@ -767,17 +760,17 @@ class LocationService implements LocationServiceInterface
         } elseif ($contentReadCriterion !== true) {
             // Query if there are any content in subtree current user don't have access to
             $query = new Query(
-                array(
+                [
                     'limit' => 0,
                     'filter' => new CriterionLogicalAnd(
-                        array(
+                        [
                             new CriterionSubtree($location->pathString),
                             new CriterionLogicalNot($contentReadCriterion),
-                        )
+                        ]
                     ),
-                )
+                ]
             );
-            $result = $this->repository->getSearchService()->findContent($query, array(), false);
+            $result = $this->repository->getSearchService()->findContent($query, [], false);
             if ($result->totalCount > 0) {
                 throw new UnauthorizedException('content', 'remove');
             }

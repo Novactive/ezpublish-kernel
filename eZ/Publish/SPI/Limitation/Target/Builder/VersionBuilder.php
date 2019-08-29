@@ -20,9 +20,7 @@ use eZ\Publish\SPI\Limitation\Target;
  */
 final class VersionBuilder
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $targetVersionProperties = [];
 
     public function build(): Target\Version
@@ -48,6 +46,28 @@ final class VersionBuilder
         }
 
         $this->targetVersionProperties['allLanguageCodesList'] = $languageCodes;
+
+        return $this;
+    }
+
+    /**
+     * Set intent to create Content from unspecified (yet) content type, any from the given list.
+     *
+     * @param int[] $contentTypeIds
+     *
+     * @return self
+     *
+     * @throws \eZ\Publish\API\Repository\Exceptions\InvalidArgumentException
+     */
+    public function createFromAnyContentTypeOf(array $contentTypeIds): self
+    {
+        foreach ($contentTypeIds as $contentTypeId) {
+            if (!\is_int($contentTypeId)) {
+                throw new InvalidArgumentException('$contentTypeIds', 'All contentType ids should be integers');
+            }
+        }
+
+        $this->targetVersionProperties['allContentTypeIdsList'] = $contentTypeIds;
 
         return $this;
     }

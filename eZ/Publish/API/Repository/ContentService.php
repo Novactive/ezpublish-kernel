@@ -9,6 +9,7 @@
 namespace eZ\Publish\API\Repository;
 
 use eZ\Publish\API\Repository\Values\Content\ContentUpdateStruct;
+use eZ\Publish\API\Repository\Values\Content\Language;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use eZ\Publish\API\Repository\Values\Content\ContentCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\ContentMetadataUpdateStruct;
@@ -200,7 +201,7 @@ interface ContentService
      *
      * @return \eZ\Publish\API\Repository\Values\Content\Content - the newly created content draft
      */
-    public function createContent(ContentCreateStruct $contentCreateStruct, array $locationCreateStructs = array());
+    public function createContent(ContentCreateStruct $contentCreateStruct, array $locationCreateStructs = []);
 
     /**
      * Updates the metadata.
@@ -285,10 +286,16 @@ interface ContentService
      * @throws \eZ\Publish\API\Repository\Exceptions\BadStateException if the version is not a draft
      *
      * @param \eZ\Publish\API\Repository\Values\Content\VersionInfo $versionInfo
+     * @param string[] $translations List of language codes of translations which will be included
+     *                               in a published version.
+     *                               By default all translations from the current version will be published.
+     *                               If the list is provided but does not cover all currently published translations,
+     *                               the missing ones will be copied from the currently published version,
+     *                               overriding those in the current version.
      *
      * @return \eZ\Publish\API\Repository\Values\Content\Content
      */
-    public function publishVersion(VersionInfo $versionInfo);
+    public function publishVersion(VersionInfo $versionInfo, array $translations = Language::ALL);
 
     /**
      * Removes the given version.
@@ -305,12 +312,14 @@ interface ContentService
      * Loads all versions for the given content.
      *
      * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException if the user is not allowed to list versions
+     * @throws \eZ\Publish\API\Repository\Exceptions\InvalidArgumentException if the given status is invalid
      *
      * @param \eZ\Publish\API\Repository\Values\Content\ContentInfo $contentInfo
+     * @param int|null $status
      *
      * @return \eZ\Publish\API\Repository\Values\Content\VersionInfo[] an array of {@link \eZ\Publish\API\Repository\Values\Content\VersionInfo} sorted by creation date
      */
-    public function loadVersions(ContentInfo $contentInfo);
+    public function loadVersions(ContentInfo $contentInfo, ?int $status = null);
 
     /**
      * Copies the content to a new location. If no version is given,
@@ -421,6 +430,9 @@ interface ContentService
 
     /**
      * Delete specified Translation from a Content Draft.
+     *
+     * When using together with ContentService::publishVersion() method, make sure to not provide deleted translation
+     * in translations array, as it is going to be copied again from published version.
      *
      * @throws \eZ\Publish\API\Repository\Exceptions\BadStateException if the specified Translation
      *         is the only one the Content Draft has or it is the main Translation of a Content Object.

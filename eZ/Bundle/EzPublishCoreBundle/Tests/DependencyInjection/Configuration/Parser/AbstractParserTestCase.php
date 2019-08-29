@@ -12,12 +12,10 @@ use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractExtensionTestCase;
 
 abstract class AbstractParserTestCase extends AbstractExtensionTestCase
 {
-    /**
-     * @var \eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\ConfigResolver
-     */
+    /** @var \eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\ConfigResolver */
     protected $configResolver;
 
-    protected function load(array $configurationValues = array())
+    protected function load(array $configurationValues = [])
     {
         parent::load($configurationValues);
         $this->configResolver = $this->container->get('ezpublish.config.resolver.core');

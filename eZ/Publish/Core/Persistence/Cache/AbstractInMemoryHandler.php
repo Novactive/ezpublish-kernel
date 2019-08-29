@@ -6,7 +6,7 @@
  */
 namespace eZ\Publish\Core\Persistence\Cache;
 
-use eZ\Publish\Core\Persistence\Cache\Adapter\InMemoryClearingProxyAdapter;
+use eZ\Publish\Core\Persistence\Cache\Adapter\TransactionAwareAdapterInterface;
 use eZ\Publish\Core\Persistence\Cache\InMemory\InMemoryCache;
 
 /**
@@ -20,13 +20,11 @@ abstract class AbstractInMemoryHandler
     /**
      * NOTE: Instance of this must be InMemoryClearingProxyAdapter in order for cache clearing to affect in-memory cache.
      *
-     * @var \eZ\Publish\Core\Persistence\Cache\Adapter\InMemoryClearingProxyAdapter
+     * @var \eZ\Publish\Core\Persistence\Cache\Adapter\TransactionAwareAdapterInterface
      */
     protected $cache;
 
-    /**
-     * @var \eZ\Publish\Core\Persistence\Cache\PersistenceLogger
-     */
+    /** @var \eZ\Publish\Core\Persistence\Cache\PersistenceLogger */
     protected $logger;
 
     /**
@@ -40,12 +38,12 @@ abstract class AbstractInMemoryHandler
     /**
      * Setups current handler with everything needed.
      *
-     * @param \eZ\Publish\Core\Persistence\Cache\Adapter\InMemoryClearingProxyAdapter $cache
+     * @param \eZ\Publish\Core\Persistence\Cache\Adapter\TransactionAwareAdapterInterface $cache
      * @param \eZ\Publish\Core\Persistence\Cache\PersistenceLogger $logger
      * @param \eZ\Publish\Core\Persistence\Cache\InMemory\InMemoryCache $inMemory
      */
     public function __construct(
-        InMemoryClearingProxyAdapter $cache,
+        TransactionAwareAdapterInterface $cache,
         PersistenceLogger $logger,
         InMemoryCache $inMemory
     ) {
@@ -97,9 +95,11 @@ abstract class AbstractInMemoryHandler
         }
 
         // Backend
+        // (log misses first in case of $backendLoader ends up throwing NotFound)
+        $this->logger->logCacheMiss($arguments ?: [$id], 3);
+
         $object = $backendLoader($id);
         $this->inMemory->setMulti([$object], $cacheIndexes);
-        $this->logger->logCacheMiss($arguments ?: [$id], 3);
         $this->cache->save(
             $cacheItem
                 ->set($object)
@@ -149,10 +149,11 @@ abstract class AbstractInMemoryHandler
         }
 
         // Backend
-        $objects = $backendLoader();
-        $this->inMemory->setMulti($objects, $cacheIndexes, $key);
+        // (log misses first in case of $backendLoader ends up throwing NotFound)
         $this->logger->logCacheMiss($arguments, 3);
 
+        $objects = $backendLoader();
+        $this->inMemory->setMulti($objects, $cacheIndexes, $key);
         if ($listTags !== null) {
             $tagSet = [$listTags()];
         } else {
@@ -264,6 +265,7 @@ abstract class AbstractInMemoryHandler
             }
         }
 
+        // Save cache & log miss (this method expects multi backend loader to return empty array over throwing NotFound)
         $this->inMemory->setMulti($loaded, $cacheIndexes);
         unset($loaded, $backendLoadedList);
         $this->logger->logCacheMiss($arguments ?: $cacheMisses, 3);

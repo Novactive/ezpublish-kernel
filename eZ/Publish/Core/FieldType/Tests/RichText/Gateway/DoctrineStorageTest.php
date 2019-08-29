@@ -17,9 +17,7 @@ use eZ\Publish\Core\Persistence\Legacy\Tests\TestCase;
  */
 class DoctrineStorageTest extends TestCase
 {
-    /**
-     * @var \eZ\Publish\Core\FieldType\RichText\RichTextStorage\Gateway\DoctrineStorage
-     */
+    /** @var \eZ\Publish\Core\FieldType\RichText\RichTextStorage\Gateway\DoctrineStorage */
     protected $storageGateway;
 
     public function testGetContentIds()
@@ -29,16 +27,16 @@ class DoctrineStorageTest extends TestCase
         $gateway = $this->getStorageGateway();
 
         $this->assertEquals(
-            array(
+            [
                 'f5c88a2209584891056f987fd965b0ba' => 4,
                 'faaeb9be3bd98ed09f606fc16d144eca' => 10,
-            ),
+            ],
             $gateway->getContentIds(
-                array(
+                [
                     'f5c88a2209584891056f987fd965b0ba',
                     'faaeb9be3bd98ed09f606fc16d144eca',
                     'fake',
-                )
+                ]
             )
         );
     }

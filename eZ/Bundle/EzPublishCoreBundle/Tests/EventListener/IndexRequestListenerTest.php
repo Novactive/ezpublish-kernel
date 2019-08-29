@@ -18,29 +18,19 @@ use PHPUnit\Framework\TestCase;
 
 class IndexRequestListenerTest extends TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $configResolver;
 
-    /**
-     * @var IndexRequestListener
-     */
+    /** @var IndexRequestListener */
     private $indexRequestEventListener;
 
-    /**
-     * @var Request
-     */
+    /** @var Request */
     private $request;
 
-    /**
-     * @var GetResponseEvent
-     */
+    /** @var GetResponseEvent */
     private $event;
 
-    /**
-     * @var HttpKernelInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var HttpKernelInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $httpKernel;
 
     protected function setUp()
@@ -53,7 +43,7 @@ class IndexRequestListenerTest extends TestCase
 
         $this->request = $this
             ->getMockBuilder(Request::class)
-            ->setMethods(array('getSession', 'hasSession'))
+            ->setMethods(['getSession', 'hasSession'])
             ->getMock();
 
         $this->httpKernel = $this->createMock(HttpKernelInterface::class);
@@ -67,11 +57,11 @@ class IndexRequestListenerTest extends TestCase
     public function testSubscribedEvents()
     {
         $this->assertSame(
-            array(
-                KernelEvents::REQUEST => array(
-                    array('onKernelRequestIndex', 40),
-                ),
-            ),
+            [
+                KernelEvents::REQUEST => [
+                    ['onKernelRequestIndex', 40],
+                ],
+            ],
             $this->indexRequestEventListener->getSubscribedEvents()
         );
     }
@@ -94,15 +84,15 @@ class IndexRequestListenerTest extends TestCase
 
     public function indexPageProvider()
     {
-        return array(
-            array('/', '/foo', '/foo'),
-            array('/', '/foo/', '/foo/'),
-            array('/', '/foo/bar', '/foo/bar'),
-            array('/', 'foo/bar', '/foo/bar'),
-            array('', 'foo/bar', '/foo/bar'),
-            array('', '/foo/bar', '/foo/bar'),
-            array('', '/foo/bar/', '/foo/bar/'),
-        );
+        return [
+            ['/', '/foo', '/foo'],
+            ['/', '/foo/', '/foo/'],
+            ['/', '/foo/bar', '/foo/bar'],
+            ['/', 'foo/bar', '/foo/bar'],
+            ['', 'foo/bar', '/foo/bar'],
+            ['', '/foo/bar', '/foo/bar'],
+            ['', '/foo/bar/', '/foo/bar/'],
+        ];
     }
 
     public function testOnKernelRequestIndexNotOnIndexPage()

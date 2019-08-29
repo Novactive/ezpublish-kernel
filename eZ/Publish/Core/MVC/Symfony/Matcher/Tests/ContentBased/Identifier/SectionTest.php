@@ -16,9 +16,7 @@ use eZ\Publish\API\Repository\Repository;
 
 class SectionTest extends BaseTest
 {
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\Matcher\ContentBased\Identifier\Section
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\Matcher\ContentBased\Identifier\Section */
     private $matcher;
 
     protected function setUp()
@@ -44,9 +42,9 @@ class SectionTest extends BaseTest
                     $this
                         ->getMockBuilder(Section::class)
                         ->setConstructorArgs(
-                            array(
-                                array('identifier' => $sectionIdentifier),
-                            )
+                            [
+                                ['identifier' => $sectionIdentifier],
+                            ]
                         )
                         ->getMockForAbstractClass()
                 )
@@ -96,28 +94,28 @@ class SectionTest extends BaseTest
 
     public function matchSectionProvider()
     {
-        return array(
-            array(
+        return [
+            [
                 'foo',
                 $this->generateRepositoryMockForSectionIdentifier('foo'),
                 true,
-            ),
-            array(
+            ],
+            [
                 'foo',
                 $this->generateRepositoryMockForSectionIdentifier('bar'),
                 false,
-            ),
-            array(
-                array('foo', 'baz'),
+            ],
+            [
+                ['foo', 'baz'],
                 $this->generateRepositoryMockForSectionIdentifier('bar'),
                 false,
-            ),
-            array(
-                array('foo', 'baz'),
+            ],
+            [
+                ['foo', 'baz'],
                 $this->generateRepositoryMockForSectionIdentifier('baz'),
                 true,
-            ),
-        );
+            ],
+        ];
     }
 
     /**

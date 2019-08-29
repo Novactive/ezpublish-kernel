@@ -66,7 +66,7 @@ class ParentDepthLimitationType extends AbstractPersistenceLimitationType implem
      */
     public function validate(APILimitationValue $limitationValue)
     {
-        $validationErrors = array();
+        $validationErrors = [];
 
         return $validationErrors;
     }
@@ -80,7 +80,7 @@ class ParentDepthLimitationType extends AbstractPersistenceLimitationType implem
      */
     public function buildValue(array $limitationValues)
     {
-        return new APIParentDepthLimitation(array('limitationValues' => $limitationValues));
+        return new APIParentDepthLimitation(['limitationValues' => $limitationValues]);
     }
 
     /**
@@ -170,21 +170,24 @@ class ParentDepthLimitationType extends AbstractPersistenceLimitationType implem
         if (empty($targets)) {
             return false;
         }
-
+        $hasMandatoryTarget = false;
         foreach ($targets as $target) {
-            if (!$target instanceof LocationCreateStruct) {
-                throw new InvalidArgumentException(
-                    '$targets',
-                    'If $object is ContentCreateStruct must contain objects of type: LocationCreateStruct'
-                );
-            }
+            if ($target instanceof LocationCreateStruct) {
+                $hasMandatoryTarget = true;
+                $depth = $this->persistence->locationHandler()->load($target->parentLocationId)->depth;
 
-            $depth = $this->persistence->locationHandler()->load($target->parentLocationId)->depth;
-
-            // All placements must match
-            if (!in_array($depth, $value->limitationValues)) {
-                return false;
+                // All placements must match
+                if (!in_array($depth, $value->limitationValues)) {
+                    return false;
+                }
             }
+        }
+
+        if (false === $hasMandatoryTarget) {
+            throw new InvalidArgumentException(
+                '$targets',
+                'If $object is ContentCreateStruct must contain objects of type: LocationCreateStruct'
+            );
         }
 
         return true;

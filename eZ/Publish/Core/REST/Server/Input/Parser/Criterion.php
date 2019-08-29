@@ -17,14 +17,12 @@ use eZ\Publish\Core\REST\Common\Exceptions;
  */
 abstract class Criterion extends BaseParser
 {
-    /**
-     * @var array
-     */
-    protected static $criterionIdMap = array(
+    /** @var array */
+    protected static $criterionIdMap = [
         'AND' => 'LogicalAnd',
         'OR' => 'LogicalOr',
         'NOT' => 'LogicalNot',
-    );
+    ];
 
     /**
      * Dispatches parsing of a criterion name + data to its own parser.
@@ -41,7 +39,7 @@ abstract class Criterion extends BaseParser
     {
         $mediaType = $this->getCriterionMediaType($criterionName);
         try {
-            return $parsingDispatcher->parse(array($criterionName => $criterionData), $mediaType);
+            return $parsingDispatcher->parse([$criterionName => $criterionData], $mediaType);
         } catch (Exceptions\Parser $e) {
             throw new Exceptions\Parser("Invalid Criterion id <$criterionName> in <AND>", 0, $e);
         }
@@ -63,7 +61,7 @@ abstract class Criterion extends BaseParser
         $mediaType = $this->getFacetBuilderMediaType($facetBuilderName);
 
         try {
-            return $parsingDispatcher->parse(array($facetBuilderName => $facetBuilderData), $mediaType);
+            return $parsingDispatcher->parse([$facetBuilderName => $facetBuilderData], $mediaType);
         } catch (Exceptions\Parser $e) {
             throw new Exceptions\Parser("Invalid FacetBuilder id <${facetBuilderName}>", 0, $e);
         }
@@ -84,7 +82,7 @@ abstract class Criterion extends BaseParser
     {
         $mediaType = $this->getSortClauseMediaType($sortClauseName);
 
-        return $parsingDispatcher->parse(array($sortClauseName => $direction), $mediaType);
+        return $parsingDispatcher->parse([$sortClauseName => $direction], $mediaType);
     }
 
     protected function getCriterionMediaType($criterionName)

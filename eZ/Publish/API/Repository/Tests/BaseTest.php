@@ -40,14 +40,10 @@ abstract class BaseTest extends TestCase
      */
     const DB_INT_MAX = 2147483647;
 
-    /**
-     * @var \eZ\Publish\API\Repository\Tests\SetupFactory
-     */
+    /** @var \eZ\Publish\API\Repository\Tests\SetupFactory */
     private $setupFactory;
 
-    /**
-     * @var \eZ\Publish\API\Repository\Repository
-     */
+    /** @var \eZ\Publish\API\Repository\Repository */
     private $repository;
 
     protected function setUp()
@@ -248,7 +244,7 @@ abstract class BaseTest extends TestCase
      * @param \eZ\Publish\API\Repository\Values\ValueObject $actualObject
      * @param array $propertyNames
      */
-    protected function assertStructPropertiesCorrect(ValueObject $expectedValues, ValueObject $actualObject, array $additionalProperties = array())
+    protected function assertStructPropertiesCorrect(ValueObject $expectedValues, ValueObject $actualObject, array $additionalProperties = [])
     {
         foreach ($expectedValues as $propertyName => $propertyValue) {
             if ($propertyValue instanceof ValueObject) {
@@ -339,7 +335,7 @@ abstract class BaseTest extends TestCase
         $group = $userService->loadUserGroup($editorsGroupId);
 
         // Create a new user instance.
-        $user = $userService->createUser($userCreate, array($group));
+        $user = $userService->createUser($userCreate, [$group]);
         /* END: Inline */
 
         return $user;
@@ -357,7 +353,7 @@ abstract class BaseTest extends TestCase
         return $this->createCustomUserVersion1(
             'Media Editor',
             'Editor',
-            new SubtreeLimitation(array('limitationValues' => array('/1/43/')))
+            new SubtreeLimitation(['limitationValues' => ['/1/43/']])
         );
     }
 
@@ -436,7 +432,7 @@ abstract class BaseTest extends TestCase
         $userCreate->setField('last_name', ucfirst($login));
 
         // Create a new user instance.
-        $user = $userService->createUser($userCreate, array($userGroup));
+        $user = $userService->createUser($userCreate, [$userGroup]);
         /* END: Inline */
 
         return $user;
@@ -475,7 +471,7 @@ abstract class BaseTest extends TestCase
         $userCreate->setField('last_name', $lastName);
 
         // Create a new user instance.
-        $user = $userService->createUser($userCreate, array($userGroup));
+        $user = $userService->createUser($userCreate, [$userGroup]);
 
         return $user;
     }
@@ -581,6 +577,7 @@ abstract class BaseTest extends TestCase
      *
      * @param string $login
      * @param array $policiesData list of policies in the form of <code>[ [ 'module' => 'name', 'function' => 'name'] ]</code>
+     * @param \eZ\Publish\API\Repository\Values\User\Limitation\RoleLimitation|null $roleLimitation
      *
      * @return \eZ\Publish\API\Repository\Values\User\User
      *
@@ -588,7 +585,7 @@ abstract class BaseTest extends TestCase
      * @throws \eZ\Publish\API\Repository\Exceptions\NotFoundException
      * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException
      */
-    public function createUserWithPolicies($login, array $policiesData)
+    public function createUserWithPolicies($login, array $policiesData, RoleLimitation $roleLimitation = null)
     {
         $repository = $this->getRepository(false);
         $roleService = $repository->getRoleService();
@@ -607,7 +604,7 @@ abstract class BaseTest extends TestCase
             $user = $userService->createUser($userCreateStruct, [$userService->loadUserGroup(4)]);
 
             $role = $this->createRoleWithPolicies(uniqid('role_for_' . $login . '_', true), $policiesData);
-            $roleService->assignRoleToUser($role, $user);
+            $roleService->assignRoleToUser($role, $user, $roleLimitation);
 
             $repository->commit();
 

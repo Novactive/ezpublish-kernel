@@ -15,9 +15,7 @@ use eZ\Publish\Core\MVC\Symfony\Matcher\Tests\ContentBased\BaseTest;
 
 class SectionTest extends BaseTest
 {
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\Matcher\ContentBased\Id\Section
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\Matcher\ContentBased\Id\Section */
     private $matcher;
 
     protected function setUp()
@@ -43,28 +41,28 @@ class SectionTest extends BaseTest
 
     public function matchLocationProvider()
     {
-        return array(
-            array(
+        return [
+            [
                 123,
                 $this->generateLocationForSectionId(123),
                 true,
-            ),
-            array(
+            ],
+            [
                 123,
                 $this->generateLocationForSectionId(456),
                 false,
-            ),
-            array(
-                array(123, 789),
+            ],
+            [
+                [123, 789],
                 $this->generateLocationForSectionId(456),
                 false,
-            ),
-            array(
-                array(123, 789),
+            ],
+            [
+                [123, 789],
                 $this->generateLocationForSectionId(789),
                 true,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -82,7 +80,7 @@ class SectionTest extends BaseTest
             ->method('getContentInfo')
             ->will(
                 $this->returnValue(
-                    $this->getContentInfoMock(array('sectionId' => $sectionId))
+                    $this->getContentInfoMock(['sectionId' => $sectionId])
                 )
             );
 
@@ -106,27 +104,27 @@ class SectionTest extends BaseTest
 
     public function matchContentInfoProvider()
     {
-        return array(
-            array(
+        return [
+            [
                 123,
-                $this->getContentInfoMock(array('sectionId' => 123)),
+                $this->getContentInfoMock(['sectionId' => 123]),
                 true,
-            ),
-            array(
+            ],
+            [
                 123,
-                $this->getContentInfoMock(array('sectionId' => 456)),
+                $this->getContentInfoMock(['sectionId' => 456]),
                 false,
-            ),
-            array(
-                array(123, 789),
-                $this->getContentInfoMock(array('sectionId' => 456)),
+            ],
+            [
+                [123, 789],
+                $this->getContentInfoMock(['sectionId' => 456]),
                 false,
-            ),
-            array(
-                array(123, 789),
-                $this->getContentInfoMock(array('sectionId' => 789)),
+            ],
+            [
+                [123, 789],
+                $this->getContentInfoMock(['sectionId' => 789]),
                 true,
-            ),
-        );
+            ],
+        ];
     }
 }

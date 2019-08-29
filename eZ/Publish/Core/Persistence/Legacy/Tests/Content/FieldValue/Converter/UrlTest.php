@@ -20,9 +20,7 @@ use PHPUnit\Framework\TestCase;
  */
 class UrlTest extends TestCase
 {
-    /**
-     * @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\UrlConverter
-     */
+    /** @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\UrlConverter */
     protected $converter;
 
     protected function setUp()
@@ -40,7 +38,7 @@ class UrlTest extends TestCase
     {
         $value = new FieldValue();
         $text = 'eZ Systems';
-        $value->data = array('text' => $text);
+        $value->data = ['text' => $text];
         $value->externalData = 'http://ez.no/';
         $value->sortKey = false;
         $storageFieldValue = new StorageFieldValue();

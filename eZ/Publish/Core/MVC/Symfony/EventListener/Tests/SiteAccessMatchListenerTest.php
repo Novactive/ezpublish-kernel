@@ -24,24 +24,16 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class SiteAccessMatchListenerTest extends TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $saRouter;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $userHashMatcher;
 
-    /**
-     * @var SiteAccessMatchListener
-     */
+    /** @var SiteAccessMatchListener */
     private $listener;
 
     protected function setUp()
@@ -56,7 +48,7 @@ class SiteAccessMatchListenerTest extends TestCase
     public function testGetSubscribedEvents()
     {
         $this->assertSame(
-            array(KernelEvents::REQUEST => array('onKernelRequest', 45)),
+            [KernelEvents::REQUEST => ['onKernelRequest', 45]],
             SiteAccessMatchListener::getSubscribedEvents()
         );
     }
@@ -171,7 +163,7 @@ class SiteAccessMatchListenerTest extends TestCase
             ->will($this->returnValue(false));
 
         $simplifiedRequest = new SimplifiedRequest(
-            array(
+            [
                 'scheme' => $request->getScheme(),
                 'host' => $request->getHost(),
                 'port' => $request->getPort(),
@@ -179,7 +171,7 @@ class SiteAccessMatchListenerTest extends TestCase
                 'queryParams' => $request->query->all(),
                 'languages' => $request->getLanguages(),
                 'headers' => $request->headers->all(),
-            )
+            ]
         );
         $this->saRouter
             ->expects($this->once())
@@ -220,7 +212,7 @@ class SiteAccessMatchListenerTest extends TestCase
             ->will($this->returnValue(true));
 
         $simplifiedRequest = new SimplifiedRequest(
-            array(
+            [
                 'scheme' => $originalRequest->getScheme(),
                 'host' => $originalRequest->getHost(),
                 'port' => $originalRequest->getPort(),
@@ -228,7 +220,7 @@ class SiteAccessMatchListenerTest extends TestCase
                 'queryParams' => $originalRequest->query->all(),
                 'languages' => $originalRequest->getLanguages(),
                 'headers' => $originalRequest->headers->all(),
-            )
+            ]
         );
         $this->saRouter
             ->expects($this->once())

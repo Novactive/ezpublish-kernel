@@ -22,9 +22,7 @@ use InvalidArgumentException;
  */
 class ClassNameMatcherFactory implements MatcherFactoryInterface
 {
-    /**
-     * @var \eZ\Publish\API\Repository\Repository
-     */
+    /** @var \eZ\Publish\API\Repository\Repository */
     protected $repository;
 
     /**
@@ -35,9 +33,7 @@ class ClassNameMatcherFactory implements MatcherFactoryInterface
      */
     protected $matchConfig;
 
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\Matcher\MatcherInterface[]
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\Matcher\MatcherInterface[] */
     protected $matchers = [];
 
     /**
@@ -136,7 +132,7 @@ class ClassNameMatcherFactory implements MatcherFactoryInterface
             }
 
             if ($hasMatched) {
-                return $this->alreadyMatched[$viewType][$view] = $configHash + array('matcher' => $matcher);
+                return $this->alreadyMatched[$viewType][$view] = $configHash + ['matcher' => $matcher];
             }
         }
 

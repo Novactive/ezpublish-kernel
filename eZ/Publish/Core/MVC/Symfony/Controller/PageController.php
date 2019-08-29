@@ -21,14 +21,10 @@ use eZ\Publish\Core\MVC\Symfony\View\BlockView;
  */
 class PageController extends Controller
 {
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\View\Manager
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\View\Manager */
     private $viewManager;
 
-    /**
-     * @var \eZ\Publish\Core\FieldType\Page\PageService
-     */
+    /** @var \eZ\Publish\Core\FieldType\Page\PageService */
     protected $pageService;
 
     public function __construct(ViewManager $viewManager, PageService $pageService)
@@ -68,7 +64,7 @@ class PageController extends Controller
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function viewBlock(Block $block, array $params = array(), array $cacheSettings = array())
+    public function viewBlock(Block $block, array $params = [], array $cacheSettings = [])
     {
         $response = new Response();
         if ($this->getParameter('content.view_cache') === true) {
@@ -90,11 +86,11 @@ class PageController extends Controller
         $response->setContent(
             $this->viewManager->renderBlock(
                 $block,
-                $params + array(
+                $params + [
                     // @deprecated pageService injection will be removed in 6.0.
                     'pageService' => $this->pageService,
                     'valid_items' => $this->pageService->getValidBlockItems($block),
-                )
+                ]
             )
         );
 
@@ -117,7 +113,7 @@ class PageController extends Controller
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function viewBlockById($id, array $params = array(), array $cacheSettings = array())
+    public function viewBlockById($id, array $params = [], array $cacheSettings = [])
     {
         return $this->viewBlock(
             $this->pageService->loadBlock($id),

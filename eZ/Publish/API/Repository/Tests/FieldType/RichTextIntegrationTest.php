@@ -17,7 +17,6 @@ use eZ\Publish\API\Repository\Values\Content\Field;
 use DOMDocument;
 use eZ\Publish\Core\Repository\Values\Content\Relation;
 use eZ\Publish\API\Repository\Values\Content\Content;
-use eZ\Publish\SPI\FieldType\ValidationError;
 
 /**
  * Integration test for use field type.
@@ -29,17 +28,13 @@ class RichTextIntegrationTest extends SearchBaseIntegrationTest
 {
     use RelationSearchBaseIntegrationTestTrait;
 
-    /**
-     * @var \DOMDocument
-     */
+    /** @var \DOMDocument */
     private $createdDOMValue;
 
-    /**
-     * @var \DOMDocument
-     */
+    /** @var \DOMDocument */
     private $updatedDOMValue;
 
-    public function __construct($name = null, array $data = array(), $dataName = '')
+    public function __construct($name = null, array $data = [], $dataName = '')
     {
         $this->createdDOMValue = new DOMDocument();
         $this->createdDOMValue->loadXML(<<<EOT
@@ -80,29 +75,29 @@ EOT
     {
         $contentService = $this->getRepository()->getContentService();
 
-        return array(
+        return [
             new Relation(
-                array(
+                [
                     'type' => Relation::LINK,
                     'sourceContentInfo' => $content->contentInfo,
                     'destinationContentInfo' => $contentService->loadContentInfo(56),
-                )
+                ]
             ),
             new Relation(
-                array(
+                [
                     'type' => Relation::LINK,
                     'sourceContentInfo' => $content->contentInfo,
                     'destinationContentInfo' => $contentService->loadContentInfo(54),
-                )
+                ]
             ),
             new Relation(
-                array(
+                [
                     'type' => Relation::EMBED,
                     'sourceContentInfo' => $content->contentInfo,
                     'destinationContentInfo' => $contentService->loadContentInfo(58),
-                )
+                ]
             ),
-        );
+        ];
     }
 
     /**
@@ -114,31 +109,31 @@ EOT
     {
         $contentService = $this->getRepository()->getContentService();
 
-        return array(
+        return [
             new Relation(
-                array(
+                [
                     'type' => Relation::LINK,
                     'sourceContentInfo' => $content->contentInfo,
                     'destinationContentInfo' => $contentService->loadContentInfo(58),
-                )
+                ]
             ),
             new Relation(
-                array(
+                [
                     'type' => Relation::LINK,
                     'sourceContentInfo' => $content->contentInfo,
                     'destinationContentInfo' => $contentService->loadContentInfo(56),
-                )
+                ]
             ),
             new Relation(
-                array(
+                [
                     // @todo Won't be possible to add before we break how we store relations with legacy kernel.
                     //'sourceFieldDefinitionIdentifier' => 'data',
                     'type' => Relation::EMBED,
                     'sourceContentInfo' => $content->contentInfo,
                     'destinationContentInfo' => $contentService->loadContentInfo(54),
-                )
+                ]
             ),
-        );
+        ];
     }
 
     /**
@@ -178,9 +173,9 @@ EOT
      */
     public function getInvalidFieldSettings()
     {
-        return array(
+        return [
             'somethingUnknown' => 0,
-        );
+        ];
     }
 
     /**
@@ -190,7 +185,7 @@ EOT
      */
     public function getValidatorSchema()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -200,7 +195,7 @@ EOT
      */
     public function getValidValidatorConfiguration()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -210,9 +205,9 @@ EOT
      */
     public function getInvalidValidatorConfiguration()
     {
-        return array(
-            'unknown' => array('value' => 23),
-        );
+        return [
+            'unknown' => ['value' => 23],
+        ];
     }
 
     /**
@@ -251,9 +246,9 @@ EOT
         );
 
         $this->assertPropertiesCorrect(
-            array(
+            [
                 'xml' => $this->createdDOMValue,
-            ),
+            ],
             $field->value
         );
     }
@@ -281,12 +276,12 @@ EOT
      */
     public function provideInvalidCreationFieldData()
     {
-        return array(
-            array(
+        return [
+            [
                 new \stdClass(),
                 'eZ\\Publish\\Core\\Base\\Exceptions\\InvalidArgumentType',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -314,9 +309,9 @@ EOT
         );
 
         $this->assertPropertiesCorrect(
-            array(
+            [
                 'xml' => $this->updatedDOMValue,
-            ),
+            ],
             $field->value
         );
     }
@@ -363,9 +358,9 @@ EOT
         );
 
         $this->assertPropertiesCorrect(
-            array(
+            [
                 'xml' => $this->createdDOMValue,
-            ),
+            ],
             $field->value
         );
     }
@@ -402,12 +397,12 @@ EOT
 EOT
         );
 
-        return array(
-            array(
+        return [
+            [
                 new RichTextValue($xml),
-                array('xml' => $xml->saveXML()),
-            ),
-        );
+                ['xml' => $xml->saveXML()],
+            ],
+        ];
     }
 
     /**
@@ -419,9 +414,9 @@ EOT
      */
     public function provideFromHashData()
     {
-        return array(
-            array(
-                array(
+        return [
+            [
+                [
                     'xml' => <<<EOT
 <?xml version="1.0" encoding="UTF-8"?>
 <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ezxhtml="http://ez.no/xmlns/ezpublish/docbook/xhtml" xmlns:ezcustom="http://ez.no/xmlns/ezpublish/docbook/custom" version="5.0-variant ezpublish-1.0">
@@ -430,9 +425,9 @@ EOT
 </section>
 
 EOT
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -463,10 +458,10 @@ EOT
 <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ezxhtml="http://ez.no/xmlns/ezpublish/docbook/xhtml" xmlns:ezcustom="http://ez.no/xmlns/ezpublish/docbook/custom" version="5.0-variant ezpublish-1.0"/>
 EOT;
 
-        return array(
-            array(new RichTextValue()),
-            array(new RichTextValue($xml)),
-        );
+        return [
+            [new RichTextValue()],
+            [new RichTextValue($xml)],
+        ];
     }
 
     public function providerForTestIsNotEmptyValue()
@@ -482,13 +477,13 @@ EOT;
 </section>
 EOT;
 
-        return array(
-            array(
+        return [
+            [
                 $this->getValidCreationFieldData(),
-            ),
-            array(new RichTextValue($xml)),
-            array(new RichTextValue($xml2)),
-        );
+            ],
+            [new RichTextValue($xml)],
+            [new RichTextValue($xml2)],
+        ];
     }
 
     /**
@@ -503,8 +498,8 @@ EOT;
         $remoteId = '[RemoteId]';
         $objectId = '[ObjectId]';
 
-        return array(
-            array(
+        return [
+            [
                 // test link
                 '<?xml version="1.0" encoding="utf-8"?>
 <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ezxhtml="http://ez.no/xmlns/ezpublish/docbook/xhtml" xmlns:ezcustom="http://ez.no/xmlns/ezpublish/docbook/custom" version="5.0-variant ezpublish-1.0">
@@ -519,7 +514,7 @@ EOT;
     </para>
 </section>
 ',
-            ), /*, @TODO adapt and enable when embeds are implemented with remote id support
+            ], /*, @TODO adapt and enable when embeds are implemented with remote id support
             array(
                 // test embed
             '<?xml version="1.0" encoding="utf-8"?>
@@ -552,7 +547,7 @@ EOT;
 </section>'
             ),
 */
-        );
+        ];
     }
 
     /**
@@ -572,19 +567,19 @@ EOT;
         $createStruct = $contentTypeService->newContentTypeCreateStruct('test-RichText');
         $createStruct->mainLanguageCode = 'eng-GB';
         $createStruct->remoteId = 'test-RichText-abcdefghjklm9876543210';
-        $createStruct->names = array('eng-GB' => 'Test');
+        $createStruct->names = ['eng-GB' => 'Test'];
         $createStruct->creatorId = $repository->getCurrentUser()->id;
         $createStruct->creationDate = $this->createDateTime();
 
         $fieldCreate = $contentTypeService->newFieldDefinitionCreateStruct('description', 'ezrichtext');
-        $fieldCreate->names = array('eng-GB' => 'Title');
+        $fieldCreate->names = ['eng-GB' => 'Title'];
         $fieldCreate->fieldGroup = 'main';
         $fieldCreate->position = 1;
         $fieldCreate->isTranslatable = true;
         $createStruct->addFieldDefinition($fieldCreate);
 
         $contentGroup = $contentTypeService->loadContentTypeGroupByIdentifier('Content');
-        $contentTypeDraft = $contentTypeService->createContentType($createStruct, array($contentGroup));
+        $contentTypeDraft = $contentTypeService->createContentType($createStruct, [$contentGroup]);
 
         $contentTypeService->publishContentTypeDraft($contentTypeDraft);
         $testContentType = $contentTypeService->loadContentType($contentTypeDraft->id);
@@ -598,7 +593,7 @@ EOT;
         $createStruct->setField('name', 'Folder Link');
         $draft = $contentService->createContent(
             $createStruct,
-            array($locationService->newLocationCreateStruct(2))
+            [$locationService->newLocationCreateStruct(2)]
         );
 
         $folder = $contentService->publishVersion(
@@ -614,7 +609,7 @@ EOT;
         $testStruct->setField('description', str_replace('[RemoteId]', $remoteId, $test));
         $test = $contentService->createContent(
             $testStruct,
-            array($locationService->newLocationCreateStruct($locationId))
+            [$locationService->newLocationCreateStruct($locationId)]
         );
 
         $this->assertEquals(
@@ -898,8 +893,8 @@ EOT;
 
     protected function getFullTextIndexedFieldData()
     {
-        return array(
-            array('mediocrity', 'analysis'),
-        );
+        return [
+            ['mediocrity', 'analysis'],
+        ];
     }
 }

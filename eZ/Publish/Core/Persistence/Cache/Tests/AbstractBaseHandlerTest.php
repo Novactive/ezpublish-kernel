@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace eZ\Publish\Core\Persistence\Cache\Tests;
 
-use eZ\Publish\Core\Persistence\Cache\Adapter\InMemoryClearingProxyAdapter;
+use eZ\Publish\Core\Persistence\Cache\Adapter\TransactionalCacheAdapterDecorator;
 use eZ\Publish\Core\Persistence\Cache\Handler as CacheHandler;
 use eZ\Publish\Core\Persistence\Cache\SectionHandler as CacheSectionHandler;
 use eZ\Publish\Core\Persistence\Cache\LocationHandler as CacheLocationHandler;
@@ -24,6 +24,7 @@ use eZ\Publish\Core\Persistence\Cache\URLHandler as CacheUrlHandler;
 use eZ\Publish\Core\Persistence\Cache\BookmarkHandler as CacheBookmarkHandler;
 use eZ\Publish\Core\Persistence\Cache\NotificationHandler as CacheNotificationHandler;
 use eZ\Publish\Core\Persistence\Cache\UserPreferenceHandler as CacheUserPreferenceHandler;
+use eZ\Publish\Core\Persistence\Cache\UrlWildcardHandler as CacheUrlWildcardHandler;
 use eZ\Publish\Core\Persistence\Cache\InMemory\InMemoryCache;
 use eZ\Publish\Core\Persistence\Cache\PersistenceLogger;
 use eZ\Publish\SPI\Persistence\Handler;
@@ -35,34 +36,22 @@ use PHPUnit\Framework\TestCase;
  */
 abstract class AbstractBaseHandlerTest extends TestCase
 {
-    /**
-     * @var \eZ\Publish\Core\Persistence\Cache\Adapter\InMemoryClearingProxyAdapter|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \eZ\Publish\Core\Persistence\Cache\Adapter\TransactionalCacheAdapterDecorator|\PHPUnit\Framework\MockObject\MockObject */
     protected $cacheMock;
 
-    /**
-     * @var \eZ\Publish\SPI\Persistence\Handler|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \eZ\Publish\SPI\Persistence\Handler|\PHPUnit\Framework\MockObject\MockObject */
     protected $persistenceHandlerMock;
 
-    /**
-     * @var \eZ\Publish\Core\Persistence\Cache\Handler
-     */
+    /** @var \eZ\Publish\Core\Persistence\Cache\Handler */
     protected $persistenceCacheHandler;
 
-    /**
-     * @var \eZ\Publish\Core\Persistence\Cache\PersistenceLogger|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \eZ\Publish\Core\Persistence\Cache\PersistenceLogger|\PHPUnit\Framework\MockObject\MockObject */
     protected $loggerMock;
 
-    /**
-     * @var \eZ\Publish\Core\Persistence\Cache\InMemory\InMemoryCache|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \eZ\Publish\Core\Persistence\Cache\InMemory\InMemoryCache|\PHPUnit\Framework\MockObject\MockObject */
     protected $inMemoryMock;
 
-    /**
-     * @var \Closure
-     */
+    /** @var \Closure */
     protected $cacheItemsClosure;
 
     /**
@@ -73,7 +62,7 @@ abstract class AbstractBaseHandlerTest extends TestCase
         parent::setUp();
 
         $this->persistenceHandlerMock = $this->createMock(Handler::class);
-        $this->cacheMock = $this->createMock(InMemoryClearingProxyAdapter::class);
+        $this->cacheMock = $this->createMock(TransactionalCacheAdapterDecorator::class);
         $this->loggerMock = $this->createMock(PersistenceLogger::class);
         $this->inMemoryMock = $this->createMock(InMemoryCache::class);
 
@@ -93,6 +82,7 @@ abstract class AbstractBaseHandlerTest extends TestCase
             new CacheBookmarkHandler($this->cacheMock, $this->persistenceHandlerMock, $this->loggerMock),
             new CacheNotificationHandler($this->cacheMock, $this->persistenceHandlerMock, $this->loggerMock),
             new CacheUserPreferenceHandler($this->cacheMock, $this->loggerMock, $this->inMemoryMock, $this->persistenceHandlerMock),
+            new CacheUrlWildcardHandler($this->cacheMock, $this->persistenceHandlerMock, $this->loggerMock),
             $this->loggerMock
         );
 

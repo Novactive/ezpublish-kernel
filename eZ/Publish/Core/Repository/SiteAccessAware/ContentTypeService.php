@@ -20,7 +20,7 @@ use eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use eZ\Publish\API\Repository\Values\User\User;
-use eZ\Publish\Core\Repository\SiteAccessAware\Language\LanguageResolver;
+use eZ\Publish\API\Repository\LanguageResolver;
 
 /**
  * SiteAccess aware implementation of ContentTypeService injecting languages where needed.
@@ -30,14 +30,14 @@ class ContentTypeService implements ContentTypeServiceInterface
     /** @var \eZ\Publish\API\Repository\ContentTypeService */
     protected $service;
 
-    /** @var \eZ\Publish\Core\Repository\SiteAccessAware\Language\LanguageResolver */
+    /** @var \eZ\Publish\API\Repository\LanguageResolver */
     protected $languageResolver;
 
     /**
      * Construct service object from aggregated service and LanguageResolver.
      *
      * @param \eZ\Publish\API\Repository\ContentTypeService $service
-     * @param \eZ\Publish\Core\Repository\SiteAccessAware\Language\LanguageResolver $languageResolver
+     * @param \eZ\Publish\API\Repository\LanguageResolver $languageResolver
      */
     public function __construct(
         ContentTypeServiceInterface $service,
@@ -109,9 +109,9 @@ class ContentTypeService implements ContentTypeServiceInterface
         return $this->service->loadContentTypeByRemoteId($remoteId, $prioritizedLanguages);
     }
 
-    public function loadContentTypeDraft($contentTypeId)
+    public function loadContentTypeDraft($contentTypeId, bool $ignoreOwnership = false)
     {
-        return $this->service->loadContentTypeDraft($contentTypeId);
+        return $this->service->loadContentTypeDraft($contentTypeId, $ignoreOwnership);
     }
 
     public function loadContentTypeList(array $contentTypeIds, array $prioritizedLanguages = []): iterable
@@ -216,5 +216,10 @@ class ContentTypeService implements ContentTypeServiceInterface
     public function removeContentTypeTranslation(ContentTypeDraft $contentTypeDraft, string $languageCode): ContentTypeDraft
     {
         return $this->service->removeContentTypeTranslation($contentTypeDraft, $languageCode);
+    }
+
+    public function deleteUserDrafts(int $userId): void
+    {
+        $this->service->deleteUserDrafts($userId);
     }
 }

@@ -32,9 +32,7 @@ class PageService
      */
     protected $blockDefinition;
 
-    /**
-     * @var \eZ\Publish\Core\FieldType\Page\PageStorage\Gateway
-     */
+    /** @var \eZ\Publish\Core\FieldType\Page\PageStorage\Gateway */
     protected $storageGateway;
 
     /**
@@ -72,9 +70,7 @@ class PageService
      */
     protected $blocksById;
 
-    /**
-     * @var \eZ\Publish\API\Repository\ContentService
-     */
+    /** @var \eZ\Publish\API\Repository\ContentService */
     protected $contentService;
 
     /**
@@ -87,8 +83,8 @@ class PageService
      */
     public function __construct(
         ContentService $contentService,
-        array $zoneDefinition = array(),
-        array $blockDefinition = array()
+        array $zoneDefinition = [],
+        array $blockDefinition = []
     ) {
         $this->contentService = $contentService;
         $this->zoneDefinition = $zoneDefinition;
@@ -97,7 +93,7 @@ class PageService
         $this->lastValidItems = new SplObjectStorage();
         $this->waitingBlockItems = new SplObjectStorage();
         $this->archivedBlockItems = new SplObjectStorage();
-        $this->blocksById = array();
+        $this->blocksById = [];
     }
 
     /**

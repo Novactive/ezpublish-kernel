@@ -34,19 +34,13 @@ class PermissionResolver implements PermissionResolverInterface
      */
     private $sudoNestingLevel = 0;
 
-    /**
-     * @var \eZ\Publish\Core\Repository\Helper\RoleDomainMapper
-     */
+    /** @var \eZ\Publish\Core\Repository\Helper\RoleDomainMapper */
     private $roleDomainMapper;
 
-    /**
-     * @var \eZ\Publish\Core\Repository\Helper\LimitationService
-     */
+    /** @var \eZ\Publish\Core\Repository\Helper\LimitationService */
     private $limitationService;
 
-    /**
-     * @var \eZ\Publish\SPI\Persistence\User\Handler
-     */
+    /** @var \eZ\Publish\SPI\Persistence\User\Handler */
     private $userHandler;
 
     /**
@@ -117,10 +111,10 @@ class PermissionResolver implements PermissionResolverInterface
         }
 
         // Uses SPI to avoid triggering permission checks in Role/User service
-        $permissionSets = array();
+        $permissionSets = [];
         $spiRoleAssignments = $this->userHandler->loadRoleAssignmentsByGroupId($userReference->getUserId(), true);
         foreach ($spiRoleAssignments as $spiRoleAssignment) {
-            $permissionSet = array('limitation' => null, 'policies' => array());
+            $permissionSet = ['limitation' => null, 'policies' => []];
 
             $spiRole = $this->userHandler->loadRole($spiRoleAssignment->roleId);
             foreach ($spiRole->policies as $spiPolicy) {
@@ -294,6 +288,7 @@ class PermissionResolver implements PermissionResolverInterface
 
                 $limitationsPass = true;
                 $possibleLimitations = [];
+                $possibleRoleLimitation = $permissionSet['limitation'];
                 foreach ($policyLimitations as $limitation) {
                     $limitationsPass = $this->isGrantedByLimitation($limitation, $currentUserReference, $object, $targets);
                     if (!$limitationsPass) {
@@ -309,12 +304,15 @@ class PermissionResolver implements PermissionResolverInterface
 
                 if (!empty($limitationsIdentifiers)) {
                     $possibleLimitations = array_filter($possibleLimitations, $limitationFilter);
+                    if (!\in_array($possibleRoleLimitation, $limitationsIdentifiers, true)) {
+                        $possibleRoleLimitation = null;
+                    }
                 }
 
-                if ($limitationsPass && !empty($possibleLimitations)) {
+                if ($limitationsPass) {
                     $passedLimitations[] = new LookupPolicyLimitations($policy, $possibleLimitations);
-                    if (null !== $permissionSet['limitation']) {
-                        $passedRoleLimitations[] = $permissionSet['limitation'];
+                    if (null !== $possibleRoleLimitation) {
+                        $passedRoleLimitations[] = $possibleRoleLimitation;
                     }
                 }
             }

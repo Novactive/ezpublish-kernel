@@ -17,9 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class IndexRequestListener implements EventSubscriberInterface
 {
-    /**
-     * @var \eZ\Publish\Core\MVC\ConfigResolverInterface
-     */
+    /** @var \eZ\Publish\Core\MVC\ConfigResolverInterface */
     protected $configResolver;
 
     public function __construct(ConfigResolverInterface $configResolver)
@@ -29,12 +27,12 @@ class IndexRequestListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            KernelEvents::REQUEST => array(
+        return [
+            KernelEvents::REQUEST => [
                 // onKernelRequestIndex needs to be before the router (prio 32)
-                array('onKernelRequestIndex', 40),
-            ),
-        );
+                ['onKernelRequestIndex', 40],
+            ],
+        ];
     }
 
     /**

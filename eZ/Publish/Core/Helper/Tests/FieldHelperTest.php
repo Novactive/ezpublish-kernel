@@ -23,24 +23,16 @@ use PHPUnit\Framework\TestCase;
 
 class FieldHelperTest extends TestCase
 {
-    /**
-     * @var FieldHelper
-     */
+    /** @var FieldHelper */
     private $fieldHelper;
 
-    /**
-     * @var FieldTypeService|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FieldTypeService|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldTypeServiceMock;
 
-    /**
-     * @var ContentTypeService|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ContentTypeService|\PHPUnit\Framework\MockObject\MockObject */
     private $contentTypeServiceMock;
 
-    /**
-     * @var \eZ\Publish\Core\Helper\TranslationHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \eZ\Publish\Core\Helper\TranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $translationHelper;
 
     protected function setUp()
@@ -55,7 +47,7 @@ class FieldHelperTest extends TestCase
     public function testIsFieldEmpty()
     {
         $contentTypeId = 123;
-        $contentInfo = new ContentInfo(array('contentTypeId' => $contentTypeId));
+        $contentInfo = new ContentInfo(['contentTypeId' => $contentTypeId]);
         $content = $this->createMock(APIContent::class);
         $content
             ->expects($this->any())
@@ -66,11 +58,11 @@ class FieldHelperTest extends TestCase
         $fieldDefIdentifier = 'my_field_definition';
         $textLineFT = new TextLineType();
         $emptyValue = $textLineFT->getEmptyValue();
-        $emptyField = new Field(array('fieldDefIdentifier' => $fieldDefIdentifier, 'value' => $emptyValue));
+        $emptyField = new Field(['fieldDefIdentifier' => $fieldDefIdentifier, 'value' => $emptyValue]);
 
         $contentType = $this->getMockForAbstractClass(ContentType::class);
         $fieldDefinition = $this->getMockBuilder(FieldDefinition::class)
-            ->setConstructorArgs(array(array('fieldTypeIdentifier' => 'ezstring')))
+            ->setConstructorArgs([['fieldTypeIdentifier' => 'ezstring']])
             ->getMockForAbstractClass();
         $contentType
             ->expects($this->once())
@@ -101,7 +93,7 @@ class FieldHelperTest extends TestCase
     public function testIsFieldNotEmpty()
     {
         $contentTypeId = 123;
-        $contentInfo = new ContentInfo(array('contentTypeId' => $contentTypeId));
+        $contentInfo = new ContentInfo(['contentTypeId' => $contentTypeId]);
         $content = $this->createMock(APIContent::class);
         $content
             ->expects($this->any())
@@ -112,11 +104,11 @@ class FieldHelperTest extends TestCase
         $fieldDefIdentifier = 'my_field_definition';
         $textLineFT = new TextLineType();
         $nonEmptyValue = new Value('Vive le sucre !!!');
-        $emptyField = new Field(array('fieldDefIdentifier' => 'ezstring', 'value' => $nonEmptyValue));
+        $emptyField = new Field(['fieldDefIdentifier' => 'ezstring', 'value' => $nonEmptyValue]);
 
         $contentType = $this->getMockForAbstractClass(ContentType::class);
         $fieldDefinition = $this->getMockBuilder(FieldDefinition::class)
-            ->setConstructorArgs(array(array('fieldTypeIdentifier' => 'ezstring')))
+            ->setConstructorArgs([['fieldTypeIdentifier' => 'ezstring']])
             ->getMockForAbstractClass();
         $contentType
             ->expects($this->once())

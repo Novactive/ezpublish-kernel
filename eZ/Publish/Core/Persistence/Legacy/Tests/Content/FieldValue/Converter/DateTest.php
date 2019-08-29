@@ -27,14 +27,10 @@ use DateTime;
  */
 class DateTest extends TestCase
 {
-    /**
-     * @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\DateConverter
-     */
+    /** @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\DateConverter */
     protected $converter;
 
-    /**
-     * @var \DateTime
-     */
+    /** @var \DateTime */
     protected $date;
 
     protected function setUp()
@@ -50,10 +46,10 @@ class DateTest extends TestCase
     public function testToStorageValue()
     {
         $value = new FieldValue();
-        $value->data = array(
+        $value->data = [
             'timestamp' => $this->date->getTimestamp(),
             'rfc850' => $this->date->format(\DateTime::RFC850),
-        );
+        ];
         $value->sortKey = $this->date->getTimestamp();
         $storageFieldValue = new StorageFieldValue();
 
@@ -76,10 +72,10 @@ class DateTest extends TestCase
 
         $this->converter->toFieldValue($storageFieldValue, $fieldValue);
         self::assertSame(
-            array(
+            [
                 'timestamp' => $this->date->getTimestamp(),
                 'rfc850' => null,
-            ),
+            ],
             $fieldValue->data
         );
         self::assertSame($storageFieldValue->dataInt, $fieldValue->data['timestamp']);
@@ -94,14 +90,14 @@ class DateTest extends TestCase
         $storageFieldDef = new StorageFieldDefinition();
         $fieldTypeConstraints = new FieldTypeConstraints();
         $fieldTypeConstraints->fieldSettings = new FieldSettings(
-            array(
+            [
                 'defaultType' => DateType::DEFAULT_EMPTY,
-            )
+            ]
         );
         $fieldDef = new PersistenceFieldDefinition(
-            array(
+            [
                 'fieldTypeConstraints' => $fieldTypeConstraints,
-            )
+            ]
         );
 
         $this->converter->toStorageFieldDefinition($fieldDef, $storageFieldDef);
@@ -119,14 +115,14 @@ class DateTest extends TestCase
         $storageFieldDef = new StorageFieldDefinition();
         $fieldTypeConstraints = new FieldTypeConstraints();
         $fieldTypeConstraints->fieldSettings = new FieldSettings(
-            array(
+            [
                 'defaultType' => DateType::DEFAULT_CURRENT_DATE,
-            )
+            ]
         );
         $fieldDef = new PersistenceFieldDefinition(
-            array(
+            [
                 'fieldTypeConstraints' => $fieldTypeConstraints,
-            )
+            ]
         );
 
         $this->converter->toStorageFieldDefinition($fieldDef, $storageFieldDef);
@@ -143,9 +139,9 @@ class DateTest extends TestCase
     {
         $fieldDef = new PersistenceFieldDefinition();
         $storageDef = new StorageFieldDefinition(
-            array(
+            [
                 'dataInt1' => DateType::DEFAULT_EMPTY,
-            )
+            ]
         );
 
         $this->converter->toFieldDefinition($storageDef, $fieldDef);
@@ -160,9 +156,9 @@ class DateTest extends TestCase
         $timestamp = time();
         $fieldDef = new PersistenceFieldDefinition();
         $storageDef = new StorageFieldDefinition(
-            array(
+            [
                 'dataInt1' => DateType::DEFAULT_CURRENT_DATE,
-            )
+            ]
         );
 
         $this->converter->toFieldDefinition($storageDef, $fieldDef);

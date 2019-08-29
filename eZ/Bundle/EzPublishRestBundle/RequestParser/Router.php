@@ -19,9 +19,7 @@ use eZ\Publish\Core\REST\Common\Exceptions\InvalidArgumentException;
  */
 class Router implements RequestParser
 {
-    /**
-     * @var \Symfony\Cmf\Component\Routing\ChainRouter
-     */
+    /** @var \Symfony\Cmf\Component\Routing\ChainRouter */
     private $router;
 
     public function __construct(RouterInterface $router)
@@ -59,7 +57,7 @@ class Router implements RequestParser
         return $matchResult;
     }
 
-    public function generate($type, array $values = array())
+    public function generate($type, array $values = [])
     {
         return $this->router->generate($type, $values);
     }

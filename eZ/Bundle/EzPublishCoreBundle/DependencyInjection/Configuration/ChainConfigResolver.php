@@ -13,14 +13,10 @@ use eZ\Publish\Core\MVC\Exception\ParameterNotFoundException;
 
 class ChainConfigResolver implements ConfigResolverInterface
 {
-    /**
-     * @var \eZ\Publish\Core\MVC\ConfigResolverInterface[]
-     */
-    protected $resolvers = array();
+    /** @var \eZ\Publish\Core\MVC\ConfigResolverInterface[] */
+    protected $resolvers = [];
 
-    /**
-     * @var \eZ\Publish\Core\MVC\ConfigResolverInterface[]
-     */
+    /** @var \eZ\Publish\Core\MVC\ConfigResolverInterface[] */
     protected $sortedResolvers;
 
     /**
@@ -34,11 +30,11 @@ class ChainConfigResolver implements ConfigResolverInterface
     {
         $priority = (int)$priority;
         if (!isset($this->resolvers[$priority])) {
-            $this->resolvers[$priority] = array();
+            $this->resolvers[$priority] = [];
         }
 
         $this->resolvers[$priority][] = $resolver;
-        $this->sortedResolvers = array();
+        $this->sortedResolvers = [];
     }
 
     /**
@@ -61,7 +57,7 @@ class ChainConfigResolver implements ConfigResolverInterface
      */
     protected function sortResolvers()
     {
-        $sortedResolvers = array();
+        $sortedResolvers = [];
         krsort($this->resolvers);
 
         foreach ($this->resolvers as $resolvers) {

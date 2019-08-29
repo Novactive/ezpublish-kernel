@@ -17,9 +17,7 @@ use eZ\Publish\API\Repository\Repository;
 
 class ContentTypeGroupTest extends BaseTest
 {
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\Matcher\ContentBased\Id\ContentTypeGroup
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\Matcher\ContentBased\Id\ContentTypeGroup */
     private $matcher;
 
     protected function setUp()
@@ -50,31 +48,31 @@ class ContentTypeGroupTest extends BaseTest
 
     public function matchLocationProvider()
     {
-        $data = array();
+        $data = [];
 
-        $data[] = array(
+        $data[] = [
             123,
             $this->generateRepositoryMockForContentTypeGroupId(123),
             true,
-        );
+        ];
 
-        $data[] = array(
+        $data[] = [
             123,
             $this->generateRepositoryMockForContentTypeGroupId(456),
             false,
-        );
+        ];
 
-        $data[] = array(
-            array(123, 789),
+        $data[] = [
+            [123, 789],
             $this->generateRepositoryMockForContentTypeGroupId(456),
             false,
-        );
+        ];
 
-        $data[] = array(
-            array(123, 789),
+        $data[] = [
+            [123, 789],
             $this->generateRepositoryMockForContentTypeGroupId(789),
             true,
-        );
+        ];
 
         return $data;
     }
@@ -92,7 +90,7 @@ class ContentTypeGroupTest extends BaseTest
             ->method('getContentInfo')
             ->will(
                 $this->returnValue(
-                    $this->getContentInfoMock(array('contentTypeId' => 42))
+                    $this->getContentInfoMock(['contentTypeId' => 42])
                 )
             );
 
@@ -115,37 +113,37 @@ class ContentTypeGroupTest extends BaseTest
 
         $this->assertSame(
             $expectedResult,
-            $this->matcher->matchContentInfo($this->getContentInfoMock(array('contentTypeId' => 42)))
+            $this->matcher->matchContentInfo($this->getContentInfoMock(['contentTypeId' => 42]))
         );
     }
 
     public function matchContentInfoProvider()
     {
-        $data = array();
+        $data = [];
 
-        $data[] = array(
+        $data[] = [
             123,
             $this->generateRepositoryMockForContentTypeGroupId(123),
             true,
-        );
+        ];
 
-        $data[] = array(
+        $data[] = [
             123,
             $this->generateRepositoryMockForContentTypeGroupId(456),
             false,
-        );
+        ];
 
-        $data[] = array(
-            array(123, 789),
+        $data[] = [
+            [123, 789],
             $this->generateRepositoryMockForContentTypeGroupId(456),
             false,
-        );
+        ];
 
-        $data[] = array(
-            array(123, 789),
+        $data[] = [
+            [123, 789],
             $this->generateRepositoryMockForContentTypeGroupId(789),
             true,
-        );
+        ];
 
         return $data;
     }
@@ -169,15 +167,15 @@ class ContentTypeGroupTest extends BaseTest
             ->method('getContentTypeGroups')
             ->will(
                 $this->returnValue(
-                    array(
+                    [
                         // First a group that will never match, then the right group.
                         // This ensures to test even if the content type belongs to several groups at once.
                         $this->getMockForAbstractClass(ContentTypeGroup::class),
                         $this
                             ->getMockBuilder(ContentTypeGroup::class)
-                            ->setConstructorArgs(array(array('id' => $contentTypeGroupId)))
+                            ->setConstructorArgs([['id' => $contentTypeGroupId]])
                             ->getMockForAbstractClass(),
-                    )
+                    ]
                 )
             );
 

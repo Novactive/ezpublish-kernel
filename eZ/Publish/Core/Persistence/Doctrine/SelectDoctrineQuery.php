@@ -19,28 +19,22 @@ use eZ\Publish\Core\Persistence\Database\QueryException;
  */
 class SelectDoctrineQuery extends AbstractDoctrineQuery implements SelectQuery
 {
-    private $parts = array(
-        'select' => array(),
-        'from' => array(),
-        'where' => array(),
-        'orderBy' => array(),
-        'groupBy' => array(),
-        'having' => array(),
-    );
+    private $parts = [
+        'select' => [],
+        'from' => [],
+        'where' => [],
+        'orderBy' => [],
+        'groupBy' => [],
+        'having' => [],
+    ];
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $distinct = false;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $limit;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $offset;
 
     /**
@@ -165,7 +159,7 @@ class SelectDoctrineQuery extends AbstractDoctrineQuery implements SelectQuery
     {
         $this->distinct = true;
 
-        return call_user_func_array(array($this, 'select'), func_get_args());
+        return call_user_func_array([$this, 'select'], func_get_args());
     }
 
     /**
@@ -195,10 +189,10 @@ class SelectDoctrineQuery extends AbstractDoctrineQuery implements SelectQuery
         $args = $this->parseArguments(func_get_args());
 
         foreach ($args as $tableName) {
-            $this->parts['from'][] = array(
+            $this->parts['from'][] = [
                 'table' => $tableName,
                 'type' => 'FROM',
-            );
+            ];
         }
 
         return $this;
@@ -283,11 +277,11 @@ class SelectDoctrineQuery extends AbstractDoctrineQuery implements SelectQuery
             $condition = $args[1] . ' = ' . $args[2];
         }
 
-        $this->parts['from'][] = array(
+        $this->parts['from'][] = [
             'table' => $tableName,
             'type' => $type,
             'condition' => $condition,
-        );
+        ];
 
         return $this;
     }

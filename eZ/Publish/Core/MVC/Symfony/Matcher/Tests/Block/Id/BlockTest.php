@@ -14,9 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 class BlockTest extends TestCase
 {
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\Matcher\Block\MatcherInterface
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\Matcher\Block\MatcherInterface */
     private $matcher;
 
     protected function setUp()
@@ -40,28 +38,28 @@ class BlockTest extends TestCase
 
     public function matchBlockProvider()
     {
-        return array(
-            array(
+        return [
+            [
                 123,
                 $this->generateBlockForId(123),
                 true,
-            ),
-            array(
+            ],
+            [
                 123,
                 $this->generateBlockForId(456),
                 false,
-            ),
-            array(
-                array(123, 789),
+            ],
+            [
+                [123, 789],
                 $this->generateBlockForId(456),
                 false,
-            ),
-            array(
-                array(123, 789),
+            ],
+            [
+                [123, 789],
                 $this->generateBlockForId(789),
                 true,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -72,7 +70,7 @@ class BlockTest extends TestCase
     private function generateBlockForId($id)
     {
         return new Block(
-            array('id' => $id)
+            ['id' => $id]
         );
     }
 }

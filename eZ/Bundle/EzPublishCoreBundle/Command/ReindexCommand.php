@@ -8,6 +8,7 @@
  */
 namespace eZ\Bundle\EzPublishCoreBundle\Command;
 
+use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 use eZ\Publish\SPI\Persistence\Content\ContentInfo;
 use eZ\Publish\Core\Search\Common\Indexer;
 use eZ\Publish\Core\Search\Common\IncrementalIndexer;
@@ -25,39 +26,25 @@ use PDO;
 
 class ReindexCommand extends ContainerAwareCommand
 {
-    /**
-     * @var \eZ\Publish\Core\Search\Common\Indexer|\eZ\Publish\Core\Search\Common\IncrementalIndexer
-     */
+    /** @var \eZ\Publish\Core\Search\Common\Indexer|\eZ\Publish\Core\Search\Common\IncrementalIndexer */
     private $searchIndexer;
 
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
+    /** @var \Doctrine\DBAL\Connection */
     private $connection;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $phpPath;
 
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
+    /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $siteaccess;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $env;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $isDebug;
 
     /**
@@ -162,7 +149,7 @@ EOT
         $iterationCount = $input->getOption('iteration-count');
         $this->siteaccess = $input->getOption('siteaccess');
         if (!is_numeric($iterationCount) || (int) $iterationCount < 1) {
-            throw new RuntimeException("'--iteration-count' option should be > 0, got '{$iterationCount}'");
+            throw new InvalidArgumentException('--iteration-count', "Option should be > 0, got '{$iterationCount}'");
         }
 
         if (!$this->searchIndexer instanceof IncrementalIndexer) {
@@ -261,9 +248,7 @@ EOT
 
     private function runParallelProcess(ProgressBar $progress, Statement $stmt, $processCount, $iterationCount, $commit)
     {
-        /**
-         * @var \Symfony\Component\Process\Process[]|null[]
-         */
+        /** @var \Symfony\Component\Process\Process[]|null[] */
         $processes = array_fill(0, $processCount, null);
         $generator = $this->fetchIteration($stmt, $iterationCount);
         do {
@@ -324,9 +309,7 @@ EOT
      */
     private function getStatementSubtree($locationId, $count = false)
     {
-        /**
-         * @var \eZ\Publish\SPI\Persistence\Content\Location\Handler
-         */
+        /** @var \eZ\Publish\SPI\Persistence\Content\Location\Handler */
         $locationHandler = $this->getContainer()->get('ezpublish.spi.persistence.location_handler');
         $location = $locationHandler->load($locationId);
         $q = $this->connection->createQueryBuilder()
@@ -370,6 +353,8 @@ EOT
             for ($i = 0; $i < $iterationCount; ++$i) {
                 if ($contentId = $stmt->fetch(PDO::FETCH_COLUMN)) {
                     $contentIds[] = $contentId;
+                } elseif (empty($contentIds)) {
+                    return;
                 } else {
                     break;
                 }
@@ -387,6 +372,10 @@ EOT
      */
     private function getPhpProcess(array $contentIds, $commit)
     {
+        if (empty($contentIds)) {
+            throw new InvalidArgumentException('--content-ids', '$contentIds can not be empty');
+        }
+
         $consolePath = file_exists('bin/console') ? 'bin/console' : 'app/console';
         $subProcessArgs = [
             $consolePath,

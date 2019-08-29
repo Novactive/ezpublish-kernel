@@ -44,9 +44,7 @@ class AddField extends Action
      */
     protected $fieldValueConverter;
 
-    /**
-     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Mapper
-     */
+    /** @var \eZ\Publish\Core\Persistence\Legacy\Content\Mapper */
     protected $contentMapper;
 
     /**
@@ -80,12 +78,12 @@ class AddField extends Action
     public function apply($contentId)
     {
         $versionNumbers = $this->contentGateway->listVersionNumbers($contentId);
-        $languageCodeToFieldId = array();
+        $languageCodeToFieldId = [];
 
         $nameRows = $this->contentGateway->loadVersionedNameData(
             array_map(
                 function ($versionNo) use ($contentId) {
-                    return array('id' => $contentId, 'version' => $versionNo);
+                    return ['id' => $contentId, 'version' => $versionNo];
                 },
                 $versionNumbers
             )
@@ -95,7 +93,7 @@ class AddField extends Action
             $contentRows = $this->contentGateway->load($contentId, $versionNo);
             $contentList = $this->contentMapper->extractContentFromRows($contentRows, $nameRows);
             $content = $contentList[0];
-            $languageCodeSet = array();
+            $languageCodeSet = [];
 
             // Each subsequent Content version can have additional language(s)
             foreach ($content->fields as $field) {

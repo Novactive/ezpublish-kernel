@@ -18,12 +18,10 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class ConfigParser implements ParserInterface
 {
-    /**
-     * @var \eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\ParserInterface[]
-     */
+    /** @var \eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\ParserInterface[] */
     private $configParsers;
 
-    public function __construct(array $configParsers = array())
+    public function __construct(array $configParsers = [])
     {
         foreach ($configParsers as $parser) {
             if (!$parser instanceof ParserInterface) {

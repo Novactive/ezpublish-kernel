@@ -26,16 +26,12 @@ class BasicContentContext implements Context
     /**
      * Content path mapping.
      */
-    private $contentPaths = array();
+    private $contentPaths = [];
 
-    /**
-     * @var eZ\Publish\API\Repository\ContentTypeService
-     */
+    /** @var eZ\Publish\API\Repository\ContentTypeService */
     private $contentTypeService;
 
-    /**
-     * @var eZ\Publish\API\Repository\ContentService
-     */
+    /** @var eZ\Publish\API\Repository\ContentService */
     private $contentService;
 
     /**
@@ -103,7 +99,7 @@ class BasicContentContext implements Context
             $contentCreateStruct->setField($key, $fields[$key]);
         }
 
-        return $this->contentService->createContent($contentCreateStruct, array($locationCreateStruct));
+        return $this->contentService->createContent($contentCreateStruct, [$locationCreateStruct]);
     }
 
     /**
@@ -158,7 +154,7 @@ class BasicContentContext implements Context
      */
     public function createBasicFolder($path)
     {
-        $fields = array('name' => $this->getTitleFromPath($path));
+        $fields = ['name' => $this->getTitleFromPath($path)];
 
         return $this->createContentwithPath($path, $fields, 'folder');
     }
@@ -168,10 +164,10 @@ class BasicContentContext implements Context
      */
     public function createBasicArticle($path)
     {
-        $fields = array(
+        $fields = [
             'title' => $this->getTitleFromPath($path),
             'intro' => $this->getDummyXmlText(),
-        );
+        ];
 
         return $this->createContentwithPath($path, $fields, 'article');
     }
@@ -181,10 +177,10 @@ class BasicContentContext implements Context
      */
     public function createArticleDraft($path)
     {
-        $fields = array(
+        $fields = [
             'title' => $this->getTitleFromPath($path),
             'intro' => $this->getDummyXmlText(),
-        );
+        ];
 
         return $this->createContentDraft(2, 'article', $fields);
     }

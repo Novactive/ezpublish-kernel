@@ -29,7 +29,7 @@ use eZ\Publish\SPI\Persistence\Content\Location as SPILocation;
 use eZ\Publish\SPI\Persistence\Content\VersionInfo as SPIVersionInfo;
 use eZ\Publish\SPI\Persistence\Content\ContentInfo as SPIContentInfo;
 use eZ\Publish\SPI\Persistence\Content\Relation as SPIRelation;
-use eZ\Publish\SPI\Persistence\Content\Type as SPIType;
+use eZ\Publish\SPI\Persistence\Content\Type as SPIContentType;
 use eZ\Publish\SPI\Persistence\Content\Location\CreateStruct as SPILocationCreateStruct;
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
@@ -47,34 +47,22 @@ class DomainMapper
     const MAX_LOCATION_PRIORITY = 2147483647;
     const MIN_LOCATION_PRIORITY = -2147483648;
 
-    /**
-     * @var \eZ\Publish\SPI\Persistence\Content\Handler
-     */
+    /** @var \eZ\Publish\SPI\Persistence\Content\Handler */
     protected $contentHandler;
 
-    /**
-     * @var \eZ\Publish\SPI\Persistence\Content\Location\Handler
-     */
+    /** @var \eZ\Publish\SPI\Persistence\Content\Location\Handler */
     protected $locationHandler;
 
-    /**
-     * @var \eZ\Publish\SPI\Persistence\Content\Type\Handler
-     */
+    /** @var \eZ\Publish\SPI\Persistence\Content\Type\Handler */
     protected $contentTypeHandler;
 
-    /**
-     * @var \eZ\Publish\Core\Repository\Helper\ContentTypeDomainMapper
-     */
+    /** @var \eZ\Publish\Core\Repository\Helper\ContentTypeDomainMapper */
     protected $contentTypeDomainMapper;
 
-    /**
-     * @var \eZ\Publish\SPI\Persistence\Content\Language\Handler
-     */
+    /** @var \eZ\Publish\SPI\Persistence\Content\Language\Handler */
     protected $contentLanguageHandler;
 
-    /**
-     * @var \eZ\Publish\Core\Repository\Helper\FieldTypeRegistry
-     */
+    /** @var \eZ\Publish\Core\Repository\Helper\FieldTypeRegistry */
     protected $fieldTypeRegistry;
 
     /**
@@ -104,7 +92,7 @@ class DomainMapper
     }
 
     /**
-     * Builds a Content domain object from value object returned from persistence.
+     * Builds a Content domain object from value object.
      *
      * @param \eZ\Publish\SPI\Persistence\Content $spiContent
      * @param \eZ\Publish\API\Repository\Values\ContentType\ContentType $contentType
@@ -131,13 +119,34 @@ class DomainMapper
         }
 
         return new Content(
-            array(
+            [
                 'internalFields' => $this->buildDomainFields($spiContent->fields, $contentType, $prioritizedLanguages, $fieldAlwaysAvailableLanguage),
                 'versionInfo' => $this->buildVersionInfoDomainObject($spiContent->versionInfo, $prioritizedLanguages),
                 'contentType' => $contentType,
                 'prioritizedFieldLanguageCode' => $prioritizedFieldLanguageCode,
-            )
+            ]
         );
+    }
+
+    /**
+     * Builds a Content domain object from value object returned from persistence.
+     *
+     * @param \eZ\Publish\SPI\Persistence\Content $spiContent
+     * @param \eZ\Publish\SPI\Persistence\Content\Type $spiContentType
+     * @param string[] $prioritizedLanguages Prioritized language codes to filter fields on
+     * @param string|null $fieldAlwaysAvailableLanguage Language code fallback if a given field is not found in $prioritizedLanguages
+     *
+     * @return \eZ\Publish\Core\Repository\Values\Content\Content
+     */
+    public function buildContentDomainObjectFromPersistence(
+        SPIContent $spiContent,
+        SPIContentType $spiContentType,
+        array $prioritizedLanguages = [],
+        ?string $fieldAlwaysAvailableLanguage = null
+    ): APIContent {
+        $contentType = $this->contentTypeDomainMapper->buildContentTypeDomainObject($spiContentType, $prioritizedLanguages);
+
+        return $this->buildContentDomainObject($spiContent, $contentType, $prioritizedLanguages, $fieldAlwaysAvailableLanguage);
     }
 
     /**
@@ -232,7 +241,7 @@ class DomainMapper
      * @throws InvalidArgumentType On invalid $contentType
      *
      * @param \eZ\Publish\SPI\Persistence\Content\Field[] $spiFields
-     * @param ContentType|SPIType $contentType
+     * @param \eZ\Publish\API\Repository\Values\ContentType\ContentType|\eZ\Publish\SPI\Persistence\Content\Type $contentType
      * @param array $prioritizedLanguages A language priority, filters returned fields and is used as prioritized language code on
      *                         returned value object. If not given all languages are returned.
      * @param string|null $alwaysAvailableLanguage Language code fallback if a given field is not found in $prioritizedLanguages
@@ -245,7 +254,7 @@ class DomainMapper
         array $prioritizedLanguages = [],
         string $alwaysAvailableLanguage = null
     ) {
-        if (!$contentType instanceof SPIType && !$contentType instanceof ContentType) {
+        if (!$contentType instanceof SPIContentType && !$contentType instanceof ContentType) {
             throw new InvalidArgumentType('$contentType', 'SPI ContentType | API ContentType');
         }
 
@@ -254,7 +263,7 @@ class DomainMapper
             $fieldDefinitionsMap[$fieldDefinition->id] = $fieldDefinition;
         }
 
-        $fieldInFilterLanguagesMap = array();
+        $fieldInFilterLanguagesMap = [];
         if (!empty($prioritizedLanguages) && $alwaysAvailableLanguage !== null) {
             foreach ($spiFields as $spiField) {
                 if (in_array($spiField->languageCode, $prioritizedLanguages)) {
@@ -263,7 +272,7 @@ class DomainMapper
             }
         }
 
-        $fields = array();
+        $fields = [];
         foreach ($spiFields as $spiField) {
             // We ignore fields in content not part of the content type
             if (!isset($fieldDefinitionsMap[$spiField->fieldDefinitionId])) {
@@ -287,14 +296,14 @@ class DomainMapper
             }
 
             $fields[$fieldDefinition->position][] = new Field(
-                array(
+                [
                     'id' => $spiField->id,
                     'value' => $this->fieldTypeRegistry->getFieldType($spiField->type)
                         ->fromPersistenceValue($spiField->value),
                     'languageCode' => $spiField->languageCode,
                     'fieldDefIdentifier' => $fieldDefinition->identifier,
                     'fieldTypeIdentifier' => $spiField->type,
-                )
+                ]
             );
         }
 
@@ -340,7 +349,7 @@ class DomainMapper
         }
 
         return new VersionInfo(
-            array(
+            [
                 'id' => $spiVersionInfo->id,
                 'versionNo' => $spiVersionInfo->versionNo,
                 'modificationDate' => $this->getDateTime($spiVersionInfo->modificationDate),
@@ -352,7 +361,7 @@ class DomainMapper
                 'names' => $spiVersionInfo->names,
                 'contentInfo' => $this->buildContentInfoDomainObject($spiVersionInfo->contentInfo),
                 'prioritizedNameLanguageCode' => $prioritizedNameLanguageCode,
-            )
+            ]
         );
     }
 
@@ -381,7 +390,7 @@ class DomainMapper
         }
 
         return new ContentInfo(
-            array(
+            [
                 'id' => $spiContentInfo->id,
                 'contentTypeId' => $spiContentInfo->contentTypeId,
                 'name' => $spiContentInfo->name,
@@ -401,7 +410,7 @@ class DomainMapper
                 'mainLocationId' => $spiContentInfo->mainLocationId,
                 'status' => $status,
                 'isHidden' => $spiContentInfo->isHidden,
-            )
+            ]
         );
     }
 
@@ -433,13 +442,13 @@ class DomainMapper
         }
 
         return new Relation(
-            array(
+            [
                 'id' => $spiRelation->id,
                 'sourceFieldDefinitionIdentifier' => $sourceFieldDefinitionIdentifier,
                 'type' => $spiRelation->type,
                 'sourceContentInfo' => $sourceContentInfo,
                 'destinationContentInfo' => $destinationContentInfo,
-            )
+            ]
         );
     }
 
@@ -547,7 +556,7 @@ class DomainMapper
     private function mapLocation(SPILocation $spiLocation, ContentInfo $contentInfo, APIContent $content): APILocation
     {
         return new Location(
-            array(
+            [
                 'content' => $content,
                 'contentInfo' => $contentInfo,
                 'id' => $spiLocation->id,
@@ -561,7 +570,7 @@ class DomainMapper
                 'depth' => $spiLocation->depth,
                 'sortField' => $spiLocation->sortField,
                 'sortOrder' => $spiLocation->sortOrder,
-            )
+            ]
         );
     }
 
@@ -722,7 +731,7 @@ class DomainMapper
         }
 
         return new SPILocationCreateStruct(
-            array(
+            [
                 'priority' => $locationCreateStruct->priority,
                 'hidden' => $locationCreateStruct->hidden,
                 // If we declare the new Location as hidden, it is automatically invisible
@@ -739,7 +748,7 @@ class DomainMapper
                 'sortField' => $locationCreateStruct->sortField !== null ? $locationCreateStruct->sortField : Location::SORT_FIELD_NAME,
                 'sortOrder' => $locationCreateStruct->sortOrder !== null ? $locationCreateStruct->sortOrder : Location::SORT_ORDER_ASC,
                 'parentId' => $locationCreateStruct->parentLocationId,
-            )
+            ]
         );
     }
 

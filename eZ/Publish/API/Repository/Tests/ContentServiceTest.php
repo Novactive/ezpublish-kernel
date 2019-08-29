@@ -8,6 +8,7 @@
  */
 namespace eZ\Publish\API\Repository\Tests;
 
+use eZ\Publish\API\Repository\LocationService;
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Exceptions\UnauthorizedException;
 use eZ\Publish\API\Repository\Values\Content\ContentInfo;
@@ -129,15 +130,15 @@ class ContentServiceTest extends BaseContentServiceTest
         $role = $roleService->loadRoleByIdentifier('Anonymous');
         $roleDraft = $roleService->createRoleDraft($role);
         $policyCreateStruct = $roleService->newPolicyCreateStruct('content', 'create');
-        $policyCreateStruct->addLimitation(new SectionLimitation(array('limitationValues' => array(1))));
-        $policyCreateStruct->addLimitation(new LocationLimitation(array('limitationValues' => array(2))));
-        $policyCreateStruct->addLimitation(new ContentTypeLimitation(array('limitationValues' => array(1))));
+        $policyCreateStruct->addLimitation(new SectionLimitation(['limitationValues' => [1]]));
+        $policyCreateStruct->addLimitation(new LocationLimitation(['limitationValues' => [2]]));
+        $policyCreateStruct->addLimitation(new ContentTypeLimitation(['limitationValues' => [1]]));
         $roleDraft = $roleService->addPolicyByRoleDraft($roleDraft, $policyCreateStruct);
 
         $policyCreateStruct = $roleService->newPolicyCreateStruct('content', 'publish');
-        $policyCreateStruct->addLimitation(new SectionLimitation(array('limitationValues' => array(1))));
-        $policyCreateStruct->addLimitation(new LocationLimitation(array('limitationValues' => array(2))));
-        $policyCreateStruct->addLimitation(new ContentTypeLimitation(array('limitationValues' => array(1))));
+        $policyCreateStruct->addLimitation(new SectionLimitation(['limitationValues' => [1]]));
+        $policyCreateStruct->addLimitation(new LocationLimitation(['limitationValues' => [2]]));
+        $policyCreateStruct->addLimitation(new ContentTypeLimitation(['limitationValues' => [1]]));
         $roleDraft = $roleService->addPolicyByRoleDraft($roleDraft, $policyCreateStruct);
         $roleService->publishRoleDraft($roleDraft);
 
@@ -154,7 +155,7 @@ class ContentServiceTest extends BaseContentServiceTest
 
         $content = $contentService->createContent(
             $contentCreate,
-            array($locationService->newLocationCreateStruct(2))
+            [$locationService->newLocationCreateStruct(2)]
         );
 
         $contentService->publishVersion(
@@ -190,7 +191,7 @@ class ContentServiceTest extends BaseContentServiceTest
     public function testCreateContentSetsExpectedContentInfo($content)
     {
         $this->assertEquals(
-            array(
+            [
                 $content->id,
                 28, // id of content type "forum"
                 true,
@@ -202,8 +203,8 @@ class ContentServiceTest extends BaseContentServiceTest
                 null,
                 // Main Location id for unpublished Content should be null
                 null,
-            ),
-            array(
+            ],
+            [
                 $content->contentInfo->id,
                 $content->contentInfo->contentTypeId,
                 $content->contentInfo->alwaysAvailable,
@@ -214,7 +215,7 @@ class ContentServiceTest extends BaseContentServiceTest
                 $content->contentInfo->published,
                 $content->contentInfo->publishedDate,
                 $content->contentInfo->mainLocationId,
-            )
+            ]
         );
     }
 
@@ -246,18 +247,18 @@ class ContentServiceTest extends BaseContentServiceTest
     public function testCreateContentSetsExpectedVersionInfo($content)
     {
         $this->assertEquals(
-            array(
+            [
                 'status' => VersionInfo::STATUS_DRAFT,
                 'versionNo' => 1,
                 'creatorId' => $this->getRepository()->getCurrentUser()->id,
                 'initialLanguageCode' => 'eng-US',
-            ),
-            array(
+            ],
+            [
                 'status' => $content->getVersionInfo()->status,
                 'versionNo' => $content->getVersionInfo()->versionNo,
                 'creatorId' => $content->getVersionInfo()->creatorId,
                 'initialLanguageCode' => $content->getVersionInfo()->initialLanguageCode,
-            )
+            ]
         );
         $this->assertTrue($content->getVersionInfo()->isDraft());
         $this->assertFalse($content->getVersionInfo()->isPublished());
@@ -496,7 +497,7 @@ class ContentServiceTest extends BaseContentServiceTest
         // Create new content object under the specified location
         $draft = $contentService->createContent(
             $contentCreate,
-            array($locationCreate1)
+            [$locationCreate1]
         );
         $contentService->publishVersion($draft->versionInfo);
 
@@ -504,7 +505,7 @@ class ContentServiceTest extends BaseContentServiceTest
         // Content remoteId already exists,
         $contentService->createContent(
             $contentCreate,
-            array($locationCreate2)
+            [$locationCreate2]
         );
         /* END: Use Case */
     }
@@ -1010,7 +1011,7 @@ class ContentServiceTest extends BaseContentServiceTest
     public function testPublishVersionSetsExpectedContentInfo($content)
     {
         $this->assertEquals(
-            array(
+            [
                 $content->id,
                 true,
                 1,
@@ -1018,8 +1019,8 @@ class ContentServiceTest extends BaseContentServiceTest
                 'eng-US',
                 $this->getRepository()->getCurrentUser()->id,
                 true,
-            ),
-            array(
+            ],
+            [
                 $content->contentInfo->id,
                 $content->contentInfo->alwaysAvailable,
                 $content->contentInfo->currentVersionNo,
@@ -1027,7 +1028,7 @@ class ContentServiceTest extends BaseContentServiceTest
                 $content->contentInfo->mainLanguageCode,
                 $content->contentInfo->ownerId,
                 $content->contentInfo->published,
-            )
+            ]
         );
 
         $this->assertNotNull($content->contentInfo->mainLocationId);
@@ -1049,18 +1050,18 @@ class ContentServiceTest extends BaseContentServiceTest
     public function testPublishVersionSetsExpectedVersionInfo($content)
     {
         $this->assertEquals(
-            array(
+            [
                 $this->getRepository()->getCurrentUser()->id,
                 'eng-US',
                 VersionInfo::STATUS_PUBLISHED,
                 1,
-            ),
-            array(
+            ],
+            [
                 $content->getVersionInfo()->creatorId,
                 $content->getVersionInfo()->initialLanguageCode,
                 $content->getVersionInfo()->status,
                 $content->getVersionInfo()->versionNo,
-            )
+            ]
         );
 
         $date = new \DateTime('1984/01/01');
@@ -1131,7 +1132,7 @@ class ContentServiceTest extends BaseContentServiceTest
             $content->getVersionInfo()->getContentInfo()
         );
 
-        return array($content, $location);
+        return [$content, $location];
     }
 
     /**
@@ -1151,7 +1152,7 @@ class ContentServiceTest extends BaseContentServiceTest
         $mainLocationId = $content->getVersionInfo()->getContentInfo()->mainLocationId;
 
         $this->assertPropertiesCorrect(
-            array(
+            [
                 'id' => $mainLocationId,
                 'priority' => 23,
                 'hidden' => true,
@@ -1162,7 +1163,7 @@ class ContentServiceTest extends BaseContentServiceTest
                 'depth' => $parentLocation->depth + 1,
                 'sortField' => Location::SORT_FIELD_NODE_ID,
                 'sortOrder' => Location::SORT_ORDER_DESC,
-            ),
+            ],
             $location
         );
     }
@@ -1297,14 +1298,14 @@ class ContentServiceTest extends BaseContentServiceTest
     public function testCreateContentDraftSetsExpectedProperties($draft)
     {
         $this->assertEquals(
-            array(
+            [
                 'fieldCount' => 2,
                 'relationCount' => 0,
-            ),
-            array(
+            ],
+            [
                 'fieldCount' => count($draft->getFields()),
                 'relationCount' => count($this->getRepository()->getContentService()->loadRelations($draft->getVersionInfo())),
-            )
+            ]
         );
     }
 
@@ -1321,7 +1322,7 @@ class ContentServiceTest extends BaseContentServiceTest
         $contentInfo = $draft->contentInfo;
 
         $this->assertEquals(
-            array(
+            [
                 $draft->id,
                 true,
                 1,
@@ -1329,8 +1330,8 @@ class ContentServiceTest extends BaseContentServiceTest
                 $this->getRepository()->getCurrentUser()->id,
                 'abcdef0123456789abcdef0123456789',
                 1,
-            ),
-            array(
+            ],
+            [
                 $contentInfo->id,
                 $contentInfo->alwaysAvailable,
                 $contentInfo->currentVersionNo,
@@ -1338,7 +1339,7 @@ class ContentServiceTest extends BaseContentServiceTest
                 $contentInfo->ownerId,
                 $contentInfo->remoteId,
                 $contentInfo->sectionId,
-            )
+            ]
         );
     }
 
@@ -1355,20 +1356,20 @@ class ContentServiceTest extends BaseContentServiceTest
         $versionInfo = $draft->getVersionInfo();
 
         $this->assertEquals(
-            array(
+            [
                 'creatorId' => $this->getRepository()->getCurrentUser()->id,
                 'initialLanguageCode' => 'eng-US',
-                'languageCodes' => array(0 => 'eng-US'),
+                'languageCodes' => [0 => 'eng-US'],
                 'status' => VersionInfo::STATUS_DRAFT,
                 'versionNo' => 2,
-            ),
-            array(
+            ],
+            [
                 'creatorId' => $versionInfo->creatorId,
                 'initialLanguageCode' => $versionInfo->initialLanguageCode,
                 'languageCodes' => $versionInfo->languageCodes,
                 'status' => $versionInfo->status,
                 'versionNo' => $versionInfo->versionNo,
-            )
+            ]
         );
         $this->assertTrue($versionInfo->isDraft());
         $this->assertFalse($versionInfo->isPublished());
@@ -1585,44 +1586,44 @@ class ContentServiceTest extends BaseContentServiceTest
     {
         $actual = $this->normalizeFields($content->getFields());
 
-        $expected = array(
+        $expected = [
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => true,
                     'languageCode' => 'eng-GB',
                     'fieldDefIdentifier' => 'description',
                     'fieldTypeIdentifier' => 'ezrichtext',
-                )
+                ]
             ),
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => true,
                     'languageCode' => 'eng-US',
                     'fieldDefIdentifier' => 'description',
                     'fieldTypeIdentifier' => 'ezrichtext',
-                )
+                ]
             ),
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => true,
                     'languageCode' => 'eng-GB',
                     'fieldDefIdentifier' => 'name',
                     'fieldTypeIdentifier' => 'ezstring',
-                )
+                ]
             ),
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => true,
                     'languageCode' => 'eng-US',
                     'fieldDefIdentifier' => 'name',
                     'fieldTypeIdentifier' => 'ezstring',
-                )
+                ]
             ),
-        );
+        ];
 
         $this->assertEquals($expected, $actual);
     }
@@ -1923,14 +1924,14 @@ XML
         $versionInfo = $contentService->loadVersionInfo($contentVersion2->contentInfo);
 
         $this->assertEquals(
-            array(
+            [
                 'status' => VersionInfo::STATUS_PUBLISHED,
                 'versionNo' => 2,
-            ),
-            array(
+            ],
+            [
                 'status' => $versionInfo->status,
                 'versionNo' => $versionInfo->versionNo,
-            )
+            ]
         );
         $this->assertTrue($versionInfo->isPublished());
         $this->assertFalse($versionInfo->isDraft());
@@ -1956,14 +1957,14 @@ XML
         $versionInfo = $contentService->loadVersionInfo($contentVersion2->contentInfo, 1);
 
         $this->assertEquals(
-            array(
+            [
                 'status' => VersionInfo::STATUS_ARCHIVED,
                 'versionNo' => 1,
-            ),
-            array(
+            ],
+            [
                 'status' => $versionInfo->status,
                 'versionNo' => $versionInfo->versionNo,
-            )
+            ]
         );
         $this->assertTrue($versionInfo->isArchived());
         $this->assertFalse($versionInfo->isDraft());
@@ -2174,7 +2175,7 @@ XML
         $contentInfo = $content->contentInfo;
 
         $this->assertEquals(
-            array(
+            [
                 'remoteId' => 'aaaabbbbccccddddeeeeffff11112222',
                 'sectionId' => $this->generateId('section', 1),
                 'alwaysAvailable' => false,
@@ -2184,8 +2185,8 @@ XML
                 'ownerId' => $this->getRepository()->getCurrentUser()->id,
                 'published' => true,
                 'publishedDate' => $this->createDateTime(441759600),
-            ),
-            array(
+            ],
+            [
                 'remoteId' => $contentInfo->remoteId,
                 'sectionId' => $contentInfo->sectionId,
                 'alwaysAvailable' => $contentInfo->alwaysAvailable,
@@ -2195,7 +2196,7 @@ XML
                 'ownerId' => $contentInfo->ownerId,
                 'published' => $contentInfo->published,
                 'publishedDate' => $contentInfo->publishedDate,
-            )
+            ]
         );
     }
 
@@ -2339,7 +2340,7 @@ XML
         $contentDrafts = $contentService->loadContentDrafts();
         /* END: Use Case */
 
-        $this->assertSame(array(), $contentDrafts);
+        $this->assertSame([], $contentDrafts);
     }
 
     /**
@@ -2374,21 +2375,21 @@ XML
         $draftedVersions = $contentService->loadContentDrafts();
         /* END: Use Case */
 
-        $actual = array(
+        $actual = [
             $draftedVersions[0]->status,
             $draftedVersions[0]->getContentInfo()->remoteId,
             $draftedVersions[1]->status,
             $draftedVersions[1]->getContentInfo()->remoteId,
-        );
+        ];
         sort($actual, SORT_STRING);
 
         $this->assertEquals(
-            array(
+            [
                 VersionInfo::STATUS_DRAFT,
                 VersionInfo::STATUS_DRAFT,
                 $demoDesignRemoteId,
                 $mediaRemoteId,
-            ),
+            ],
             $actual
         );
     }
@@ -2430,17 +2431,17 @@ XML
         $oldCurrentUserDrafts = $contentService->loadContentDrafts($oldCurrentUser);
         /* END: Use Case */
 
-        $this->assertSame(array(), $oldCurrentUserDrafts);
+        $this->assertSame([], $oldCurrentUserDrafts);
 
         $this->assertEquals(
-            array(
+            [
                 VersionInfo::STATUS_DRAFT,
                 $mediaRemoteId,
-            ),
-            array(
+            ],
+            [
                 $newCurrentUserDrafts[0]->status,
                 $newCurrentUserDrafts[0]->getContentInfo()->remoteId,
-            )
+            ]
         );
         $this->assertTrue($newCurrentUserDrafts[0]->isDraft());
         $this->assertFalse($newCurrentUserDrafts[0]->isArchived());
@@ -2644,22 +2645,22 @@ XML
         // Will return a content instance with fields in "eng-US"
         $reloadedContent = $contentService->loadContentByVersionInfo(
             $publishedContent->getVersionInfo(),
-            array(
+            [
                 'eng-GB',
-            ),
+            ],
             false
         );
         /* END: Use Case */
 
-        $actual = array();
+        $actual = [];
         foreach ($reloadedContent->getFields() as $field) {
             $actual[] = new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => ($field->value !== null ? true : null), // Actual value tested by FieldType integration tests
                     'languageCode' => $field->languageCode,
                     'fieldDefIdentifier' => $field->fieldDefIdentifier,
-                )
+                ]
             );
         }
         usort(
@@ -2673,24 +2674,24 @@ XML
             }
         );
 
-        $expected = array(
+        $expected = [
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => true,
                     'languageCode' => 'eng-GB',
                     'fieldDefIdentifier' => 'description',
-                )
+                ]
             ),
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => true,
                     'languageCode' => 'eng-GB',
                     'fieldDefIdentifier' => 'name',
-                )
+                ]
             ),
-        );
+        ];
 
         $this->assertEquals($expected, $actual);
     }
@@ -2733,9 +2734,9 @@ XML
         // Will return a content instance with fields in "eng-US"
         $reloadedContent = $contentService->loadContentByContentInfo(
             $publishedContent->contentInfo,
-            array(
+            [
                 'eng-US',
-            ),
+            ],
             null,
             false
         );
@@ -2743,96 +2744,96 @@ XML
 
         $actual = $this->normalizeFields($reloadedContent->getFields());
 
-        $expected = array(
+        $expected = [
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => true,
                     'languageCode' => 'eng-US',
                     'fieldDefIdentifier' => 'description',
                     'fieldTypeIdentifier' => 'ezrichtext',
-                )
+                ]
             ),
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => true,
                     'languageCode' => 'eng-US',
                     'fieldDefIdentifier' => 'name',
                     'fieldTypeIdentifier' => 'ezstring',
-                )
+                ]
             ),
-        );
+        ];
 
         $this->assertEquals($expected, $actual);
 
         // Will return a content instance with fields in "eng-GB" (versions prior to 6.0.0-beta9 returned "eng-US" also)
         $reloadedContent = $contentService->loadContentByContentInfo(
             $publishedContent->contentInfo,
-            array(
+            [
                 'eng-GB',
-            ),
+            ],
             null,
             true
         );
 
         $actual = $this->normalizeFields($reloadedContent->getFields());
 
-        $expected = array(
+        $expected = [
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => true,
                     'languageCode' => 'eng-GB',
                     'fieldDefIdentifier' => 'description',
                     'fieldTypeIdentifier' => 'ezrichtext',
-                )
+                ]
             ),
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => true,
                     'languageCode' => 'eng-GB',
                     'fieldDefIdentifier' => 'name',
                     'fieldTypeIdentifier' => 'ezstring',
-                )
+                ]
             ),
-        );
+        ];
 
         $this->assertEquals($expected, $actual);
 
         // Will return a content instance with fields in main language "eng-US", as "fre-FR" does not exists
         $reloadedContent = $contentService->loadContentByContentInfo(
             $publishedContent->contentInfo,
-            array(
+            [
                 'fre-FR',
-            ),
+            ],
             null,
             true
         );
 
         $actual = $this->normalizeFields($reloadedContent->getFields());
 
-        $expected = array(
+        $expected = [
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => true,
                     'languageCode' => 'eng-US',
                     'fieldDefIdentifier' => 'description',
                     'fieldTypeIdentifier' => 'ezrichtext',
-                )
+                ]
             ),
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => true,
                     'languageCode' => 'eng-US',
                     'fieldDefIdentifier' => 'name',
                     'fieldTypeIdentifier' => 'ezstring',
-                )
+                ]
             ),
-        );
+        ];
 
         $this->assertEquals($expected, $actual);
     }
@@ -2912,7 +2913,7 @@ XML
         $draft = $this->createMultipleLanguageDraftVersion1();
 
         // This draft contains those fields localized with "eng-GB"
-        $draftLocalized = $contentService->loadContent($draft->id, array('eng-GB'), null, false);
+        $draftLocalized = $contentService->loadContent($draft->id, ['eng-GB'], null, false);
         /* END: Use Case */
 
         $this->assertLocaleFieldsEquals($draftLocalized->getFields(), 'eng-GB');
@@ -2934,7 +2935,7 @@ XML
 
         $contentService = $repository->getContentService();
 
-        $contentService->loadContent($contentDraft->id, array('ger-DE'), null, false);
+        $contentService->loadContent($contentDraft->id, ['ger-DE'], null, false);
     }
 
     /**
@@ -3009,7 +3010,7 @@ XML
         // This draft contains those fields localized with "eng-GB"
         $draftLocalized = $contentService->loadContentByRemoteId(
             $draft->contentInfo->remoteId,
-            array('eng-GB'),
+            ['eng-GB'],
             null,
             false
         );
@@ -3413,10 +3414,8 @@ XML
      *
      * @see \eZ\Publish\API\Repository\ContentService::copyContent($contentInfo, $destinationLocationCreateStruct, $versionInfo)
      * @depends eZ\Publish\API\Repository\Tests\ContentServiceTest::testCopyContent
-     *
-     * @todo Fix to more descriptive name
      */
-    public function testCopyContentWithThirdParameter()
+    public function testCopyContentWithGivenVersion()
     {
         $parentLocationId = $this->generateId('location', 56);
 
@@ -3532,18 +3531,18 @@ XML
     protected function assertExpectedRelations($relations)
     {
         $this->assertEquals(
-            array(
+            [
                 'type' => Relation::COMMON,
                 'sourceFieldDefinitionIdentifier' => null,
                 'sourceContentInfo' => 'abcdef0123456789abcdef0123456789',
                 'destinationContentInfo' => 'a6e35cbcb7cd6ae4b691f3eee30cd262',
-            ),
-            array(
+            ],
+            [
                 'type' => $relations[0]->type,
                 'sourceFieldDefinitionIdentifier' => $relations[0]->sourceFieldDefinitionIdentifier,
                 'sourceContentInfo' => $relations[0]->sourceContentInfo->remoteId,
                 'destinationContentInfo' => $relations[0]->destinationContentInfo->remoteId,
-            )
+            ]
         );
     }
 
@@ -3702,26 +3701,26 @@ XML
         );
 
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     'sourceContentInfo' => 'abcdef0123456789abcdef0123456789',
                     'destinationContentInfo' => 'a6e35cbcb7cd6ae4b691f3eee30cd262',
-                ),
-                array(
+                ],
+                [
                     'sourceContentInfo' => 'abcdef0123456789abcdef0123456789',
                     'destinationContentInfo' => '8b8b22fe3c6061ed500fbd2b377b885f',
-                ),
-            ),
-            array(
-                array(
+                ],
+            ],
+            [
+                [
                     'sourceContentInfo' => $relations[0]->sourceContentInfo->remoteId,
                     'destinationContentInfo' => $relations[0]->destinationContentInfo->remoteId,
-                ),
-                array(
+                ],
+                [
                     'sourceContentInfo' => $relations[1]->sourceContentInfo->remoteId,
                     'destinationContentInfo' => $relations[1]->destinationContentInfo->remoteId,
-                ),
-            )
+                ],
+            ]
         );
     }
 
@@ -3776,18 +3775,18 @@ XML
 
         $this->assertCount(1, $relations);
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     'sourceContentInfo' => 'abcdef0123456789abcdef0123456789',
                     'destinationContentInfo' => 'a6e35cbcb7cd6ae4b691f3eee30cd262',
-                ),
-            ),
-            array(
-                array(
+                ],
+            ],
+            [
+                [
                     'sourceContentInfo' => $relations[0]->sourceContentInfo->remoteId,
                     'destinationContentInfo' => $relations[0]->destinationContentInfo->remoteId,
-                ),
-            )
+                ],
+            ]
         );
     }
 
@@ -3838,18 +3837,18 @@ XML
 
         $this->assertCount(1, $relations);
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     'sourceContentInfo' => 'a6e35cbcb7cd6ae4b691f3eee30cd262',
                     'destinationContentInfo' => '8b8b22fe3c6061ed500fbd2b377b885f',
-                ),
-            ),
-            array(
-                array(
+                ],
+            ],
+            [
+                [
                     'sourceContentInfo' => $relations[0]->sourceContentInfo->remoteId,
                     'destinationContentInfo' => $relations[0]->destinationContentInfo->remoteId,
-                ),
-            )
+                ],
+            ]
         );
     }
 
@@ -3923,26 +3922,26 @@ XML
         );
 
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     'sourceContentInfo' => 'a6e35cbcb7cd6ae4b691f3eee30cd262',
                     'destinationContentInfo' => 'abcdef0123456789abcdef0123456789',
-                ),
-                array(
+                ],
+                [
                     'sourceContentInfo' => '8b8b22fe3c6061ed500fbd2b377b885f',
                     'destinationContentInfo' => 'abcdef0123456789abcdef0123456789',
-                ),
-            ),
-            array(
-                array(
+                ],
+            ],
+            [
+                [
                     'sourceContentInfo' => $reverseRelations[0]->sourceContentInfo->remoteId,
                     'destinationContentInfo' => $reverseRelations[0]->destinationContentInfo->remoteId,
-                ),
-                array(
+                ],
+                [
                     'sourceContentInfo' => $reverseRelations[1]->sourceContentInfo->remoteId,
                     'destinationContentInfo' => $reverseRelations[1]->destinationContentInfo->remoteId,
-                ),
-            )
+                ],
+            ]
         );
     }
 
@@ -4015,18 +4014,18 @@ XML
         $this->assertEquals(1, count($reverseRelations));
 
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     'sourceContentInfo' => 'a6e35cbcb7cd6ae4b691f3eee30cd262',
                     'destinationContentInfo' => 'abcdef0123456789abcdef0123456789',
-                ),
-            ),
-            array(
-                array(
+                ],
+            ],
+            [
+                [
                     'sourceContentInfo' => $reverseRelations[0]->sourceContentInfo->remoteId,
                     'destinationContentInfo' => $reverseRelations[0]->destinationContentInfo->remoteId,
-                ),
-            )
+                ],
+            ]
         );
     }
 
@@ -4091,18 +4090,18 @@ XML
         $this->assertEquals(1, count($reverseRelations));
 
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     'sourceContentInfo' => '8b8b22fe3c6061ed500fbd2b377b885f',
                     'destinationContentInfo' => 'a6e35cbcb7cd6ae4b691f3eee30cd262',
-                ),
-            ),
-            array(
-                array(
+                ],
+            ],
+            [
+                [
                     'sourceContentInfo' => $reverseRelations[0]->sourceContentInfo->remoteId,
                     'destinationContentInfo' => $reverseRelations[0]->destinationContentInfo->remoteId,
-                ),
-            )
+                ],
+            ]
         );
     }
 
@@ -4857,7 +4856,7 @@ XML
         $drafts = $contentService->loadContentDrafts();
         /* END: Use Case */
 
-        $this->assertSame(array(), $drafts);
+        $this->assertSame([], $drafts);
     }
 
     /**
@@ -4902,7 +4901,7 @@ XML
         $drafts = $contentService->loadContentDrafts();
         /* END: Use Case */
 
-        $this->assertSame(array(), $drafts);
+        $this->assertSame([], $drafts);
     }
 
     /**
@@ -5139,17 +5138,17 @@ XML
         $aliases = $urlAliasService->listLocationAliases($location, false);
 
         $this->assertAliasesCorrect(
-            array(
-                '/Design/Plain-site/An-awesome-forum' => array(
+            [
+                '/Design/Plain-site/An-awesome-forum' => [
                     'type' => URLAlias::LOCATION,
                     'destination' => $location->id,
                     'path' => '/Design/Plain-site/An-awesome-forum',
-                    'languageCodes' => array('eng-US'),
+                    'languageCodes' => ['eng-US'],
                     'isHistory' => false,
                     'isCustom' => false,
                     'forward' => false,
-                ),
-            ),
+                ],
+            ],
             $aliases
         );
     }
@@ -5174,18 +5173,18 @@ XML
         $aliases = $urlAliasService->listLocationAliases($location, false);
 
         $this->assertAliasesCorrect(
-            array(
-                '/Design/Plain-site/An-awesome-forum' => array(
+            [
+                '/Design/Plain-site/An-awesome-forum' => [
                     'type' => URLAlias::LOCATION,
                     'destination' => $location->id,
                     'path' => '/Design/Plain-site/An-awesome-forum',
-                    'languageCodes' => array('eng-US'),
+                    'languageCodes' => ['eng-US'],
                     'alwaysAvailable' => true,
                     'isHistory' => false,
                     'isCustom' => false,
                     'forward' => false,
-                ),
-            ),
+                ],
+            ],
             $aliases
         );
 
@@ -5201,28 +5200,28 @@ XML
         $aliases = $urlAliasService->listLocationAliases($location, false);
 
         $this->assertAliasesCorrect(
-            array(
-                '/Design/Plain-site/An-awesome-forum2' => array(
+            [
+                '/Design/Plain-site/An-awesome-forum2' => [
                     'type' => URLAlias::LOCATION,
                     'destination' => $location->id,
                     'path' => '/Design/Plain-site/An-awesome-forum2',
-                    'languageCodes' => array('eng-US'),
+                    'languageCodes' => ['eng-US'],
                     'alwaysAvailable' => true,
                     'isHistory' => false,
                     'isCustom' => false,
                     'forward' => false,
-                ),
-                '/Design/Plain-site/An-awesome-forum23' => array(
+                ],
+                '/Design/Plain-site/An-awesome-forum23' => [
                     'type' => URLAlias::LOCATION,
                     'destination' => $location->id,
                     'path' => '/Design/Plain-site/An-awesome-forum23',
-                    'languageCodes' => array('eng-GB'),
+                    'languageCodes' => ['eng-GB'],
                     'alwaysAvailable' => true,
                     'isHistory' => false,
                     'isCustom' => false,
                     'forward' => false,
-                ),
-            ),
+                ],
+            ],
             $aliases
         );
     }
@@ -5271,18 +5270,18 @@ XML
         $aliases = $urlAliasService->listLocationAliases($location);
 
         $this->assertAliasesCorrect(
-            array(
-                '/my/fancy/story-about-ez-publish' => array(
+            [
+                '/my/fancy/story-about-ez-publish' => [
                     'type' => URLAlias::LOCATION,
                     'destination' => $location->id,
                     'path' => '/my/fancy/story-about-ez-publish',
-                    'languageCodes' => array('eng-US'),
+                    'languageCodes' => ['eng-US'],
                     'isHistory' => false,
                     'isCustom' => true,
                     'forward' => false,
                     'alwaysAvailable' => false,
-                ),
-            ),
+                ],
+            ],
             $aliases
         );
     }
@@ -5960,6 +5959,48 @@ XML
     }
 
     /**
+     * Tests loading list of content versions of status draft.
+     */
+    public function testLoadVersionsOfStatusDraft()
+    {
+        $repository = $this->getRepository();
+
+        $contentService = $repository->getContentService();
+
+        $content = $this->createContentVersion1();
+
+        $contentService->createContentDraft($content->contentInfo);
+        $contentService->createContentDraft($content->contentInfo);
+        $contentService->createContentDraft($content->contentInfo);
+
+        $versions = $contentService->loadVersions($content->contentInfo, VersionInfo::STATUS_DRAFT);
+
+        $this->assertSame(\count($versions), 3);
+    }
+
+    /**
+     * Tests loading list of content versions of status archived.
+     */
+    public function testLoadVersionsOfStatusArchived()
+    {
+        $repository = $this->getRepository();
+
+        $contentService = $repository->getContentService();
+
+        $content = $this->createContentVersion1();
+
+        $draft1 = $contentService->createContentDraft($content->contentInfo);
+        $contentService->publishVersion($draft1->versionInfo);
+
+        $draft2 = $contentService->createContentDraft($content->contentInfo);
+        $contentService->publishVersion($draft2->versionInfo);
+
+        $versions = $contentService->loadVersions($content->contentInfo, VersionInfo::STATUS_ARCHIVED);
+
+        $this->assertSame(\count($versions), 2);
+    }
+
+    /**
      * Asserts that all aliases defined in $expectedAliasProperties with the
      * given properties are available in $actualAliases and not more.
      *
@@ -6029,7 +6070,7 @@ XML
     {
         $actual = $this->normalizeFields($fields);
 
-        $expected = array();
+        $expected = [];
         foreach ($this->normalizeFields($this->createFieldsFixture()) as $field) {
             if ($field->languageCode !== $languageCode) {
                 continue;
@@ -6054,16 +6095,16 @@ XML
      */
     private function normalizeFields(array $fields)
     {
-        $normalized = array();
+        $normalized = [];
         foreach ($fields as $field) {
             $normalized[] = new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => ($field->value !== null ? true : null),
                     'languageCode' => $field->languageCode,
                     'fieldDefIdentifier' => $field->fieldDefIdentifier,
                     'fieldTypeIdentifier' => $field->fieldTypeIdentifier,
-                )
+                ]
             );
         }
         usort(
@@ -6089,7 +6130,7 @@ XML
      */
     private function createLocaleFieldsFixture($languageCode)
     {
-        $fields = array();
+        $fields = [];
         foreach ($this->createFieldsFixture() as $field) {
             if (null === $field->languageCode || $languageCode === $field->languageCode) {
                 $fields[] = $field;
@@ -6160,44 +6201,44 @@ XML
      */
     private function createFieldsFixture()
     {
-        return array(
+        return [
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => 'Foo',
                     'languageCode' => 'eng-US',
                     'fieldDefIdentifier' => 'description',
                     'fieldTypeIdentifier' => 'ezrichtext',
-                )
+                ]
             ),
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => 'Bar',
                     'languageCode' => 'eng-GB',
                     'fieldDefIdentifier' => 'description',
                     'fieldTypeIdentifier' => 'ezrichtext',
-                )
+                ]
             ),
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => 'An awesome multi-lang forum²',
                     'languageCode' => 'eng-US',
                     'fieldDefIdentifier' => 'name',
                     'fieldTypeIdentifier' => 'ezstring',
-                )
+                ]
             ),
             new Field(
-                array(
+                [
                     'id' => 0,
                     'value' => 'An awesome multi-lang forum²³',
                     'languageCode' => 'eng-GB',
                     'fieldDefIdentifier' => 'name',
                     'fieldTypeIdentifier' => 'ezstring',
-                )
+                ]
             ),
-        );
+        ];
     }
 
     /**
@@ -6226,153 +6267,110 @@ XML
     }
 
     /**
-     * @param \eZ\Publish\API\Repository\Values\Content\LocationCreateStruct[] $locationsToHide
-     *
-     * @dataProvider provideLocationsToHideAndReveal
-     */
-    public function testHideContent(array $locationsToHide)
-    {
-        $repository = $this->getRepository();
-
-        $contentTypeService = $repository->getContentTypeService();
-
-        $contentType = $contentTypeService->loadContentTypeByIdentifier('folder');
-
-        $contentService = $repository->getContentService();
-        $locationService = $repository->getLocationService();
-
-        $contentCreate = $contentService->newContentCreateStruct($contentType, 'eng-US');
-        $contentCreate->setField('name', 'Folder to hide');
-
-        $content = $contentService->createContent(
-            $contentCreate,
-            $locationsToHide
-        );
-
-        $publishedContent = $contentService->publishVersion($content->versionInfo);
-        $locations = $locationService->loadLocations($publishedContent->contentInfo);
-
-        // Sanity check
-        $this->assertCount(3, $locations);
-        $this->assertEquals(
-            [
-                false,
-                false,
-                false,
-            ],
-            array_column($locations, 'hidden')
-        );
-
-        /* BEGIN: Use Case */
-        $contentService->hideContent($publishedContent->contentInfo);
-        /* END: Use Case */
-
-        $hiddenLocations = $locationService->loadLocations($publishedContent->contentInfo);
-        $this->assertEquals(
-            [
-                true,
-                true,
-                true,
-            ],
-            array_column($hiddenLocations, 'hidden')
-        );
-    }
-
-    /**
-     * @param \eZ\Publish\API\Repository\Values\Content\LocationCreateStruct[] $locationsToReveal
-     *
-     * @dataProvider provideLocationsToHideAndReveal
+     * @covers \eZ\Publish\API\Repository\ContentService::hideContent
      *
      * @throws \eZ\Publish\API\Repository\Exceptions\ForbiddenException
      * @throws \eZ\Publish\API\Repository\Exceptions\NotFoundException
      * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException
      */
-    public function testRevealContent(array $locationsToReveal)
+    public function testHideContent(): void
     {
         $repository = $this->getRepository();
-
         $contentTypeService = $repository->getContentTypeService();
-
-        $contentType = $contentTypeService->loadContentTypeByIdentifier('folder');
-
         $contentService = $repository->getContentService();
         $locationService = $repository->getLocationService();
+
+        $locationCreateStructs = array_map(
+            function (Location $parentLocation) use ($locationService) {
+                return $locationService->newLocationCreateStruct($parentLocation->id);
+            },
+            $this->createParentLocationsForHideReveal($locationService, 2)
+        );
+
+        $contentType = $contentTypeService->loadContentTypeByIdentifier('folder');
 
         $contentCreate = $contentService->newContentCreateStruct($contentType, 'eng-US');
         $contentCreate->setField('name', 'Folder to hide');
 
-        $locationsToReveal[0]->hidden = true;
-
         $content = $contentService->createContent(
             $contentCreate,
-            $locationsToReveal
+            $locationCreateStructs
         );
 
         $publishedContent = $contentService->publishVersion($content->versionInfo);
         $locations = $locationService->loadLocations($publishedContent->contentInfo);
-        // sort the Locations putting hidden one on top, as the order in which they're returned is not deterministic
-        usort(
-            $locations,
-            function (Location $location) {
-                return $location->hidden ? -1 : 1;
-            }
-        );
 
         // Sanity check
         $this->assertCount(3, $locations);
-        $this->assertEquals(
-            [
-                true,
-                false,
-                false,
-            ],
-            array_column($locations, 'hidden')
-        );
+        $this->assertCount(0, $this->filterHiddenLocations($locations));
 
         /* BEGIN: Use Case */
         $contentService->hideContent($publishedContent->contentInfo);
+        /* END: Use Case */
 
-        $this->assertEquals(
-            [
-                true,
-                true,
-                true,
-            ],
-            array_column($locationService->loadLocations($publishedContent->contentInfo), 'hidden')
+        $locations = $locationService->loadLocations($publishedContent->contentInfo);
+        $this->assertCount(3, $locations);
+        $this->assertCount(3, $this->filterHiddenLocations($locations));
+    }
+
+    /**
+     * @covers \eZ\Publish\API\Repository\ContentService::revealContent
+     *
+     * @throws \eZ\Publish\API\Repository\Exceptions\ForbiddenException
+     * @throws \eZ\Publish\API\Repository\Exceptions\NotFoundException
+     * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException
+     */
+    public function testRevealContent()
+    {
+        $repository = $this->getRepository();
+        $contentTypeService = $repository->getContentTypeService();
+        $contentService = $repository->getContentService();
+        $locationService = $repository->getLocationService();
+
+        $locationCreateStructs = array_map(
+            function (Location $parentLocation) use ($locationService) {
+                return $locationService->newLocationCreateStruct($parentLocation->id);
+            },
+            $this->createParentLocationsForHideReveal($locationService, 2)
+        );
+
+        $contentType = $contentTypeService->loadContentTypeByIdentifier('folder');
+
+        $contentCreate = $contentService->newContentCreateStruct($contentType, 'eng-US');
+        $contentCreate->setField('name', 'Folder to hide');
+
+        $locationCreateStructs[0]->hidden = true;
+
+        $content = $contentService->createContent(
+            $contentCreate,
+            $locationCreateStructs
+        );
+
+        $publishedContent = $contentService->publishVersion($content->versionInfo);
+        $locations = $locationService->loadLocations($publishedContent->contentInfo);
+
+        // Sanity check
+        $hiddenLocations = $this->filterHiddenLocations($locations);
+        $this->assertCount(3, $locations);
+        $this->assertCount(1, $hiddenLocations);
+
+        // BEGIN: Use Case
+        $contentService->hideContent($publishedContent->contentInfo);
+        $this->assertCount(
+            3,
+            $this->filterHiddenLocations(
+                $locationService->loadLocations($publishedContent->contentInfo)
+            )
         );
 
         $contentService->revealContent($publishedContent->contentInfo);
-        /* END: Use Case */
+        // END: Use Case
 
-        $this->assertEquals(
-            [
-                true,
-                false,
-                false,
-            ],
-            array_column($locationService->loadLocations($publishedContent->contentInfo), 'hidden')
-        );
-    }
-
-    public function provideLocationsToHideAndReveal()
-    {
-        $locationService = $this->getRepository()->getLocationService();
-
-        return [
-            [
-                [
-                    $mainLocationCreateStruct = $locationService->newLocationCreateStruct(
-                        $this->generateId('location', 2)
-                    ),
-                    $otherCreateStruct = $locationService->newLocationCreateStruct(
-                        $this->generateId('location', 5)
-                    ),
-                    $thirdCreateStruct = $locationService->newLocationCreateStruct(
-                        $this->generateId('location', 43)
-                    ),
-                ],
-            ],
-        ];
+        $locations = $locationService->loadLocations($publishedContent->contentInfo);
+        $hiddenLocationsAfterReveal = $this->filterHiddenLocations($locations);
+        $this->assertCount(3, $locations);
+        $this->assertCount(1, $hiddenLocationsAfterReveal);
+        $this->assertEquals($hiddenLocations, $hiddenLocationsAfterReveal);
     }
 
     /**
@@ -6592,7 +6590,6 @@ XML
         $repository = $this->getRepository();
 
         $contentService = $repository->getContentService();
-        $this->createLanguage('fre-FR', 'French');
 
         $contentDraft = $this->createContentDraft(
             'folder',
@@ -6613,9 +6610,9 @@ XML
 
         $contentUpdateStruct->setField('name', 'Folder GER', 'ger-DE');
 
-        $gerContent = $contentService->updateContent($deDraft->versionInfo, $contentUpdateStruct);
+        $deContent = $contentService->updateContent($deDraft->versionInfo, $contentUpdateStruct);
 
-        $updatedContent = $contentService->loadContent($gerContent->id, null, $gerContent->versionInfo->versionNo);
+        $updatedContent = $contentService->loadContent($deContent->id, null, $deContent->versionInfo->versionNo);
         $this->assertEquals(
             [
                 'eng-US' => 'Folder US',
@@ -6624,22 +6621,22 @@ XML
             $updatedContent->fields['name']
         );
 
-        $frDraft = $contentService->createContentDraft($publishedContent->contentInfo);
+        $gbDraft = $contentService->createContentDraft($publishedContent->contentInfo);
 
         $contentUpdateStruct = new ContentUpdateStruct([
-            'initialLanguageCode' => 'fre-FR',
+            'initialLanguageCode' => 'eng-GB',
             'fields' => $contentDraft->getFields(),
         ]);
 
-        $contentUpdateStruct->setField('name', 'Folder FR', 'fre-FR');
+        $contentUpdateStruct->setField('name', 'Folder GB', 'eng-GB');
 
-        $frContent = $contentService->updateContent($frDraft->versionInfo, $contentUpdateStruct);
-        $contentService->publishVersion($frDraft->versionInfo);
-        $updatedContent = $contentService->loadContent($frContent->id, null, $frContent->versionInfo->versionNo);
+        $gbContent = $contentService->updateContent($gbDraft->versionInfo, $contentUpdateStruct);
+        $contentService->publishVersion($gbDraft->versionInfo);
+        $updatedContent = $contentService->loadContent($gbContent->id, null, $gbContent->versionInfo->versionNo);
         $this->assertEquals(
             [
                 'eng-US' => 'Folder US',
-                'fre-FR' => 'Folder FR',
+                'eng-GB' => 'Folder GB',
             ],
             $updatedContent->fields['name']
         );
@@ -6649,9 +6646,99 @@ XML
             [
                 'eng-US' => 'Folder US',
                 'ger-DE' => 'Folder GER',
-                'fre-FR' => 'Folder FR',
+                'eng-GB' => 'Folder GB',
             ],
             $dePublished->fields['name']
         );
+    }
+
+    /**
+     * Create structure of parent folders with Locations to be used for Content hide/reveal tests.
+     *
+     * @param \eZ\Publish\API\Repository\LocationService $locationService
+     * @param int $parentLocationId
+     *
+     * @return \eZ\Publish\API\Repository\Values\Content\Location[] A list of Locations aimed to be parents
+     *
+     * @throws \eZ\Publish\API\Repository\Exceptions\ForbiddenException
+     * @throws \eZ\Publish\API\Repository\Exceptions\NotFoundException
+     * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException
+     */
+    private function createParentLocationsForHideReveal(LocationService $locationService, int $parentLocationId): array
+    {
+        $parentFoldersLocationsIds = [
+            $this->createFolder(['eng-US' => 'P1'], $parentLocationId)->contentInfo->mainLocationId,
+            $this->createFolder(['eng-US' => 'P2'], $parentLocationId)->contentInfo->mainLocationId,
+            $this->createFolder(['eng-US' => 'P3'], $parentLocationId)->contentInfo->mainLocationId,
+        ];
+
+        return array_values($locationService->loadLocationList($parentFoldersLocationsIds));
+    }
+
+    /**
+     * Filter Locations list by hidden only.
+     *
+     * @param \eZ\Publish\API\Repository\Values\Content\Location[] $locations
+     *
+     * @return array
+     */
+    private function filterHiddenLocations(array $locations): array
+    {
+        return array_values(
+            array_filter(
+                $locations,
+                function (Location $location) {
+                    return $location->hidden;
+                }
+            )
+        );
+    }
+
+    public function testPublishVersionWithSelectedLanguages()
+    {
+        $repository = $this->getRepository();
+
+        $contentService = $repository->getContentService();
+
+        $publishedContent = $this->createFolder(
+            [
+                'eng-US' => 'Published US',
+                'ger-DE' => 'Published DE',
+            ],
+            $this->generateId('location', 2)
+        );
+
+        $draft = $contentService->createContentDraft($publishedContent->contentInfo);
+        $contentUpdateStruct = new ContentUpdateStruct([
+            'initialLanguageCode' => 'eng-US',
+        ]);
+        $contentUpdateStruct->setField('name', 'Draft 1 US', 'eng-US');
+        $contentUpdateStruct->setField('name', 'Draft 1 DE', 'ger-DE');
+
+        $contentService->updateContent($draft->versionInfo, $contentUpdateStruct);
+
+        $contentService->publishVersion($draft->versionInfo, ['ger-DE']);
+        $content = $contentService->loadContent($draft->contentInfo->id);
+        $this->assertEquals(
+            [
+                'eng-US' => 'Published US',
+                'ger-DE' => 'Draft 1 DE',
+            ],
+            $content->fields['name']
+        );
+    }
+
+    public function testCreateContentWithRomanianSpecialCharsInTitle()
+    {
+        $repository = $this->getRepository();
+
+        $baseName = 'ȘșțȚdfdf';
+        $expectedPath = '/SstTdfdf';
+
+        $this->createFolder(['eng-US' => $baseName], 2);
+
+        $urlAliasService = $repository->getURLAliasService();
+        $urlAlias = $urlAliasService->lookup($expectedPath);
+        $this->assertSame($expectedPath, $urlAlias->path);
     }
 }

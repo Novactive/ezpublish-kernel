@@ -22,9 +22,7 @@ class LegacyStorage extends Gateway
     const URL_TABLE = 'ezurl';
     const URL_LINK_TABLE = 'ezurl_object_link';
 
-    /**
-     * @var \eZ\Publish\Core\Persistence\Database\DatabaseHandler
-     */
+    /** @var \eZ\Publish\Core\Persistence\Database\DatabaseHandler */
     protected $dbHandler;
 
     public function __construct(DatabaseHandler $dbHandler)
@@ -57,7 +55,7 @@ class LegacyStorage extends Gateway
      */
     public function getIdUrlMap(array $ids)
     {
-        $map = array();
+        $map = [];
 
         if (!empty($ids)) {
             $q = $this->getConnection()->createSelectQuery();
@@ -87,7 +85,7 @@ class LegacyStorage extends Gateway
      */
     public function getUrlIdMap(array $urls)
     {
-        $map = array();
+        $map = [];
 
         if (!empty($urls)) {
             $q = $this->getConnection()->createSelectQuery();

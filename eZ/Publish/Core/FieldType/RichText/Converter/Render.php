@@ -19,9 +19,7 @@ use DOMNode;
  */
 abstract class Render
 {
-    /**
-     * @var \eZ\Publish\Core\FieldType\RichText\RendererInterface
-     */
+    /** @var \eZ\Publish\Core\FieldType\RichText\RendererInterface */
     protected $renderer;
 
     public function __construct(RendererInterface $renderer)
@@ -38,7 +36,7 @@ abstract class Render
      */
     protected function extractConfiguration(DOMElement $embed)
     {
-        $hash = array();
+        $hash = [];
         $configElements = $embed->getElementsByTagName('ezconfig');
 
         if ($configElements->length) {
@@ -57,7 +55,7 @@ abstract class Render
      */
     protected function extractHash(DOMNode $configHash)
     {
-        $hash = array();
+        $hash = [];
 
         foreach ($configHash->childNodes as $node) {
             /** @var \DOMText|\DOMElement $node */

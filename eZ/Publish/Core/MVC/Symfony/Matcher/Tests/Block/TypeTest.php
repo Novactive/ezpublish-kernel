@@ -14,9 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 class TypeTest extends TestCase
 {
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\Matcher\Block\MatcherInterface
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\Matcher\Block\MatcherInterface */
     private $matcher;
 
     protected function setUp()
@@ -40,31 +38,31 @@ class TypeTest extends TestCase
 
     public function matchBlockProvider()
     {
-        $data = array();
+        $data = [];
 
-        $data[] = array(
+        $data[] = [
             'foo',
             $this->generateBlockForType('foo'),
             true,
-        );
+        ];
 
-        $data[] = array(
+        $data[] = [
             'foo',
             $this->generateBlockForType('bar'),
             false,
-        );
+        ];
 
-        $data[] = array(
-            array('foo', 'baz'),
+        $data[] = [
+            ['foo', 'baz'],
             $this->generateBlockForType('bar'),
             false,
-        );
+        ];
 
-        $data[] = array(
-            array('foo', 'baz'),
+        $data[] = [
+            ['foo', 'baz'],
             $this->generateBlockForType('baz'),
             true,
-        );
+        ];
 
         return $data;
     }
@@ -77,7 +75,7 @@ class TypeTest extends TestCase
     private function generateBlockForType($type)
     {
         return new Block(
-            array('type' => $type)
+            ['type' => $type]
         );
     }
 }

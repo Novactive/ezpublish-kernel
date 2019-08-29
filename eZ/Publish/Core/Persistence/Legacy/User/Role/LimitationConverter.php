@@ -17,9 +17,7 @@ use eZ\Publish\SPI\Persistence\User\Policy;
  */
 class LimitationConverter
 {
-    /**
-     * @var \eZ\Publish\Core\Persistence\Legacy\User\Role\LimitationHandler[]
-     */
+    /** @var \eZ\Publish\Core\Persistence\Legacy\User\Role\LimitationHandler[] */
     protected $limitationHandlers;
 
     /**
@@ -27,7 +25,7 @@ class LimitationConverter
      *
      * @param \eZ\Publish\Core\Persistence\Legacy\User\Role\LimitationHandler[] $limitationHandlers
      */
-    public function __construct(array $limitationHandlers = array())
+    public function __construct(array $limitationHandlers = [])
     {
         $this->limitationHandlers = $limitationHandlers;
     }

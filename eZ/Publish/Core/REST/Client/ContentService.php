@@ -13,6 +13,7 @@ use eZ\Publish\API\Repository\Values\Content\ContentInfo;
 use eZ\Publish\API\Repository\Values\Content\ContentCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\ContentUpdateStruct;
 use eZ\Publish\API\Repository\Values\Content\ContentMetadataUpdateStruct;
+use eZ\Publish\API\Repository\Values\Content\Language;
 use eZ\Publish\API\Repository\Values\Content\LocationCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\TranslationInfo;
 use eZ\Publish\API\Repository\Values\Content\VersionInfo;
@@ -29,29 +30,19 @@ use eZ\Publish\Core\REST\Common\Message;
  */
 class ContentService implements APIContentService, Sessionable
 {
-    /**
-     * @var \eZ\Publish\Core\REST\Client\HttpClient
-     */
+    /** @var \eZ\Publish\Core\REST\Client\HttpClient */
     private $client;
 
-    /**
-     * @var \eZ\Publish\Core\REST\Common\Input\Dispatcher
-     */
+    /** @var \eZ\Publish\Core\REST\Common\Input\Dispatcher */
     private $inputDispatcher;
 
-    /**
-     * @var \eZ\Publish\Core\REST\Common\Output\Visitor
-     */
+    /** @var \eZ\Publish\Core\REST\Common\Output\Visitor */
     private $outputVisitor;
 
-    /**
-     * @var \eZ\Publish\Core\REST\Common\RequestParser
-     */
+    /** @var \eZ\Publish\Core\REST\Common\RequestParser */
     private $requestParser;
 
-    /**
-     * @var \eZ\Publish\Core\REST\Client\ContentTypeService
-     */
+    /** @var \eZ\Publish\Core\REST\Client\ContentTypeService */
     private $contentTypeService;
 
     /**
@@ -499,13 +490,14 @@ class ContentService implements APIContentService, Sessionable
      * @throws \eZ\Publish\API\Repository\Exceptions\BadStateException if the version is not a draft
      *
      * @param \eZ\Publish\API\Repository\Values\Content\VersionInfo $versionInfo
+     * @param string[] $translations
      *
      * @return \eZ\Publish\API\Repository\Values\Content\Content
      *
      * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException if the user is not allowed to publish this version
      * @throws \eZ\Publish\API\Repository\Exceptions\BadStateException if the version is not a draft
      */
-    public function publishVersion(VersionInfo $versionInfo)
+    public function publishVersion(VersionInfo $versionInfo, array $translations = Language::ALL)
     {
         throw new \Exception('@todo: Implement.');
     }
@@ -528,12 +520,14 @@ class ContentService implements APIContentService, Sessionable
      * Loads all versions for the given content.
      *
      * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException if the user is not allowed to list versions
+     * @throws \eZ\Publish\API\Repository\Exceptions\InvalidArgumentException if the given status is invalid
      *
      * @param \eZ\Publish\API\Repository\Values\Content\ContentInfo $contentInfo
+     * @param int|null $status
      *
      * @return \eZ\Publish\API\Repository\Values\Content\VersionInfo[] Sorted by creation date
      */
-    public function loadVersions(ContentInfo $contentInfo)
+    public function loadVersions(ContentInfo $contentInfo, ?int $status = null)
     {
         throw new \Exception('@todo: Implement.');
     }
@@ -730,26 +724,6 @@ class ContentService implements APIContentService, Sessionable
      * @throws \Exception Not implemented
      */
     public function loadContentListByContentInfo(array $contentInfoList, array $languages = [], $useAlwaysAvailable = true)
-    {
-        throw new \Exception('@todo: Implement.');
-    }
-
-    /**
-     * Instantiates a new TranslationInfo object.
-     *
-     * @return \eZ\Publish\API\Repository\Values\Content\TranslationInfo
-     */
-    public function newTranslationInfo()
-    {
-        throw new \Exception('@todo: Implement.');
-    }
-
-    /**
-     * Instantiates a Translation object.
-     *
-     * @return \eZ\Publish\API\Repository\Values\Content\TranslationValues
-     */
-    public function newTranslationValues()
     {
         throw new \Exception('@todo: Implement.');
     }

@@ -32,44 +32,28 @@ class UpdateTimestampsToUTCCommand extends ContainerAwareCommand
         'all' => ['ezdate', 'ezdatetime'],
     ];
 
-    /**
-     * @var int
-     */
+    /** @var int */
     protected $done = 0;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $timezone;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $mode;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $from;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $to;
 
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
+    /** @var \Doctrine\DBAL\Connection */
     private $connection;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $phpPath;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $dryRun;
 
     protected function configure()
@@ -292,7 +276,7 @@ EOT
 
             //failsafe for int field limitation (dates/datetimes after 01/19/2038 @ 4:14am (UTC))
             if ($newTimestamp <= self::MAX_TIMESTAMP_VALUE && !$this->dryRun) {
-                $this->updateTimestampToUTC($timestampBasedField['id'], $newTimestamp);
+                $this->updateTimestampToUTC($timestampBasedField['id'], $timestampBasedField['version'], $newTimestamp);
             }
             ++$this->done;
         }
@@ -308,7 +292,7 @@ EOT
     {
         $query = $this->connection->createQueryBuilder();
         $query
-            ->select('a.id, a.data_int')
+            ->select('a.id, a.version, a.data_int')
             ->from('ezcontentobject_attribute', 'a')
             ->join('a', 'ezcontentobject_version', 'v', 'a.contentobject_id = v.contentobject_id')
             ->where(
@@ -463,10 +447,12 @@ EOT
 
     /**
      * @param int $contentAttributeId
+     * @param int $contentAttributeVersion
      * @param int $newTimestamp
      */
     protected function updateTimestampToUTC(
         $contentAttributeId,
+        $contentAttributeVersion,
         $newTimestamp
     ) {
         $query = $this->connection->createQueryBuilder();
@@ -475,7 +461,9 @@ EOT
             ->set('a.data_int', $newTimestamp)
             ->set('a.sort_key_int', $newTimestamp)
             ->where('a.id = :id')
-            ->setParameter(':id', $contentAttributeId);
+            ->andWhere('a.version = :version')
+            ->setParameter(':id', $contentAttributeId)
+            ->setParameter(':version', $contentAttributeVersion);
 
         $query->execute();
     }

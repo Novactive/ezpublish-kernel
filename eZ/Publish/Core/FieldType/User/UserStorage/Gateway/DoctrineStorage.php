@@ -20,9 +20,7 @@ class DoctrineStorage extends Gateway
     const USER_TABLE = 'ezuser';
     const USER_SETTING_TABLE = 'ezuser_setting';
 
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
+    /** @var \Doctrine\DBAL\Connection */
     protected $connection;
 
     /**
@@ -231,6 +229,6 @@ class DoctrineStorage extends Gateway
 
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        return isset($rows[0]) ? $this->convertColumnsToProperties($rows[0]) : array();
+        return isset($rows[0]) ? $this->convertColumnsToProperties($rows[0]) : [];
     }
 }

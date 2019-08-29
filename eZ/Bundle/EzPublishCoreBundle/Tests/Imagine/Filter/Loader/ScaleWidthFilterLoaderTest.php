@@ -15,14 +15,10 @@ use PHPUnit\Framework\TestCase;
 
 class ScaleWidthFilterLoaderTest extends TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $innerLoader;
 
-    /**
-     * @var ScaleWidthFilterLoader
-     */
+    /** @var ScaleWidthFilterLoader */
     private $loader;
 
     protected function setUp()
@@ -38,7 +34,7 @@ class ScaleWidthFilterLoaderTest extends TestCase
      */
     public function testLoadFail()
     {
-        $this->loader->load($this->createMock(ImageInterface::class, array()));
+        $this->loader->load($this->createMock(ImageInterface::class, []));
     }
 
     public function testLoad()
@@ -48,9 +44,9 @@ class ScaleWidthFilterLoaderTest extends TestCase
         $this->innerLoader
             ->expects($this->once())
             ->method('load')
-            ->with($image, $this->equalTo(array('widen' => $width)))
+            ->with($image, $this->equalTo(['widen' => $width]))
             ->will($this->returnValue($image));
 
-        $this->assertSame($image, $this->loader->load($image, array($width)));
+        $this->assertSame($image, $this->loader->load($image, [$width]));
     }
 }

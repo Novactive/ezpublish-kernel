@@ -16,14 +16,10 @@ use eZ\Publish\Core\MVC\ConfigResolverInterface;
  */
 class RepositoryConfigurationProvider
 {
-    /**
-     * @var \eZ\Publish\Core\MVC\ConfigResolverInterface
-     */
+    /** @var \eZ\Publish\Core\MVC\ConfigResolverInterface */
     private $configResolver;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $repositories;
 
     public function __construct(ConfigResolverInterface $configResolver, array $repositories)
@@ -53,6 +49,6 @@ class RepositoryConfigurationProvider
             );
         }
 
-        return array('alias' => $repositoryAlias) + $this->repositories[$repositoryAlias];
+        return ['alias' => $repositoryAlias] + $this->repositories[$repositoryAlias];
     }
 }

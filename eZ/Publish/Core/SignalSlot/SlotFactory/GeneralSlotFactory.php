@@ -19,15 +19,13 @@ use eZ\Publish\Core\Base\Exceptions\NotFoundException;
  */
 class GeneralSlotFactory extends SlotFactory
 {
-    /**
-     * @var \eZ\Publish\Core\SignalSlot\Slot[]
-     */
-    protected $slots = array();
+    /** @var \eZ\Publish\Core\SignalSlot\Slot[] */
+    protected $slots = [];
 
     /**
      * @param \eZ\Publish\Core\SignalSlot\Slot[] $slots
      */
-    public function __construct(array $slots = array())
+    public function __construct(array $slots = [])
     {
         $this->slots = $slots;
     }

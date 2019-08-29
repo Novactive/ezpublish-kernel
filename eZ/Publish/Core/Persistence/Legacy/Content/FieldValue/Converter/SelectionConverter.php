@@ -19,9 +19,7 @@ use DOMDocument;
 
 class SelectionConverter implements Converter
 {
-    /**
-     * @var \eZ\Publish\API\Repository\LanguageService
-     */
+    /** @var \eZ\Publish\API\Repository\LanguageService */
     private $languageService;
 
     /**
@@ -72,7 +70,7 @@ class SelectionConverter implements Converter
                 explode('-', $value->dataText)
             );
         } else {
-            $fieldValue->data = array();
+            $fieldValue->data = [];
         }
         $fieldValue->sortKey = $value->sortKeyString;
     }
@@ -153,7 +151,7 @@ class SelectionConverter implements Converter
 
         // @todo: Can Selection store a default value in the DB?
         $fieldDef->defaultValue = new FieldValue();
-        $fieldDef->defaultValue->data = array();
+        $fieldDef->defaultValue->data = [];
         $fieldDef->defaultValue->sortKey = '';
     }
 

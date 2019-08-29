@@ -23,19 +23,13 @@ use eZ\Publish\Core\MVC\Symfony\Security\User;
 
 class RepositoryAuthenticationProviderTest extends TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|\Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface */
     private $encoderFactory;
 
-    /**
-     * @var RepositoryAuthenticationProvider
-     */
+    /** @var RepositoryAuthenticationProvider */
     private $authProvider;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|\eZ\Publish\API\Repository\Repository
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\eZ\Publish\API\Repository\Repository */
     private $repository;
 
     protected function setUp()
@@ -90,7 +84,7 @@ class RepositoryAuthenticationProviderTest extends TestCase
         $token = new UsernamePasswordToken($tokenUser, 'foo', 'bar');
 
         $renewedApiUser = $this->getMockBuilder(APIUser::class)
-            ->setConstructorArgs(array(array('passwordHash' => 'renewed_encoded_password')))
+            ->setConstructorArgs([['passwordHash' => 'renewed_encoded_password']])
             ->getMockForAbstractClass();
 
         $user = $this->createMock(User::class);
@@ -109,7 +103,7 @@ class RepositoryAuthenticationProviderTest extends TestCase
         $password = 'encoded_password';
 
         $apiUser = $this->getMockBuilder(APIUser::class)
-            ->setConstructorArgs(array(array('passwordHash' => $password)))
+            ->setConstructorArgs([['passwordHash' => $password]])
             ->setMethods(['getUserId'])
             ->getMockForAbstractClass();
         $tokenUser = new User($apiUser);

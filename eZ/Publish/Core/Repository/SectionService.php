@@ -8,61 +8,50 @@
  */
 namespace eZ\Publish\Core\Repository;
 
+use Exception;
+use eZ\Publish\API\Repository\Exceptions\NotFoundException as APINotFoundException;
 use eZ\Publish\API\Repository\PermissionCriterionResolver;
+use eZ\Publish\API\Repository\Repository as RepositoryInterface;
+use eZ\Publish\API\Repository\SectionService as SectionServiceInterface;
+use eZ\Publish\API\Repository\Values\Content\ContentInfo;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use eZ\Publish\API\Repository\Values\Content\Query;
-use eZ\Publish\API\Repository\Values\Content\Query\Criterion\Subtree as CriterionSubtree;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion\LogicalAnd as CriterionLogicalAnd;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion\LogicalNot as CriterionLogicalNot;
-use eZ\Publish\API\Repository\Values\Content\SectionCreateStruct;
-use eZ\Publish\API\Repository\Values\Content\ContentInfo;
+use eZ\Publish\API\Repository\Values\Content\Query\Criterion\Subtree as CriterionSubtree;
 use eZ\Publish\API\Repository\Values\Content\Section;
+use eZ\Publish\API\Repository\Values\Content\SectionCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\SectionUpdateStruct;
-use eZ\Publish\API\Repository\SectionService as SectionServiceInterface;
-use eZ\Publish\API\Repository\Repository as RepositoryInterface;
-use eZ\Publish\SPI\Persistence\Content\Section\Handler as SectionHandler;
+use eZ\Publish\Core\Base\Exceptions\BadStateException;
+use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
+use eZ\Publish\Core\Base\Exceptions\InvalidArgumentValue;
+use eZ\Publish\Core\Base\Exceptions\UnauthorizedException;
 use eZ\Publish\SPI\Persistence\Content\Location\Handler as LocationHandler;
 use eZ\Publish\SPI\Persistence\Content\Section as SPISection;
-use eZ\Publish\Core\Base\Exceptions\InvalidArgumentValue;
-use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
-use eZ\Publish\Core\Base\Exceptions\BadStateException;
-use eZ\Publish\Core\Base\Exceptions\UnauthorizedException;
-use eZ\Publish\API\Repository\Exceptions\NotFoundException as APINotFoundException;
-use Exception;
+use eZ\Publish\SPI\Persistence\Content\Section\Handler as SectionHandler;
+use function array_filter;
 
 /**
  * Section service, used for section operations.
  */
 class SectionService implements SectionServiceInterface
 {
-    /**
-     * @var \eZ\Publish\API\Repository\Repository
-     */
+    /** @var \eZ\Publish\API\Repository\Repository */
     protected $repository;
 
-    /**
-     * @var \eZ\Publish\API\Repository\PermissionResolver
-     */
+    /** @var \eZ\Publish\API\Repository\PermissionResolver */
     protected $permissionResolver;
 
-    /**
-     * @var \eZ\Publish\API\Repository\PermissionCriterionResolver
-     */
+    /** @var \eZ\Publish\API\Repository\PermissionCriterionResolver */
     protected $permissionCriterionResolver;
 
-    /**
-     * @var \eZ\Publish\SPI\Persistence\Content\Section\Handler
-     */
+    /** @var \eZ\Publish\SPI\Persistence\Content\Section\Handler */
     protected $sectionHandler;
 
-    /**
-     * @var \eZ\Publish\SPI\Persistence\Content\Location\Handler
-     */
+    /** @var \eZ\Publish\SPI\Persistence\Content\Location\Handler */
     protected $locationHandler;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $settings;
 
     /**
@@ -74,7 +63,7 @@ class SectionService implements SectionServiceInterface
      * @param \eZ\Publish\API\Repository\PermissionCriterionResolver $permissionCriterionResolver
      * @param array $settings
      */
-    public function __construct(RepositoryInterface $repository, SectionHandler $sectionHandler, LocationHandler $locationHandler, PermissionCriterionResolver $permissionCriterionResolver, array $settings = array())
+    public function __construct(RepositoryInterface $repository, SectionHandler $sectionHandler, LocationHandler $locationHandler, PermissionCriterionResolver $permissionCriterionResolver, array $settings = [])
     {
         $this->repository = $repository;
         $this->sectionHandler = $sectionHandler;
@@ -82,9 +71,9 @@ class SectionService implements SectionServiceInterface
         $this->permissionResolver = $repository->getPermissionResolver();
         $this->permissionCriterionResolver = $permissionCriterionResolver;
         // Union makes sure default settings are ignored if provided in argument
-        $this->settings = $settings + array(
+        $this->settings = $settings + [
             //'defaultSetting' => array(),
-        );
+        ];
     }
 
     /**
@@ -112,7 +101,7 @@ class SectionService implements SectionServiceInterface
         }
 
         try {
-            $existingSection = $this->loadSectionByIdentifier($sectionCreateStruct->identifier);
+            $existingSection = $this->sectionHandler->loadByIdentifier($sectionCreateStruct->identifier);
             if ($existingSection !== null) {
                 throw new InvalidArgumentException('sectionCreateStruct', 'section with specified identifier already exists');
             }
@@ -162,7 +151,7 @@ class SectionService implements SectionServiceInterface
 
         if ($sectionUpdateStruct->identifier !== null) {
             try {
-                $existingSection = $this->loadSectionByIdentifier($sectionUpdateStruct->identifier);
+                $existingSection = $this->sectionHandler->loadByIdentifier($sectionUpdateStruct->identifier);
 
                 // Allowing identifier update only for the same section
                 if ($existingSection->id != $section->id) {
@@ -173,7 +162,7 @@ class SectionService implements SectionServiceInterface
             }
         }
 
-        $loadedSection = $this->loadSection($section->id);
+        $loadedSection = $this->sectionHandler->load($section->id);
 
         $this->repository->beginTransaction();
         try {
@@ -215,25 +204,19 @@ class SectionService implements SectionServiceInterface
     }
 
     /**
-     * Loads all sections.
-     *
-     * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException If the current user user is not allowed to read a section
+     * Loads all sections, excluding the ones the current user is not allowed to read.
      *
      * @return \eZ\Publish\API\Repository\Values\Content\Section[]
      */
     public function loadSections()
     {
-        $sections = [];
-        foreach ($this->sectionHandler->loadAll() as $spiSection) {
-            $sections[] = $section = $this->buildDomainSectionObject($spiSection);
+        $sections = array_map(function ($spiSection) {
+            return $this->buildDomainSectionObject($spiSection);
+        }, $this->sectionHandler->loadAll());
 
-            // @todo change API to just filter instead of throwing here
-            if (!$this->permissionResolver->canUser('section', 'view', $section)) {
-                throw new UnauthorizedException('section', 'view');
-            }
-        }
-
-        return $sections;
+        return array_values(array_filter($sections, function ($section) {
+            return $this->permissionResolver->canUser('section', 'view', $section);
+        }));
     }
 
     /**
@@ -313,10 +296,10 @@ class SectionService implements SectionServiceInterface
             throw new UnauthorizedException(
                 'section',
                 'assign',
-                array(
+                [
                     'name' => $loadedSection->name,
                     'content-name' => $loadedContentInfo->name,
-                )
+                ]
             );
         }
 
@@ -412,7 +395,7 @@ class SectionService implements SectionServiceInterface
         $loadedSection = $this->loadSection($section->id);
 
         if (!$this->permissionResolver->canUser('section', 'edit', $loadedSection)) {
-            throw new UnauthorizedException('section', 'edit', array('sectionId' => $loadedSection->id));
+            throw new UnauthorizedException('section', 'edit', ['sectionId' => $loadedSection->id]);
         }
 
         if ($this->sectionHandler->assignmentsCount($loadedSection->id) > 0) {
@@ -463,11 +446,11 @@ class SectionService implements SectionServiceInterface
     protected function buildDomainSectionObject(SPISection $spiSection)
     {
         return new Section(
-            array(
+            [
                 'id' => $spiSection->id,
                 'identifier' => $spiSection->identifier,
                 'name' => $spiSection->name,
-            )
+            ]
         );
     }
 }

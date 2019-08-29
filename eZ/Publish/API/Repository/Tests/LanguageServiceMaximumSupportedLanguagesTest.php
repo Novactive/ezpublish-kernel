@@ -19,15 +19,11 @@ use eZ\Publish\API\Repository\Tests\SetupFactory\Legacy as LegacySetupFactory;
  */
 class LanguageServiceMaximumSupportedLanguagesTest extends BaseTest
 {
-    /**
-     * @var \eZ\Publish\API\Repository\LanguageService
-     */
+    /** @var \eZ\Publish\API\Repository\LanguageService */
     private $languageService;
 
-    /**
-     * @var array
-     */
-    private $createdLanguages = array();
+    /** @var array */
+    private $createdLanguages = [];
 
     /**
      * Creates as much languages as possible.

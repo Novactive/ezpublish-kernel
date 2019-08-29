@@ -15,19 +15,13 @@ use eZ\Publish\SPI\Persistence\ValueObject;
  */
 class Type extends ValueObject
 {
-    /**
-     * @var int Status constant for defined (aka "published") Type
-     */
+    /** @var int Status constant for defined (aka "published") Type */
     const STATUS_DEFINED = 0;
 
-    /**
-     * @var int Status constant for draft (aka "temporary") Type
-     */
+    /** @var int Status constant for draft (aka "temporary") Type */
     const STATUS_DRAFT = 1;
 
-    /**
-     * @var int Status constant for modified (aka "deferred for publishing") Type
-     */
+    /** @var int Status constant for modified (aka "deferred for publishing") Type */
     const STATUS_MODIFIED = 2;
 
     /**
@@ -66,7 +60,7 @@ class Type extends ValueObject
      *
      * @var string[]
      */
-    public $description = array();
+    public $description = [];
 
     /**
      * String identifier of a type.
@@ -170,14 +164,14 @@ class Type extends ValueObject
      *
      * @var mixed[]
      */
-    public $groupIds = array();
+    public $groupIds = [];
 
     /**
      * Definitions for Content fields in this type.
      *
      * @var \eZ\Publish\SPI\Persistence\Content\Type\FieldDefinition[]
      */
-    public $fieldDefinitions = array();
+    public $fieldDefinitions = [];
 
     /**
      * Defines if content objects should have always available enabled or not by default.

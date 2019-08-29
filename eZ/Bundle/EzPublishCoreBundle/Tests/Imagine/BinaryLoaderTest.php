@@ -21,19 +21,13 @@ use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
 
 class BinaryLoaderTest extends TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $ioService;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $extensionGuesser;
 
-    /**
-     * @var BinaryLoader
-     */
+    /** @var BinaryLoader */
     private $binaryLoader;
 
     protected function setUp()
@@ -98,7 +92,7 @@ class BinaryLoaderTest extends TestCase
         $path = 'something.jpg';
         $mimeType = 'foo/mime-type';
         $content = 'some content';
-        $binaryFile = new BinaryFile(array('id' => $path));
+        $binaryFile = new BinaryFile(['id' => $path]);
         $this->ioService
             ->expects($this->once())
             ->method('loadBinaryFile')

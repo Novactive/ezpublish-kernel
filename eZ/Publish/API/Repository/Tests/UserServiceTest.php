@@ -14,6 +14,7 @@ use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\Values\Content\ContentInfo;
 use eZ\Publish\API\Repository\Values\Content\VersionInfo as APIVersionInfo;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
+use eZ\Publish\API\Repository\Values\User\Limitation\SubtreeLimitation;
 use eZ\Publish\API\Repository\Values\User\PasswordValidationContext;
 use eZ\Publish\API\Repository\Values\User\UserGroupUpdateStruct;
 use eZ\Publish\API\Repository\Values\User\UserTokenUpdateStruct;
@@ -53,11 +54,48 @@ class UserServiceTest extends BaseTest
         $userGroup = $userService->loadUserGroup($mainGroupId);
         /* END: Use Case */
 
-        $this->assertInstanceOf('\\eZ\\Publish\\API\\Repository\\Values\\User\\UserGroup', $userGroup);
+        $this->assertInstanceOf(UserGroup::class, $userGroup);
 
         // User group happens to also be a Content; isUserGroup() should be true and isUser() should be false
         $this->assertTrue($userService->isUserGroup($userGroup), 'isUserGroup() => false on a user group');
         $this->assertFalse($userService->isUser($userGroup), 'isUser() => true on a user group');
+        $this->assertSame(0, $userGroup->parentId, 'parentId should be equal `0` because it is top level node');
+    }
+
+    /**
+     * Test for the loadUserGroup() method to ensure that DomainUserGroupObject is created properly even if a user
+     * has no access to parent of UserGroup.
+     *
+     * @see \eZ\Publish\API\Repository\UserService::loadUserGroup()
+     */
+    public function testLoadUserGroupWithNoAccessToParent()
+    {
+        $repository = $this->getRepository();
+
+        $mainGroupId = $this->generateId('group', 4);
+        /* BEGIN: Use Case */
+        // $mainGroupId is the ID of the main "Users" group
+
+        $userService = $repository->getUserService();
+
+        $user = $this->createUserWithPolicies(
+            'user',
+            [
+                ['module' => 'content', 'function' => 'read'],
+            ],
+            new SubtreeLimitation(['limitationValues' => ['/1/5']])
+        );
+        $repository->getPermissionResolver()->setCurrentUserReference($user);
+
+        $userGroup = $userService->loadUserGroup($mainGroupId);
+        /* END: Use Case */
+
+        $this->assertInstanceOf(UserGroup::class, $userGroup);
+
+        // User group happens to also be a Content; isUserGroup() should be true and isUser() should be false
+        $this->assertTrue($userService->isUserGroup($userGroup), 'isUserGroup() => false on a user group');
+        $this->assertFalse($userService->isUser($userGroup), 'isUser() => true on a user group');
+        $this->assertSame(0, $userGroup->parentId, 'parentId should be equal `0` because it is top level node');
     }
 
     /**
@@ -101,7 +139,7 @@ class UserServiceTest extends BaseTest
         $subUserGroups = $userService->loadSubUserGroups($userGroup);
         foreach ($subUserGroups as $subUserGroup) {
             // Do something with the $subUserGroup
-            $this->assertInstanceOf('\\eZ\\Publish\\API\\Repository\\Values\\User\\UserGroup', $subUserGroup);
+            $this->assertInstanceOf(UserGroup::class, $subUserGroup);
         }
         /* END: Use Case */
     }
@@ -240,7 +278,7 @@ class UserServiceTest extends BaseTest
         /* END: Use Case */
 
         $this->assertInstanceOf(
-            '\\eZ\\Publish\\API\\Repository\\Values\\User\\UserGroup',
+            UserGroup::class,
             $userGroup
         );
 
@@ -263,12 +301,12 @@ class UserServiceTest extends BaseTest
     public function testCreateUserGroupSetsExpectedProperties($userGroup)
     {
         $this->assertEquals(
-            array(
+            [
                 'parentId' => $this->generateId('group', 4),
-            ),
-            array(
+            ],
+            [
                 'parentId' => $userGroup->parentId,
-            )
+            ]
         );
     }
 
@@ -515,7 +553,7 @@ class UserServiceTest extends BaseTest
         );
 
         $this->assertEquals($membersGroupId, $userGroup->parentId);
-        $this->assertEquals(array($userGroup->id), $subUserGroupIds);
+        $this->assertEquals([$userGroup->id], $subUserGroupIds);
     }
 
     /**
@@ -606,7 +644,7 @@ class UserServiceTest extends BaseTest
         /* END: Use Case */
 
         $this->assertInstanceOf(
-            '\\eZ\\Publish\\API\\Repository\\Values\\User\\UserGroup',
+            UserGroup::class,
             $userGroup
         );
 
@@ -788,18 +826,18 @@ class UserServiceTest extends BaseTest
     public function testNewUserCreateStructSetsExpectedProperties($userCreate)
     {
         $this->assertEquals(
-            array(
+            [
                 'login' => 'user',
                 'email' => 'user@example.com',
                 'password' => 'secret',
                 'mainLanguageCode' => 'eng-US',
-            ),
-            array(
+            ],
+            [
                 'login' => $userCreate->login,
                 'email' => $userCreate->email,
                 'password' => $userCreate->password,
                 'mainLanguageCode' => $userCreate->mainLanguageCode,
-            )
+            ]
         );
     }
 
@@ -884,16 +922,16 @@ class UserServiceTest extends BaseTest
     public function testCreateUserSetsExpectedProperties(User $user)
     {
         $this->assertEquals(
-            array(
+            [
                 'login' => 'user',
                 'email' => 'user@example.com',
                 'mainLanguageCode' => 'eng-US',
-            ),
-            array(
+            ],
+            [
                 'login' => $user->login,
                 'email' => $user->email,
                 'mainLanguageCode' => $user->contentInfo->mainLanguageCode,
-            )
+            ]
         );
     }
 
@@ -932,7 +970,7 @@ class UserServiceTest extends BaseTest
 
         // This call will fail with a "ContentFieldValidationException", because the
         // mandatory fields "first_name" and "last_name" are not set.
-        $userService->createUser($userCreate, array($group));
+        $userService->createUser($userCreate, [$group]);
         /* END: Use Case */
     }
 
@@ -971,7 +1009,7 @@ class UserServiceTest extends BaseTest
 
         // This call will fail with an "InvalidArgumentException", because the
         // value for the firled "first_name" is not accepted by the field type.
-        $userService->createUser($userCreate, array($group));
+        $userService->createUser($userCreate, [$group]);
         /* END: Use Case */
     }
 
@@ -1011,7 +1049,7 @@ class UserServiceTest extends BaseTest
 
         // This call will fail with a "InvalidArgumentException", because the
         // user with "admin" login already exists.
-        $userService->createUser($userCreate, array($group));
+        $userService->createUser($userCreate, [$group]);
         /* END: Use Case */
     }
 
@@ -1324,7 +1362,7 @@ class UserServiceTest extends BaseTest
         /* END: Use Case */
 
         $this->assertPropertiesCorrect(
-            array(
+            [
                 'login' => $user->login,
                 'email' => $user->email,
                 'passwordHash' => $user->passwordHash,
@@ -1335,7 +1373,7 @@ class UserServiceTest extends BaseTest
                 'contentInfo' => $user->contentInfo,
                 'versionInfo' => $user->versionInfo,
                 'fields' => $user->fields,
-            ),
+            ],
             $userReloaded
         );
     }
@@ -1382,7 +1420,7 @@ class UserServiceTest extends BaseTest
         /* END: Use Case */
 
         $this->assertPropertiesCorrect(
-            array(
+            [
                 'login' => $user->login,
                 'email' => $user->email,
                 'passwordHash' => $user->passwordHash,
@@ -1393,7 +1431,7 @@ class UserServiceTest extends BaseTest
                 'contentInfo' => $user->contentInfo,
                 'versionInfo' => $user->versionInfo,
                 'fields' => $user->fields,
-            ),
+            ],
             $userReloaded
         );
     }
@@ -1440,7 +1478,7 @@ class UserServiceTest extends BaseTest
         $usersReloaded = $userService->loadUsersByEmail('user@example.com');
         /* END: Use Case */
 
-        $this->assertEquals(array($user), $usersReloaded);
+        $this->assertEquals([$user], $usersReloaded);
     }
 
     /**
@@ -1463,7 +1501,7 @@ class UserServiceTest extends BaseTest
         $emptyUserList = $userService->loadUsersByEmail('user42@example.com');
         /* END: Use Case */
 
-        $this->assertEquals(array(), $emptyUserList);
+        $this->assertEquals([], $emptyUserList);
     }
 
     /**
@@ -1710,18 +1748,18 @@ class UserServiceTest extends BaseTest
     public function testUpdateUserUpdatesExpectedProperties(User $user)
     {
         $this->assertEquals(
-            array(
+            [
                 'login' => 'user',
                 'email' => 'user@example.com',
                 'maxLogin' => 42,
                 'enabled' => false,
-            ),
-            array(
+            ],
+            [
                 'login' => $user->login,
                 'email' => $user->email,
                 'maxLogin' => $user->maxLogin,
                 'enabled' => $user->enabled,
-            )
+            ]
         );
     }
 
@@ -1984,13 +2022,13 @@ class UserServiceTest extends BaseTest
         $this->refreshSearch($repository);
 
         // This array will contain the email of the newly created "Editor" user
-        $email = array();
+        $email = [];
         foreach ($userService->loadUsersOfUserGroup($group) as $user) {
             $this->assertInstanceOf(User::class, $user);
             $email[] = $user->email;
         }
         /* END: Use Case */
-        $this->assertEquals(array('user@example.com'), $email);
+        $this->assertEquals(['user@example.com'], $email);
     }
 
     /**
@@ -2018,7 +2056,7 @@ class UserServiceTest extends BaseTest
         );
 
         // This array will contain "Editors" and "Administrator users"
-        $userGroupNames = array();
+        $userGroupNames = [];
         foreach ($userService->loadUserGroupsOfUser($user) as $userGroup) {
             $userGroupNames[] = $userGroup->getFieldValue('name');
         }
@@ -2027,10 +2065,10 @@ class UserServiceTest extends BaseTest
         sort($userGroupNames, SORT_STRING);
 
         $this->assertEquals(
-            array(
+            [
                 'Administrator users',
                 'Editors',
-            ),
+            ],
             $userGroupNames
         );
     }
@@ -2096,13 +2134,13 @@ class UserServiceTest extends BaseTest
         );
 
         // This array will contain "Anonymous Users"
-        $userGroupNames = array();
+        $userGroupNames = [];
         foreach ($userService->loadUserGroupsOfUser($user) as $userGroup) {
             $userGroupNames[] = $userGroup->getFieldValue('name');
         }
         /* END: Use Case */
 
-        $this->assertEquals(array('Anonymous Users'), $userGroupNames);
+        $this->assertEquals(['Anonymous Users'], $userGroupNames);
     }
 
     /**
@@ -2819,9 +2857,9 @@ class UserServiceTest extends BaseTest
         $contentType = $this->createUserWithStrongPasswordContentType();
 
         /* BEGIN: Use Case */
-        $context = new PasswordValidationContext(array(
+        $context = new PasswordValidationContext([
             'contentType' => $contentType,
-        ));
+        ]);
 
         $actualErrors = $userService->validatePassword($password, $context);
         /* END: Use Case */
@@ -2836,23 +2874,23 @@ class UserServiceTest extends BaseTest
      */
     public function dataProviderForValidatePassword(): array
     {
-        return array(
-            array(
+        return [
+            [
                 'pass',
-                array(
-                    new ValidationError('User password must be at least %length% characters long', null, array(
+                [
+                    new ValidationError('User password must be at least %length% characters long', null, [
                         '%length%' => 8,
-                    ), 'password'),
-                    new ValidationError('User password must include at least one upper case letter', null, array(), 'password'),
-                    new ValidationError('User password must include at least one number', null, array(), 'password'),
-                    new ValidationError('User password must include at least one special character', null, array(), 'password'),
-                ),
-            ),
-            array(
+                    ], 'password'),
+                    new ValidationError('User password must include at least one upper case letter', null, [], 'password'),
+                    new ValidationError('User password must include at least one number', null, [], 'password'),
+                    new ValidationError('User password must include at least one special character', null, [], 'password'),
+                ],
+            ],
+            [
                 'H@xxxi0R!!!',
-                array(),
-            ),
-        );
+                [],
+            ],
+        ];
     }
 
     /**
@@ -2881,9 +2919,9 @@ class UserServiceTest extends BaseTest
         $userCreate->setField('first_name', 'John');
         $userCreate->setField('last_name', 'Doe');
 
-        return $userService->createUser($userCreate, array(
+        return $userService->createUser($userCreate, [
             $userService->loadUserGroup($editorsGroupId),
-        ));
+        ]);
     }
 
     /**
@@ -2902,93 +2940,93 @@ class UserServiceTest extends BaseTest
         $typeCreate->remoteId = '384b94a1bd6bc06826410e284dd9684887bf56fc';
         $typeCreate->urlAliasSchema = 'url|scheme';
         $typeCreate->nameSchema = 'name|scheme';
-        $typeCreate->names = array(
+        $typeCreate->names = [
             'eng-GB' => 'User with strong password',
-        );
-        $typeCreate->descriptions = array(
+        ];
+        $typeCreate->descriptions = [
             'eng-GB' => '',
-        );
+        ];
         $typeCreate->creatorId = $this->generateId('user', $repository->getCurrentUser()->id);
         $typeCreate->creationDate = $this->createDateTime();
 
         $firstNameFieldCreate = $contentTypeService->newFieldDefinitionCreateStruct('first_name', 'ezstring');
-        $firstNameFieldCreate->names = array(
+        $firstNameFieldCreate->names = [
             'eng-GB' => 'First name',
-        );
-        $firstNameFieldCreate->descriptions = array(
+        ];
+        $firstNameFieldCreate->descriptions = [
             'eng-GB' => '',
-        );
+        ];
         $firstNameFieldCreate->fieldGroup = 'default';
         $firstNameFieldCreate->position = 1;
         $firstNameFieldCreate->isTranslatable = false;
         $firstNameFieldCreate->isRequired = true;
         $firstNameFieldCreate->isInfoCollector = false;
-        $firstNameFieldCreate->validatorConfiguration = array(
-            'StringLengthValidator' => array(
+        $firstNameFieldCreate->validatorConfiguration = [
+            'StringLengthValidator' => [
                 'minStringLength' => 0,
                 'maxStringLength' => 0,
-            ),
-        );
-        $firstNameFieldCreate->fieldSettings = array();
+            ],
+        ];
+        $firstNameFieldCreate->fieldSettings = [];
         $firstNameFieldCreate->isSearchable = true;
         $firstNameFieldCreate->defaultValue = '';
 
         $typeCreate->addFieldDefinition($firstNameFieldCreate);
 
         $lastNameFieldCreate = $contentTypeService->newFieldDefinitionCreateStruct('last_name', 'ezstring');
-        $lastNameFieldCreate->names = array(
+        $lastNameFieldCreate->names = [
             'eng-GB' => 'Last name',
-        );
-        $lastNameFieldCreate->descriptions = array(
+        ];
+        $lastNameFieldCreate->descriptions = [
             'eng-GB' => '',
-        );
+        ];
         $lastNameFieldCreate->fieldGroup = 'default';
         $lastNameFieldCreate->position = 2;
         $lastNameFieldCreate->isTranslatable = false;
         $lastNameFieldCreate->isRequired = true;
         $lastNameFieldCreate->isInfoCollector = false;
-        $lastNameFieldCreate->validatorConfiguration = array(
-            'StringLengthValidator' => array(
+        $lastNameFieldCreate->validatorConfiguration = [
+            'StringLengthValidator' => [
                 'minStringLength' => 0,
                 'maxStringLength' => 0,
-            ),
-        );
-        $lastNameFieldCreate->fieldSettings = array();
+            ],
+        ];
+        $lastNameFieldCreate->fieldSettings = [];
         $lastNameFieldCreate->isSearchable = true;
         $lastNameFieldCreate->defaultValue = '';
 
         $typeCreate->addFieldDefinition($lastNameFieldCreate);
 
         $accountFieldCreate = $contentTypeService->newFieldDefinitionCreateStruct('account', 'ezuser');
-        $accountFieldCreate->names = array(
+        $accountFieldCreate->names = [
             'eng-GB' => 'User account',
-        );
-        $accountFieldCreate->descriptions = array(
+        ];
+        $accountFieldCreate->descriptions = [
             'eng-GB' => '',
-        );
+        ];
         $accountFieldCreate->fieldGroup = 'default';
         $accountFieldCreate->position = 3;
         $accountFieldCreate->isTranslatable = false;
         $accountFieldCreate->isRequired = true;
         $accountFieldCreate->isInfoCollector = false;
-        $accountFieldCreate->validatorConfiguration = array(
-            'PasswordValueValidator' => array(
+        $accountFieldCreate->validatorConfiguration = [
+            'PasswordValueValidator' => [
                 'requireAtLeastOneUpperCaseCharacter' => 1,
                 'requireAtLeastOneLowerCaseCharacter' => 1,
                 'requireAtLeastOneNumericCharacter' => 1,
                 'requireAtLeastOneNonAlphanumericCharacter' => 1,
                 'minLength' => 8,
-            ),
-        );
-        $accountFieldCreate->fieldSettings = array();
+            ],
+        ];
+        $accountFieldCreate->fieldSettings = [];
         $accountFieldCreate->isSearchable = false;
         $accountFieldCreate->defaultValue = null;
 
         $typeCreate->addFieldDefinition($accountFieldCreate);
 
-        $contentTypeDraft = $contentTypeService->createContentType($typeCreate, array(
+        $contentTypeDraft = $contentTypeService->createContentType($typeCreate, [
             $contentTypeService->loadContentTypeGroupByIdentifier('Users'),
-        ));
+        ]);
         $contentTypeService->publishContentTypeDraft($contentTypeDraft);
 
         return $contentTypeService->loadContentTypeByIdentifier('user-with-strong-password');

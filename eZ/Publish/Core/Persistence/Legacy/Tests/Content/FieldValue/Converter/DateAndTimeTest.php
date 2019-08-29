@@ -28,14 +28,10 @@ use ReflectionObject;
  */
 class DateAndTimeTest extends TestCase
 {
-    /**
-     * @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\DateAndTimeConverter
-     */
+    /** @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\DateAndTimeConverter */
     protected $converter;
 
-    /**
-     * @var \DateTime
-     */
+    /** @var \DateTime */
     protected $date;
 
     protected function setUp()
@@ -53,10 +49,10 @@ class DateAndTimeTest extends TestCase
     public function testToStorageValue()
     {
         $value = new FieldValue();
-        $value->data = array(
+        $value->data = [
             'timestamp' => $this->date->getTimestamp(),
             'rfc850' => $this->date->format(\DateTime::RFC850),
-        );
+        ];
         $value->sortKey = $this->date->getTimestamp();
         $storageFieldValue = new StorageFieldValue();
 
@@ -81,10 +77,10 @@ class DateAndTimeTest extends TestCase
 
         $this->converter->toFieldValue($storageFieldValue, $fieldValue);
         self::assertSame(
-            array(
+            [
                 'rfc850' => null,
                 'timestamp' => 1048633200,
-            ),
+            ],
             $fieldValue->data
         );
         self::assertSame($storageFieldValue->dataInt, $fieldValue->data['timestamp']);
@@ -102,16 +98,16 @@ class DateAndTimeTest extends TestCase
         $dateInterval = DateInterval::createFromDateString('+10 years, -1 month, +3 days, -13 hours');
         $fieldTypeConstraints = new FieldTypeConstraints();
         $fieldTypeConstraints->fieldSettings = new FieldSettings(
-            array(
+            [
                 'useSeconds' => true,
                 'defaultType' => DateAndTimeType::DEFAULT_CURRENT_DATE_ADJUSTED,
                 'dateInterval' => $dateInterval,
-            )
+            ]
         );
         $fieldDef = new PersistenceFieldDefinition(
-            array(
+            [
                 'fieldTypeConstraints' => $fieldTypeConstraints,
-            )
+            ]
         );
 
         $this->converter->toStorageFieldDefinition($fieldDef, $storageFieldDef);
@@ -143,16 +139,16 @@ class DateAndTimeTest extends TestCase
         $storageFieldDef = new StorageFieldDefinition();
         $fieldTypeConstraints = new FieldTypeConstraints();
         $fieldTypeConstraints->fieldSettings = new FieldSettings(
-            array(
+            [
                 'useSeconds' => true,
                 'defaultType' => DateAndTimeType::DEFAULT_EMPTY,
                 'dateInterval' => null,
-            )
+            ]
         );
         $fieldDef = new PersistenceFieldDefinition(
-            array(
+            [
                 'fieldTypeConstraints' => $fieldTypeConstraints,
-            )
+            ]
         );
 
         $this->converter->toStorageFieldDefinition($fieldDef, $storageFieldDef);
@@ -177,16 +173,16 @@ class DateAndTimeTest extends TestCase
         $storageFieldDef = new StorageFieldDefinition();
         $fieldTypeConstraints = new FieldTypeConstraints();
         $fieldTypeConstraints->fieldSettings = new FieldSettings(
-            array(
+            [
                 'useSeconds' => true,
                 'defaultType' => DateAndTimeType::DEFAULT_CURRENT_DATE,
                 'dateInterval' => null,
-            )
+            ]
         );
         $fieldDef = new PersistenceFieldDefinition(
-            array(
+            [
                 'fieldTypeConstraints' => $fieldTypeConstraints,
-            )
+            ]
         );
 
         $this->converter->toStorageFieldDefinition($fieldDef, $storageFieldDef);
@@ -208,14 +204,14 @@ class DateAndTimeTest extends TestCase
      */
     private function getXMLToDateIntervalMap()
     {
-        return array(
+        return [
             'year' => 'y',
             'month' => 'm',
             'day' => 'd',
             'hour' => 'h',
             'minute' => 'i',
             'second' => 's',
-        );
+        ];
     }
 
     /**
@@ -227,10 +223,10 @@ class DateAndTimeTest extends TestCase
     {
         $fieldDef = new PersistenceFieldDefinition();
         $storageDef = new StorageFieldDefinition(
-            array(
+            [
                 'dataInt1' => DateAndTimeType::DEFAULT_EMPTY,
                 'dataInt2' => 1,
-            )
+            ]
         );
 
         $this->converter->toFieldDefinition($storageDef, $fieldDef);
@@ -247,10 +243,10 @@ class DateAndTimeTest extends TestCase
         $time = time();
         $fieldDef = new PersistenceFieldDefinition();
         $storageDef = new StorageFieldDefinition(
-            array(
+            [
                 'dataInt1' => DateAndTimeType::DEFAULT_CURRENT_DATE,
                 'dataInt2' => 1,
-            )
+            ]
         );
 
         $this->converter->toFieldDefinition($storageDef, $fieldDef);
@@ -278,11 +274,11 @@ class DateAndTimeTest extends TestCase
         $timestamp = $date->getTimestamp();
 
         $storageDef = new StorageFieldDefinition(
-            array(
+            [
                 'dataInt1' => DateAndTimeType::DEFAULT_CURRENT_DATE_ADJUSTED,
                 'dataInt2' => 1,
                 'dataText5' => $this->getXMLStringFromDateInterval($dateInterval),
-            )
+            ]
         );
 
         $this->converter->toFieldDefinition($storageDef, $fieldDef);
@@ -314,11 +310,11 @@ class DateAndTimeTest extends TestCase
         $timestamp = $date->getTimestamp() - $seconds;
 
         $storageDef = new StorageFieldDefinition(
-            array(
+            [
                 'dataInt1' => DateAndTimeType::DEFAULT_CURRENT_DATE_ADJUSTED,
                 'dataInt2' => 0,
                 'dataText5' => $this->getXMLStringFromDateInterval($dateInterval),
-            )
+            ]
         );
 
         $this->converter->toFieldDefinition($storageDef, $fieldDef);

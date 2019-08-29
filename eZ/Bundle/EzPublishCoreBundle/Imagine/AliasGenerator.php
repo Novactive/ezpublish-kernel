@@ -37,9 +37,7 @@ class AliasGenerator implements VariationHandler
 {
     const ALIAS_ORIGINAL = 'original';
 
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
+    /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
     /**
@@ -50,19 +48,13 @@ class AliasGenerator implements VariationHandler
      */
     private $dataLoader;
 
-    /**
-     * @var \Liip\ImagineBundle\Imagine\Filter\FilterManager
-     */
+    /** @var \Liip\ImagineBundle\Imagine\Filter\FilterManager */
     private $filterManager;
 
-    /**
-     * @var FilterConfiguration
-     */
+    /** @var FilterConfiguration */
     private $filterConfiguration;
 
-    /**
-     * @var \Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface
-     */
+    /** @var \Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface */
     private $ioResolver;
 
     public function __construct(
@@ -86,7 +78,7 @@ class AliasGenerator implements VariationHandler
      * @throws \eZ\Publish\Core\MVC\Exception\SourceImageNotFoundException If source image cannot be found.
      * @throws \eZ\Publish\API\Repository\Exceptions\InvalidVariationException If a problem occurs with generated variation.
      */
-    public function getVariation(Field $field, VersionInfo $versionInfo, $variationName, array $parameters = array())
+    public function getVariation(Field $field, VersionInfo $versionInfo, $variationName, array $parameters = [])
     {
         /** @var \eZ\Publish\Core\FieldType\Image\Value $imageValue */
         $imageValue = $field->value;

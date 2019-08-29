@@ -2,7 +2,7 @@
 
 namespace eZ\Publish\Core\Repository\SiteAccessAware\Tests;
 
-use eZ\Publish\Core\Repository\SiteAccessAware\Language\LanguageResolver;
+use eZ\Publish\API\Repository\LanguageResolver;
 use PHPUnit\Framework\TestCase;
 use Closure;
 
@@ -24,19 +24,13 @@ abstract class AbstractServiceTest extends TestCase
      */
     const LANG_ARG = 0;
 
-    /**
-     * @var \object|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \object|\PHPUnit_Framework_MockObject_MockObject */
     protected $innerApiServiceMock;
 
-    /**
-     * @var object
-     */
+    /** @var object */
     protected $service;
 
-    /**
-     * @var \eZ\Publish\Core\Repository\SiteAccessAware\Language\LanguageResolver|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \eZ\Publish\API\Repository\LanguageResolver|\PHPUnit_Framework_MockObject_MockObject */
     protected $languageResolverMock;
 
     abstract public function getAPIServiceClassName();

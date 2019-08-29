@@ -14,14 +14,10 @@ use Twig_SimpleFilter;
 
 class RichTextExtension extends Twig_Extension
 {
-    /**
-     * @var RichTextConverterInterface
-     */
+    /** @var RichTextConverterInterface */
     private $richTextConverter;
 
-    /**
-     * @var RichTextConverterInterface
-     */
+    /** @var RichTextConverterInterface */
     private $richTextEditConverter;
 
     public function __construct(RichTextConverterInterface $richTextConverter, RichTextConverterInterface $richTextEditConverter)
@@ -37,18 +33,18 @@ class RichTextExtension extends Twig_Extension
 
     public function getFilters()
     {
-        return array(
+        return [
             new Twig_SimpleFilter(
                 'richtext_to_html5',
-                array($this, 'richTextToHtml5'),
-                array('is_safe' => array('html'))
+                [$this, 'richTextToHtml5'],
+                ['is_safe' => ['html']]
             ),
             new Twig_SimpleFilter(
                 'richtext_to_html5_edit',
-                array($this, 'richTextToHtml5Edit'),
-                array('is_safe' => array('html'))
+                [$this, 'richTextToHtml5Edit'],
+                ['is_safe' => ['html']]
             ),
-        );
+        ];
     }
 
     /**

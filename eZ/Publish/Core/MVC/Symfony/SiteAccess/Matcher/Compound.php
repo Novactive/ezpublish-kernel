@@ -19,9 +19,7 @@ use eZ\Publish\Core\MVC\Symfony\Routing\SimplifiedRequest;
  */
 abstract class Compound implements CompoundInterface, URILexer
 {
-    /**
-     * @var array Collection of rules using the Compound matcher.
-     */
+    /** @var array Collection of rules using the Compound matcher. */
     protected $config;
 
     /**
@@ -30,27 +28,21 @@ abstract class Compound implements CompoundInterface, URILexer
      *
      * @var array
      */
-    protected $matchersMap = array();
+    protected $matchersMap = [];
 
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\SiteAccess\Matcher[]
-     */
-    protected $subMatchers = array();
+    /** @var \eZ\Publish\Core\MVC\Symfony\SiteAccess\Matcher[] */
+    protected $subMatchers = [];
 
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\SiteAccess\MatcherBuilderInterface
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\SiteAccess\MatcherBuilderInterface */
     protected $matcherBuilder;
 
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\Routing\SimplifiedRequest
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\Routing\SimplifiedRequest */
     protected $request;
 
     public function __construct(array $config)
     {
         $this->config = $config;
-        $this->matchersMap = array();
+        $this->matchersMap = [];
     }
 
     public function setMatcherBuilder(MatcherBuilderInterface $matcherBuilder)
@@ -136,6 +128,6 @@ abstract class Compound implements CompoundInterface, URILexer
     {
         // We don't need the whole matcher map and the matcher builder once serialized.
         // config property is not needed either as it's only needed for matching.
-        return array('subMatchers');
+        return ['subMatchers'];
     }
 }

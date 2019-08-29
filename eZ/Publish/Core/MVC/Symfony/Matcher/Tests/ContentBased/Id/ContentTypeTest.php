@@ -15,9 +15,7 @@ use eZ\Publish\Core\MVC\Symfony\Matcher\Tests\ContentBased\BaseTest;
 
 class ContentTypeTest extends BaseTest
 {
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\Matcher\ContentBased\Id\ContentType
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\Matcher\ContentBased\Id\ContentType */
     private $matcher;
 
     protected function setUp()
@@ -43,31 +41,31 @@ class ContentTypeTest extends BaseTest
 
     public function matchLocationProvider()
     {
-        $data = array();
+        $data = [];
 
-        $data[] = array(
+        $data[] = [
             123,
             $this->generateLocationForContentType(123),
             true,
-        );
+        ];
 
-        $data[] = array(
+        $data[] = [
             123,
             $this->generateLocationForContentType(456),
             false,
-        );
+        ];
 
-        $data[] = array(
-            array(123, 789),
+        $data[] = [
+            [123, 789],
             $this->generateLocationForContentType(456),
             false,
-        );
+        ];
 
-        $data[] = array(
-            array(123, 789),
+        $data[] = [
+            [123, 789],
             $this->generateLocationForContentType(789),
             true,
-        );
+        ];
 
         return $data;
     }
@@ -103,7 +101,7 @@ class ContentTypeTest extends BaseTest
      */
     private function generateContentInfoForContentType($contentTypeId)
     {
-        return $this->getContentInfoMock(array('contentTypeId' => $contentTypeId));
+        return $this->getContentInfoMock(['contentTypeId' => $contentTypeId]);
     }
 
     /**
@@ -123,31 +121,31 @@ class ContentTypeTest extends BaseTest
 
     public function matchContentInfoProvider()
     {
-        $data = array();
+        $data = [];
 
-        $data[] = array(
+        $data[] = [
             123,
             $this->generateContentInfoForContentType(123),
             true,
-        );
+        ];
 
-        $data[] = array(
+        $data[] = [
             123,
             $this->generateContentInfoForContentType(456),
             false,
-        );
+        ];
 
-        $data[] = array(
-            array(123, 789),
+        $data[] = [
+            [123, 789],
             $this->generateContentInfoForContentType(456),
             false,
-        );
+        ];
 
-        $data[] = array(
-            array(123, 789),
+        $data[] = [
+            [123, 789],
             $this->generateContentInfoForContentType(789),
             true,
-        );
+        ];
 
         return $data;
     }

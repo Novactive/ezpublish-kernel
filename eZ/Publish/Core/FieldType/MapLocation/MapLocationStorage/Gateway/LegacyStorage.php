@@ -18,9 +18,7 @@ use eZ\Publish\SPI\Persistence\Content\VersionInfo;
  */
 class LegacyStorage extends Gateway
 {
-    /**
-     * @var \eZ\Publish\Core\Persistence\Database\DatabaseHandler
-     */
+    /** @var \eZ\Publish\Core\Persistence\Database\DatabaseHandler */
     protected $dbHandler;
 
     public function __construct(DatabaseHandler $dbHandler)
@@ -57,11 +55,11 @@ class LegacyStorage extends Gateway
     {
         if ($field->value->externalData === null) {
             // Store empty value and return
-            $this->deleteFieldData($versionInfo, array($field->id));
-            $field->value->data = array(
+            $this->deleteFieldData($versionInfo, [$field->id]);
+            $field->value->data = [
                 'sortKey' => null,
                 'hasData' => false,
-            );
+            ];
 
             return false;
         }
@@ -72,10 +70,10 @@ class LegacyStorage extends Gateway
             $this->storeNewFieldData($versionInfo, $field);
         }
 
-        $field->value->data = array(
+        $field->value->data = [
             'sortKey' => $field->value->externalData['address'],
             'hasData' => true,
-        );
+        ];
 
         return true;
     }

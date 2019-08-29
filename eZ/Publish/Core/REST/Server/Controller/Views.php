@@ -18,9 +18,7 @@ use eZ\Publish\Core\REST\Server\Values;
  */
 class Views extends Controller
 {
-    /**
-     * @var \eZ\Publish\API\Repository\SearchService
-     */
+    /** @var \eZ\Publish\API\Repository\SearchService */
     private $searchService;
 
     public function __construct(SearchService $searchService)
@@ -37,7 +35,7 @@ class Views extends Controller
     {
         $viewInput = $this->inputDispatcher->parse(
             new Message(
-                array('Content-Type' => $request->headers->get('Content-Type')),
+                ['Content-Type' => $request->headers->get('Content-Type')],
                 $request->getContent()
             )
         );
@@ -49,13 +47,13 @@ class Views extends Controller
         }
 
         return new Values\RestExecutedView(
-            array(
+            [
                 'identifier' => $viewInput->identifier,
                 'searchResults' => $this->searchService->$method(
                     $viewInput->query,
                     ['languages' => Language::ALL]
                 ),
-            )
+            ]
         );
     }
 

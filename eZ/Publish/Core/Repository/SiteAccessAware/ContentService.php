@@ -12,12 +12,13 @@ use eZ\Publish\API\Repository\ContentService as ContentServiceInterface;
 use eZ\Publish\API\Repository\Values\Content\ContentCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\ContentUpdateStruct;
 use eZ\Publish\API\Repository\Values\Content\ContentMetadataUpdateStruct;
+use eZ\Publish\API\Repository\Values\Content\Language;
 use eZ\Publish\API\Repository\Values\Content\LocationCreateStruct;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use eZ\Publish\API\Repository\Values\User\User;
 use eZ\Publish\API\Repository\Values\Content\VersionInfo;
 use eZ\Publish\API\Repository\Values\Content\ContentInfo;
-use eZ\Publish\Core\Repository\SiteAccessAware\Language\LanguageResolver;
+use eZ\Publish\API\Repository\LanguageResolver;
 
 /**
  * SiteAccess aware implementation of ContentService injecting languages where needed.
@@ -27,14 +28,14 @@ class ContentService implements ContentServiceInterface
     /** @var \eZ\Publish\API\Repository\ContentService */
     protected $service;
 
-    /** @var \eZ\Publish\Core\Repository\SiteAccessAware\Language\LanguageResolver */
+    /** @var \eZ\Publish\API\Repository\LanguageResolver */
     protected $languageResolver;
 
     /**
      * Construct service object from aggregated service and LanguageResolver.
      *
      * @param \eZ\Publish\API\Repository\ContentService $service
-     * @param \eZ\Publish\Core\Repository\SiteAccessAware\Language\LanguageResolver $languageResolver
+     * @param \eZ\Publish\API\Repository\LanguageResolver $languageResolver
      */
     public function __construct(
         ContentServiceInterface $service,
@@ -111,7 +112,7 @@ class ContentService implements ContentServiceInterface
         );
     }
 
-    public function createContent(ContentCreateStruct $contentCreateStruct, array $locationCreateStructs = array())
+    public function createContent(ContentCreateStruct $contentCreateStruct, array $locationCreateStructs = [])
     {
         return $this->service->createContent($contentCreateStruct, $locationCreateStructs);
     }
@@ -141,9 +142,9 @@ class ContentService implements ContentServiceInterface
         return $this->service->updateContent($versionInfo, $contentUpdateStruct);
     }
 
-    public function publishVersion(VersionInfo $versionInfo)
+    public function publishVersion(VersionInfo $versionInfo, array $translations = Language::ALL)
     {
-        return $this->service->publishVersion($versionInfo);
+        return $this->service->publishVersion($versionInfo, $translations);
     }
 
     public function deleteVersion(VersionInfo $versionInfo)
@@ -151,9 +152,9 @@ class ContentService implements ContentServiceInterface
         return $this->service->deleteVersion($versionInfo);
     }
 
-    public function loadVersions(ContentInfo $contentInfo)
+    public function loadVersions(ContentInfo $contentInfo, ?int $status = null)
     {
-        return $this->service->loadVersions($contentInfo);
+        return $this->service->loadVersions($contentInfo, $status);
     }
 
     public function copyContent(ContentInfo $contentInfo, LocationCreateStruct $destinationLocationCreateStruct, VersionInfo $versionInfo = null)

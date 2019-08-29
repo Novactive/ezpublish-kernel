@@ -33,9 +33,7 @@ class Mapper
      */
     protected $converterRegistry;
 
-    /**
-     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Language\MaskGenerator
-     */
+    /** @var \eZ\Publish\Core\Persistence\Legacy\Content\Language\MaskGenerator */
     private $maskGenerator;
 
     /**
@@ -85,7 +83,7 @@ class Mapper
      */
     public function extractGroupsFromRows(array $rows)
     {
-        $groups = array();
+        $groups = [];
 
         foreach ($rows as $row) {
             $group = new Group();
@@ -112,8 +110,8 @@ class Mapper
      */
     public function extractTypesFromRows(array $rows, bool $keepTypeIdAsKey = false)
     {
-        $types = array();
-        $fields = array();
+        $types = [];
+        $fields = [];
 
         foreach ($rows as $row) {
             $typeId = (int)$row['ezcontentclass_id'];
@@ -201,8 +199,8 @@ class Mapper
         $type->sortOrder = (int)$row['ezcontentclass_sort_order'];
         $type->languageCodes = $this->maskGenerator->extractLanguageCodesFromMask((int)$row['ezcontentclass_language_mask']);
 
-        $type->groupIds = array();
-        $type->fieldDefinitions = array();
+        $type->groupIds = [];
+        $type->fieldDefinitions = [];
 
         return $type;
     }

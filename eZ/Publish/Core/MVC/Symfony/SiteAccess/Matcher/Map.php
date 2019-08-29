@@ -34,9 +34,7 @@ abstract class Map implements VersatileMatcher
      */
     protected $reverseMap;
 
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\Routing\SimplifiedRequest
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\Routing\SimplifiedRequest */
     protected $request;
 
     /**
@@ -58,10 +56,10 @@ abstract class Map implements VersatileMatcher
      */
     public function __sleep()
     {
-        $this->map = array();
-        $this->reverseMap = array();
+        $this->map = [];
+        $this->reverseMap = [];
 
-        return array('map', 'reverseMap', 'key');
+        return ['map', 'reverseMap', 'key'];
     }
 
     public function setRequest(SimplifiedRequest $request)

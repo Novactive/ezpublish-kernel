@@ -25,14 +25,10 @@ abstract class ValueObjectVisitor
      */
     protected $requestParser;
 
-    /**
-     * @var \Symfony\Component\Routing\RouterInterface
-     */
+    /** @var \Symfony\Component\Routing\RouterInterface */
     protected $router;
 
-    /**
-     * @var \Symfony\Component\Routing\RouterInterface
-     */
+    /** @var \Symfony\Component\Routing\RouterInterface */
     protected $templateRouter;
 
     /**
@@ -109,7 +105,7 @@ abstract class ValueObjectVisitor
         $generator->startHashElement($listName);
         $generator->startList('value');
         foreach ($translatedElements as $languageCode => $element) {
-            $generator->startValueElement('value', $element, array('languageCode' => $languageCode));
+            $generator->startValueElement('value', $element, ['languageCode' => $languageCode]);
             $generator->endValueElement('value');
         }
         $generator->endList('value');

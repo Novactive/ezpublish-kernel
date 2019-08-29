@@ -36,24 +36,16 @@ use Exception;
  */
 class TrashService implements TrashServiceInterface
 {
-    /**
-     * @var \eZ\Publish\Core\Repository\Repository
-     */
+    /** @var \eZ\Publish\Core\Repository\Repository */
     protected $repository;
 
-    /**
-     * @var \eZ\Publish\SPI\Persistence\Handler
-     */
+    /** @var \eZ\Publish\SPI\Persistence\Handler */
     protected $persistenceHandler;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $settings;
 
-    /**
-     * @var \eZ\Publish\Core\Repository\Helper\NameSchemaService
-     */
+    /** @var \eZ\Publish\Core\Repository\Helper\NameSchemaService */
     protected $nameSchemaService;
 
     /**
@@ -70,16 +62,16 @@ class TrashService implements TrashServiceInterface
         Handler $handler,
         Helper\NameSchemaService $nameSchemaService,
         PermissionCriterionResolver $permissionCriterionResolver,
-        array $settings = array()
+        array $settings = []
     ) {
         $this->permissionCriterionResolver = $permissionCriterionResolver;
         $this->repository = $repository;
         $this->persistenceHandler = $handler;
         $this->nameSchemaService = $nameSchemaService;
         // Union makes sure default settings are ignored if provided in argument
-        $this->settings = $settings + array(
+        $this->settings = $settings + [
             //'defaultSetting' => array(),
-        );
+        ];
     }
 
     /**
@@ -233,10 +225,7 @@ class TrashService implements TrashServiceInterface
      */
     public function emptyTrash()
     {
-        // Will throw if you have Role assignment limitation where you have content/cleantrash permission.
-        // This is by design and means you can only delete one and one trash item, or you'll need to change how
-        // permissions is assigned to be on separate role with no Role assignment limitation.
-        if ($this->repository->hasAccess('content', 'cleantrash') !== true) {
+        if ($this->repository->hasAccess('content', 'cleantrash') === false) {
             throw new UnauthorizedException('content', 'cleantrash');
         }
 
@@ -338,7 +327,7 @@ class TrashService implements TrashServiceInterface
 
     protected function buildDomainTrashItems(array $spiTrashItems): array
     {
-        $trashItems = array();
+        $trashItems = [];
         // TODO: load content in bulk once API allows for it
         foreach ($spiTrashItems as $spiTrashItem) {
             try {
@@ -357,7 +346,7 @@ class TrashService implements TrashServiceInterface
     protected function buildDomainTrashItemObject(Trashed $spiTrashItem, Content $content): APITrashItem
     {
         return new TrashItem(
-            array(
+            [
                 'content' => $content,
                 'contentInfo' => $content->contentInfo,
                 'id' => $spiTrashItem->id,
@@ -371,7 +360,7 @@ class TrashService implements TrashServiceInterface
                 'sortField' => $spiTrashItem->sortField,
                 'sortOrder' => $spiTrashItem->sortOrder,
                 'trashed' => isset($spiTrashItem->trashed) ? new DateTime('@' . $spiTrashItem->trashed) : new DateTime('@0'),
-            )
+            ]
         );
     }
 
@@ -407,17 +396,17 @@ class TrashService implements TrashServiceInterface
             return (bool)$contentRemoveCriterion;
         }
         $query = new Query(
-            array(
+            [
                 'limit' => 0,
                 'filter' => new CriterionLogicalAnd(
-                    array(
+                    [
                         new CriterionSubtree($location->pathString),
                         new CriterionLogicalNot($contentRemoveCriterion),
-                    )
+                    ]
                 ),
-            )
+            ]
         );
-        $result = $this->repository->getSearchService()->findContent($query, array(), false);
+        $result = $this->repository->getSearchService()->findContent($query, [], false);
 
         return $result->totalCount == 0;
     }

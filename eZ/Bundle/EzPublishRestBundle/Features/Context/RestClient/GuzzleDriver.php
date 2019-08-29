@@ -16,49 +16,31 @@ class GuzzleDriver implements DriverInterface
 {
     use DriverHelper;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $sent = false;
 
-    /**
-     * @var \Guzzle\Http\Client
-     */
+    /** @var \Guzzle\Http\Client */
     protected $client;
 
-    /**
-     * @var \Guzzle\Http\Message\Request
-     */
+    /** @var \Guzzle\Http\Message\Request */
     protected $request;
 
-    /**
-     * @var \Guzzle\Http\Message\Response
-     */
+    /** @var \Guzzle\Http\Message\Response */
     protected $response;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $host;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $resource;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $method;
 
-    /**
-     * @var array Associative array with 'header' => 'value'
-     */
+    /** @var array Associative array with 'header' => 'value' */
     protected $headers;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $body;
 
     /**
@@ -199,7 +181,7 @@ class GuzzleDriver implements DriverInterface
      */
     public function getHeaders()
     {
-        $headers = array();
+        $headers = [];
         foreach ($this->response->getHeaders()->getAll() as $header => $headerObject) {
             $allHeaderValues = $headerObject->toArray();
             $headers[strtolower($header)] = implode(';', $allHeaderValues);

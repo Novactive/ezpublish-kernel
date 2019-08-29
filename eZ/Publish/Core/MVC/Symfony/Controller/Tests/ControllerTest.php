@@ -19,19 +19,13 @@ use PHPUnit\Framework\TestCase;
  */
 class ControllerTest extends TestCase
 {
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\Controller\Controller
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\Controller\Controller */
     protected $controller;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $templateEngineMock;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $containerMock;
 
     protected function setUp()
@@ -53,7 +47,7 @@ class ControllerTest extends TestCase
     public function testRender()
     {
         $view = 'some:valid:view.html.twig';
-        $params = array('foo' => 'bar', 'truc' => 'muche');
+        $params = ['foo' => 'bar', 'truc' => 'muche'];
         $tplResult = "I'm a template result";
         $this->templateEngineMock
             ->expects($this->once())
@@ -69,7 +63,7 @@ class ControllerTest extends TestCase
     {
         $response = new Response();
         $view = 'some:valid:view.html.twig';
-        $params = array('foo' => 'bar', 'truc' => 'muche');
+        $params = ['foo' => 'bar', 'truc' => 'muche'];
         $tplResult = "I'm a template result";
         $this->templateEngineMock
             ->expects($this->once())

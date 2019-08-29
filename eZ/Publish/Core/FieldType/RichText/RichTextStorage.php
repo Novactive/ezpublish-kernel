@@ -19,14 +19,10 @@ use DOMXPath;
 
 class RichTextStorage extends GatewayBasedStorage
 {
-    /**
-     * @var \Psr\Log\LoggerInterface
-     */
+    /** @var \Psr\Log\LoggerInterface */
     protected $logger;
 
-    /**
-     * @var \eZ\Publish\Core\FieldType\RichText\RichTextStorage\Gateway
-     */
+    /** @var \eZ\Publish\Core\FieldType\RichText\RichTextStorage\Gateway */
     protected $gateway;
 
     /**
@@ -61,9 +57,9 @@ class RichTextStorage extends GatewayBasedStorage
             return false;
         }
 
-        $urlSet = array();
-        $remoteIdSet = array();
-        $linksInfo = array();
+        $urlSet = [];
+        $remoteIdSet = [];
+        $linksInfo = [];
 
         /** @var \DOMElement $link */
         foreach ($links as $index => $link) {
@@ -83,7 +79,7 @@ class RichTextStorage extends GatewayBasedStorage
 
         $urlIdMap = $this->gateway->getUrlIdMap(array_keys($urlSet));
         $contentIds = $this->gateway->getContentIds(array_keys($remoteIdSet));
-        $urlLinkSet = array();
+        $urlLinkSet = [];
 
         foreach ($links as $index => $link) {
             list(, $scheme, $url, $fragment) = $linksInfo[$index];
@@ -140,8 +136,8 @@ class RichTextStorage extends GatewayBasedStorage
             return;
         }
 
-        $urlIdSet = array();
-        $urlInfo = array();
+        $urlIdSet = [];
+        $urlInfo = [];
 
         /** @var \DOMElement $link */
         foreach ($links as $index => $link) {

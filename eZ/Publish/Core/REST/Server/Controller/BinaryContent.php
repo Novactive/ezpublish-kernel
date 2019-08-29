@@ -19,9 +19,7 @@ use eZ\Publish\API\Repository\Exceptions\InvalidVariationException;
  */
 class BinaryContent extends RestController
 {
-    /**
-     * @var \eZ\Publish\SPI\Variation\VariationHandler
-     */
+    /** @var \eZ\Publish\SPI\Variation\VariationHandler */
     protected $imageVariationHandler;
 
     /**
@@ -80,7 +78,7 @@ class BinaryContent extends RestController
 
             return new CachedValue(
                 $variation,
-                array('locationId' => $content->contentInfo->mainLocationId)
+                ['locationId' => $content->contentInfo->mainLocationId]
             );
         } catch (InvalidVariationException $e) {
             throw new Exceptions\NotFoundException("Invalid image variation $variationIdentifier");

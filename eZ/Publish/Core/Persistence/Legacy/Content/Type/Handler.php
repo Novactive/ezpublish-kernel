@@ -25,9 +25,7 @@ use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 
 class Handler implements BaseContentTypeHandler
 {
-    /**
-     * @var \eZ\Publish\Core\Persistence\Legacy\Content\Type\Gateway
-     */
+    /** @var \eZ\Publish\Core\Persistence\Legacy\Content\Type\Gateway */
     protected $contentTypeGateway;
 
     /**
@@ -494,10 +492,10 @@ class Handler implements BaseContentTypeHandler
         if ($rows === false) {
             throw new NotFoundException(
                 'FieldDefinition',
-                array(
+                [
                     'id' => $id,
                     'status' => $status,
-                )
+                ]
             );
         }
 
@@ -663,5 +661,10 @@ class Handler implements BaseContentTypeHandler
         $updateStruct = $this->mapper->createUpdateStructFromType($type);
 
         return $this->update($type->id, Type::STATUS_DRAFT, $updateStruct);
+    }
+
+    public function deleteByUserAndStatus(int $userId, int $status): void
+    {
+        $this->contentTypeGateway->removeByUserAndVersion($userId, $status);
     }
 }

@@ -25,19 +25,13 @@ class SiteAccessListener implements EventSubscriberInterface, ContainerAwareInte
 {
     use ContainerAwareTrait;
 
-    /**
-     * @var \Symfony\Component\Routing\RouterInterface
-     */
+    /** @var \Symfony\Component\Routing\RouterInterface */
     private $defaultRouter;
 
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\Routing\Generator\UrlAliasGenerator
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\Routing\Generator\UrlAliasGenerator */
     private $urlAliasGenerator;
 
-    /**
-     * @var \Symfony\Component\Security\Http\HttpUtils
-     */
+    /** @var \Symfony\Component\Security\Http\HttpUtils */
     private $httpUtils;
 
     public function __construct(RouterInterface $defaultRouter, UrlAliasGenerator $urlAliasGenerator, HttpUtils $httpUtils)
@@ -49,9 +43,9 @@ class SiteAccessListener implements EventSubscriberInterface, ContainerAwareInte
 
     public static function getSubscribedEvents()
     {
-        return array(
-            MVCEvents::SITEACCESS => array('onSiteAccessMatch', 255),
-        );
+        return [
+            MVCEvents::SITEACCESS => ['onSiteAccessMatch', 255],
+        ];
     }
 
     public function onSiteAccessMatch(PostSiteAccessMatchEvent $event)
@@ -74,7 +68,7 @@ class SiteAccessListener implements EventSubscriberInterface, ContainerAwareInte
                 );
             } else {
                 $request->attributes->set('viewParametersString', '');
-                $request->attributes->set('viewParameters', array());
+                $request->attributes->set('viewParameters', []);
             }
 
             return;
@@ -112,7 +106,7 @@ class SiteAccessListener implements EventSubscriberInterface, ContainerAwareInte
     {
         // No view parameters, get out of here.
         if (($vpStart = strpos($pathinfo, '/(')) === false) {
-            return array($pathinfo, array(), '');
+            return [$pathinfo, [], ''];
         }
 
         $vpString = substr($pathinfo, $vpStart + 1);
@@ -121,7 +115,7 @@ class SiteAccessListener implements EventSubscriberInterface, ContainerAwareInte
         // Now remove the view parameters string from $semanticPathinfo
         $pathinfo = substr($pathinfo, 0, $vpStart);
 
-        return array($pathinfo, $viewParameters, "/$vpString");
+        return [$pathinfo, $viewParameters, "/$vpString"];
     }
 
     /**
@@ -134,7 +128,7 @@ class SiteAccessListener implements EventSubscriberInterface, ContainerAwareInte
     private function generateViewParametersArray($vpString)
     {
         $vpString = trim($vpString, '/');
-        $viewParameters = array();
+        $viewParameters = [];
 
         $vpSegments = explode('/', $vpString);
         for ($i = 0, $iMax = count($vpSegments); $i < $iMax; ++$i) {
@@ -145,7 +139,7 @@ class SiteAccessListener implements EventSubscriberInterface, ContainerAwareInte
             // View parameter name.
             // We extract it + the value from the following segment (next element in $vpSegments array)
             if ($vpSegments[$i][0] === '(') {
-                $paramName = str_replace(array('(', ')'), '', $vpSegments[$i]);
+                $paramName = str_replace(['(', ')'], '', $vpSegments[$i]);
                 // A value is present (e.g. /(foo)/bar)
                 if (isset($vpSegments[$i + 1])) {
                     $viewParameters[$paramName] = $vpSegments[$i + 1];

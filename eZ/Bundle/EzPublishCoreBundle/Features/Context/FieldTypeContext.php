@@ -39,47 +39,35 @@ class FieldTypeContext implements Context
      * @var array Stores the values needed to build the contentType with the desired fieldTypes,
      * used to postpone until object is ready for publishing.
      */
-    private $fieldConstructionObject = array(
+    private $fieldConstructionObject = [
         'contentType' => null,
         'fieldType' => null,
         'content' => null,
         'objectState' => self::FIELD_TYPE_NOT_CREATED,
-    );
+    ];
 
-    /**
-     * @var array Stores Internal mapping of the fieldType names
-     */
-    private $fieldTypeInternalIdentifier = array(
+    /** @var array Stores Internal mapping of the fieldType names */
+    private $fieldTypeInternalIdentifier = [
         'integer' => 'ezinteger',
-    );
+    ];
 
-    /**
-     * @var array Maps the validator of the fieldtypes
-     */
-    private $validatorMappings = array(
+    /** @var array Maps the validator of the fieldtypes */
+    private $validatorMappings = [
         'integer' => 'IntegerValue',
-    );
+    ];
 
-    /**
-     * @var array Maps the default values of the fieldtypes
-     */
-    private $defaultValues = array(
+    /** @var array Maps the default values of the fieldtypes */
+    private $defaultValues = [
         'integer' => 1,
-    );
+    ];
 
-    /**
-     * @var eZ\Publish\B\Repository\ContentTypeService
-     */
+    /** @var eZ\Publish\B\Repository\ContentTypeService */
     private $contentTypeService;
 
-    /**
-     * @var eZ\Publish\B\Repository\ContentService
-     */
+    /** @var eZ\Publish\B\Repository\ContentService */
     private $contentService;
 
-    /**
-     * @var eZ\Publish\B\Repository\LocationService
-     */
+    /** @var eZ\Publish\B\Repository\LocationService */
     private $locationService;
 
     /**
@@ -137,7 +125,7 @@ class FieldTypeContext implements Context
             $name,
             $this->fieldTypeInternalIdentifier[$fieldType]
         );
-        $fieldCreateStruct->names = array(self::DEFAULT_LANGUAGE => $name);
+        $fieldCreateStruct->names = [self::DEFAULT_LANGUAGE => $name];
         $fieldCreateStruct->position = $fieldPosition;
         $fieldCreateStruct->isRequired = $required;
         $fieldCreateStruct->defaultValue = $this->defaultValues[$fieldType];
@@ -157,9 +145,9 @@ class FieldTypeContext implements Context
         $validatorName = $this->getFieldValidator($fieldType);
         $validatorParent = $validatorName . 'Validator';
         if ($this->fieldConstructionObject['fieldType']->validatorConfiguration == null) {
-            $this->fieldConstructionObject['fieldType']->validatorConfiguration = array(
-                $validatorParent => array(),
-            );
+            $this->fieldConstructionObject['fieldType']->validatorConfiguration = [
+                $validatorParent => [],
+            ];
         }
         $value = is_numeric($value) ? $value + 0 : $value;
 
@@ -240,7 +228,7 @@ class FieldTypeContext implements Context
             $value = is_numeric($value) ? $value + 0 : $value;
             $contentCreateStruct->setField($field, $value);
         }
-        $draft = $this->contentService->createContent($contentCreateStruct, array($locationCreateStruct));
+        $draft = $this->contentService->createContent($contentCreateStruct, [$locationCreateStruct]);
         $content = $this->contentService->publishVersion($draft->versionInfo);
 
         $this->fieldConstructionObject['content'] = $content;
@@ -266,7 +254,7 @@ class FieldTypeContext implements Context
         $contentTypeCreateStruct = $this->fieldConstructionObject['contentType'];
         $contentTypeDraft = $this->contentTypeService->createContentType(
             $contentTypeCreateStruct,
-            array($contentTypeGroup)
+            [$contentTypeGroup]
         );
         $this->contentTypeService->publishContentTypeDraft($contentTypeDraft);
         $contentTypeIdentifier = $this->fieldConstructionObject['contentType']->identifier;
@@ -338,7 +326,7 @@ class FieldTypeContext implements Context
         $identifier = str_replace('.', '', strtolower($name));
         $contentTypeCreateStruct = $this->contentTypeService->newContentTypeCreateStruct($identifier);
         $contentTypeCreateStruct->mainLanguageCode = self::DEFAULT_LANGUAGE;
-        $contentTypeCreateStruct->names = array(self::DEFAULT_LANGUAGE => $name);
+        $contentTypeCreateStruct->names = [self::DEFAULT_LANGUAGE => $name];
         $contentTypeCreateStruct->nameSchema = $name;
         $this->fieldConstructionObject['contentType'] = $contentTypeCreateStruct;
         $this->fieldConstructionObject['objectState'] = self::CONTENT_TYPE_CREATED;

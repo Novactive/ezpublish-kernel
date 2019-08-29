@@ -30,9 +30,7 @@ class AbstractTestCase extends LanguageAwareTestCase
      */
     private $converterRegistry;
 
-    /**
-     * @var \eZ\Publish\SPI\Persistence\Content\Type\Handler
-     */
+    /** @var \eZ\Publish\SPI\Persistence\Content\Type\Handler */
     private $contentTypeHandler;
 
     /**
@@ -98,7 +96,7 @@ class AbstractTestCase extends LanguageAwareTestCase
     {
         if (!isset($this->converterRegistry)) {
             $this->converterRegistry = new ConverterRegistry(
-                array(
+                [
                     'ezdatetime' => new Converter\DateAndTimeConverter(),
                     'ezinteger' => new Converter\IntegerConverter(),
                     'ezstring' => new Converter\TextLineConverter(),
@@ -111,7 +109,7 @@ class AbstractTestCase extends LanguageAwareTestCase
                     'ezimage' => new Converter\NullConverter(),
                     'ezsrrating' => new Converter\NullConverter(),
                     'ezmultioption' => new Converter\NullConverter(),
-                )
+                ]
             );
         }
 

@@ -23,9 +23,7 @@ use PHPUnit\Framework\TestCase;
  */
 class TextBlockTest extends TestCase
 {
-    /**
-     * @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\TextBlockConverter
-     */
+    /** @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\TextBlockConverter */
     protected $converter;
 
     protected $longText;
@@ -89,15 +87,15 @@ EOT;
         $storageFieldDef = new StorageFieldDefinition();
         $fieldTypeConstraints = new FieldTypeConstraints();
         $fieldTypeConstraints->fieldSettings = new FieldSettings(
-            array(
+            [
                 'textRows' => 15,
-            )
+            ]
         );
         $fieldDef = new PersistenceFieldDefinition(
-            array(
+            [
                 'fieldTypeConstraints' => $fieldTypeConstraints,
                 'defaultValue' => new TextBlockValue(),
-            )
+            ]
         );
 
         $this->converter->toStorageFieldDefinition($fieldDef, $storageFieldDef);
@@ -116,9 +114,9 @@ EOT;
     {
         $fieldDef = new PersistenceFieldDefinition();
         $storageDef = new StorageFieldDefinition(
-            array(
+            [
                 'dataInt1' => 20,
-            )
+            ]
         );
 
         $this->converter->toFieldDefinition($storageDef, $fieldDef);
@@ -127,7 +125,7 @@ EOT;
         self::assertNull($fieldDef->fieldTypeConstraints->validators);
         self::assertInstanceOf('eZ\\Publish\\Core\\FieldType\\FieldSettings', $fieldDef->fieldTypeConstraints->fieldSettings);
         self::assertSame(
-            array('textRows' => 20),
+            ['textRows' => 20],
             $fieldDef->fieldTypeConstraints->fieldSettings->getArrayCopy()
         );
     }

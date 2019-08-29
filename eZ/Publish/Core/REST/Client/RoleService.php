@@ -42,29 +42,19 @@ use eZ\Publish\Core\REST\Common\Message;
  */
 class RoleService implements APIRoleService, Sessionable
 {
-    /**
-     * @var \eZ\Publish\Core\REST\Client\UserService
-     */
+    /** @var \eZ\Publish\Core\REST\Client\UserService */
     private $userService;
 
-    /**
-     * @var \eZ\Publish\Core\REST\Client\HttpClient
-     */
+    /** @var \eZ\Publish\Core\REST\Client\HttpClient */
     private $client;
 
-    /**
-     * @var \eZ\Publish\Core\REST\Common\Input\Dispatcher
-     */
+    /** @var \eZ\Publish\Core\REST\Common\Input\Dispatcher */
     private $inputDispatcher;
 
-    /**
-     * @var \eZ\Publish\Core\REST\Common\Output\Visitor
-     */
+    /** @var \eZ\Publish\Core\REST\Common\Output\Visitor */
     private $outputVisitor;
 
-    /**
-     * @var \eZ\Publish\Core\REST\Common\RequestParser
-     */
+    /** @var \eZ\Publish\Core\REST\Common\RequestParser */
     private $requestParser;
 
     /**
@@ -552,9 +542,7 @@ class RoleService implements APIRoleService, Sessionable
     }
 
     /**
-     * Loads all roles.
-     *
-     * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException if the authenticated user is not allowed to read the roles
+     * Loads all roles, excluding the ones the current user is not allowed to read.
      *
      * @return \eZ\Publish\API\Repository\Values\User\Role[]
      */
@@ -823,9 +811,7 @@ class RoleService implements APIRoleService, Sessionable
     }
 
     /**
-     * Returns the roles assigned to the given user group.
-     *
-     * @throws \eZ\Publish\API\Repository\Exceptions\UnauthorizedException if the authenticated user is not allowed to read a user group
+     * Returns the roles assigned to the given user group, excluding the ones the current user is not allowed to read.
      *
      * @param \eZ\Publish\API\Repository\Values\User\UserGroup $userGroup
      *

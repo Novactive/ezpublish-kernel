@@ -20,9 +20,7 @@ use PHPUnit\Framework\TestCase;
  */
 class KeywordTest extends TestCase
 {
-    /**
-     * @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\KeywordConverter
-     */
+    /** @var \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\KeywordConverter */
     protected $converter;
 
     protected function setUp()
@@ -39,7 +37,7 @@ class KeywordTest extends TestCase
     public function testToStorageValue()
     {
         $value = new FieldValue();
-        $value->data = array('key1', 'key2');
+        $value->data = ['key1', 'key2'];
         $value->sortKey = false;
         $storageFieldValue = new StorageFieldValue();
 
@@ -62,7 +60,7 @@ class KeywordTest extends TestCase
         $fieldValue = new FieldValue();
 
         $this->converter->toFieldValue($storageFieldValue, $fieldValue);
-        $this->assertSame(array(), $fieldValue->data);
+        $this->assertSame([], $fieldValue->data);
         $this->assertEquals('', $fieldValue->sortKey);
     }
 

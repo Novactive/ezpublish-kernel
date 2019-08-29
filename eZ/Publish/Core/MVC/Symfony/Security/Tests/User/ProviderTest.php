@@ -24,19 +24,13 @@ use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 
 class ProviderTest extends TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $userService;
 
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\Security\User\Provider
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\Security\User\Provider */
     private $userProvider;
 
     protected function setUp()
@@ -84,7 +78,7 @@ class ProviderTest extends TestCase
         $user = $this->userProvider->loadUserByUsername($username);
         $this->assertInstanceOf(UserInterface::class, $user);
         $this->assertSame($apiUser, $user->getAPIUser());
-        $this->assertSame(array('ROLE_USER'), $user->getRoles());
+        $this->assertSame(['ROLE_USER'], $user->getRoles());
     }
 
     /**
@@ -100,15 +94,15 @@ class ProviderTest extends TestCase
     {
         $userId = 123;
         $apiUser = new User(
-            array(
+            [
                 'content' => new Content(
-                    array(
+                    [
                         'versionInfo' => new VersionInfo(
-                            array('contentInfo' => new ContentInfo(array('id' => $userId)))
+                            ['contentInfo' => new ContentInfo(['id' => $userId])]
                         ),
-                    )
+                    ]
                 ),
-            )
+            ]
         );
         $refreshedAPIUser = clone $apiUser;
         $user = $this->createMock(UserInterface::class);
@@ -142,15 +136,15 @@ class ProviderTest extends TestCase
     {
         $userId = 123;
         $apiUser = new User(
-            array(
+            [
                 'content' => new Content(
-                    array(
+                    [
                         'versionInfo' => new VersionInfo(
-                            array('contentInfo' => new ContentInfo(array('id' => $userId)))
+                            ['contentInfo' => new ContentInfo(['id' => $userId])]
                         ),
-                    )
+                    ]
                 ),
-            )
+            ]
         );
         $user = $this->createMock(UserInterface::class);
         $user
@@ -177,11 +171,11 @@ class ProviderTest extends TestCase
 
     public function supportsClassProvider()
     {
-        return array(
-            array(SymfonyUserInterface::class, false),
-            array(MVCUser::class, true),
-            array(get_class($this->createMock(MVCUser::class)), true),
-        );
+        return [
+            [SymfonyUserInterface::class, false],
+            [MVCUser::class, true],
+            [get_class($this->createMock(MVCUser::class)), true],
+        ];
     }
 
     public function testLoadUserByAPIUser()

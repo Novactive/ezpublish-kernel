@@ -24,6 +24,7 @@ use eZ\Publish\Core\Repository\Values\Content\Content;
 use eZ\Publish\Core\Repository\Values\Content\Location;
 use eZ\Publish\Core\Repository\Values\Content\VersionInfo;
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Symfony\Component\HttpFoundation\RequestStack;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,35 +32,26 @@ use PHPUnit\Framework\TestCase;
  */
 class ContentViewBuilderTest extends TestCase
 {
-    /**
-     * @var \eZ\Publish\API\Repository\Repository|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \eZ\Publish\API\Repository\Repository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\View\Configurator|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\View\Configurator|\PHPUnit\Framework\MockObject\MockObject */
     private $viewConfigurator;
 
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\View\ParametersInjector|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\View\ParametersInjector|\PHPUnit\Framework\MockObject\MockObject */
     private $parametersInjector;
 
-    /**
-     * @var \eZ\Publish\Core\Helper\ContentInfoLocationLoader|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \eZ\Publish\Core\Helper\ContentInfoLocationLoader|\PHPUnit\Framework\MockObject\MockObject */
     private $contentInfoLocationLoader;
 
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\View\Builder\ContentViewBuilder|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\View\Builder\ContentViewBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $contentViewBuilder;
 
-    /**
-     * @var \eZ\Publish\API\Repository\PermissionResolver|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \eZ\Publish\API\Repository\PermissionResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $permissionResolver;
+
+    /** @var \Symfony\Component\HttpFoundation\RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
     public function setUp(): void
     {
@@ -68,6 +60,7 @@ class ContentViewBuilderTest extends TestCase
         $this->parametersInjector = $this->getMockBuilder(ParametersInjector::class)->getMock();
         $this->contentInfoLocationLoader = $this->getMockBuilder(ContentInfoLocationLoader::class)->getMock();
         $this->permissionResolver = $this->getMockBuilder(PermissionResolver::class)->getMock();
+        $this->requestStack = $this->getMockBuilder(RequestStack::class)->getMock();
         $this->repository
             ->expects($this->any())
             ->method('getPermissionResolver')
@@ -77,6 +70,7 @@ class ContentViewBuilderTest extends TestCase
             $this->repository,
             $this->viewConfigurator,
             $this->parametersInjector,
+            $this->requestStack,
             $this->contentInfoLocationLoader
         );
     }

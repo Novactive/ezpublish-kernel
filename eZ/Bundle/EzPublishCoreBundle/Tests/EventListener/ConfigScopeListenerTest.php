@@ -19,19 +19,13 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigScopeListenerTest extends TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $configResolver;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $viewManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $viewProviders;
 
     protected function setUp()
@@ -39,19 +33,19 @@ class ConfigScopeListenerTest extends TestCase
         parent::setUp();
         $this->configResolver = $this->createMock(VersatileScopeInterface::class);
         $this->viewManager = $this->createMock(ViewManager::class);
-        $this->viewProviders = array(
+        $this->viewProviders = [
             $this->createMock(ViewProvider::class),
             $this->createMock(ViewProvider::class),
-        );
+        ];
     }
 
     public function testGetSubscribedEvents()
     {
         $this->assertSame(
-            array(
-                MVCEvents::CONFIG_SCOPE_CHANGE => array('onConfigScopeChange', 100),
-                MVCEvents::CONFIG_SCOPE_RESTORE => array('onConfigScopeChange', 100),
-            ),
+            [
+                MVCEvents::CONFIG_SCOPE_CHANGE => ['onConfigScopeChange', 100],
+                MVCEvents::CONFIG_SCOPE_RESTORE => ['onConfigScopeChange', 100],
+            ],
             ConfigScopeListener::getSubscribedEvents()
         );
     }

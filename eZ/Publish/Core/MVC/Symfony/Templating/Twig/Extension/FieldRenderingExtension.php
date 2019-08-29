@@ -24,19 +24,13 @@ use Twig_SimpleFunction;
  */
 class FieldRenderingExtension extends Twig_Extension
 {
-    /**
-     * @var FieldBlockRendererInterface|\eZ\Publish\Core\MVC\Symfony\Templating\Twig\FieldBlockRenderer
-     */
+    /** @var FieldBlockRendererInterface|\eZ\Publish\Core\MVC\Symfony\Templating\Twig\FieldBlockRenderer */
     private $fieldBlockRenderer;
 
-    /**
-     * @var ParameterProviderRegistryInterface
-     */
+    /** @var ParameterProviderRegistryInterface */
     private $parameterProviderRegistry;
 
-    /**
-     * @var TranslationHelper
-     */
+    /** @var TranslationHelper */
     private $translationHelper;
 
     /**
@@ -63,7 +57,7 @@ class FieldRenderingExtension extends Twig_Extension
 
     public function getFunctions()
     {
-        return array(
+        return [
             new Twig_SimpleFunction(
                 'ez_render_field',
                 function (Twig_Environment $environment, Content $content, $fieldIdentifier, array $params = []) {
@@ -82,7 +76,7 @@ class FieldRenderingExtension extends Twig_Extension
                 },
                 ['is_safe' => ['html'], 'needs_environment' => true]
             ),
-        );
+        ];
     }
 
     /**

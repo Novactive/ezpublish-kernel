@@ -23,9 +23,7 @@ use eZ\Publish\SPI\Persistence\TransactionHandler;
  */
 class SignalDispatcherTransactionWrapper extends SignalDispatcher implements TransactionHandler
 {
-    /**
-     * @var \eZ\Publish\Core\SignalSlot\SignalDispatcher
-     */
+    /** @var \eZ\Publish\Core\SignalSlot\SignalDispatcher */
     private $signalDispatcher;
 
     /**
@@ -33,16 +31,12 @@ class SignalDispatcherTransactionWrapper extends SignalDispatcher implements Tra
      *
      * @var \eZ\Publish\Core\SignalSlot\Signal[][]
      */
-    private $signalsQueue = array();
+    private $signalsQueue = [];
 
-    /**
-     * @var int Used to keep track of depth of current transaction
-     */
+    /** @var int Used to keep track of depth of current transaction */
     private $transactionDepth = 0;
 
-    /**
-     * @var int Used to be able to unset affected signals on rollback
-     */
+    /** @var int Used to be able to unset affected signals on rollback */
     private $transactionCount = 0;
 
     /**
@@ -77,7 +71,7 @@ class SignalDispatcherTransactionWrapper extends SignalDispatcher implements Tra
     public function beginTransaction()
     {
         ++$this->transactionDepth;
-        $this->signalsQueue[++$this->transactionCount] = array();
+        $this->signalsQueue[++$this->transactionCount] = [];
     }
 
     /**
@@ -100,7 +94,7 @@ class SignalDispatcherTransactionWrapper extends SignalDispatcher implements Tra
 
             // To avoid possible int overflow on long running processes
             $this->transactionCount = 0;
-            $this->signalsQueue = array();
+            $this->signalsQueue = [];
         }
     }
 

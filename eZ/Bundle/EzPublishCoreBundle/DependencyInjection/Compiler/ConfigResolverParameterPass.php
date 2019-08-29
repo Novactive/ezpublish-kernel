@@ -25,9 +25,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
  */
 class ConfigResolverParameterPass implements CompilerPassInterface
 {
-    /**
-     * @var DynamicSettingParserInterface
-     */
+    /** @var DynamicSettingParserInterface */
     private $dynamicSettingParser;
 
     public function __construct(DynamicSettingParserInterface $dynamicSettingParser)
@@ -37,13 +35,13 @@ class ConfigResolverParameterPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        $dynamicSettingsServices = array();
-        $resettableServices = array();
+        $dynamicSettingsServices = [];
+        $resettableServices = [];
         $updateableServices = $container->getParameter('ezpublish.config_resolver.updateable_services');
         // Pass #1 Loop against all arguments of all service definitions to replace dynamic settings by the fake service.
         foreach ($container->getDefinitions() as $serviceId => $definition) {
             // Constructor injection
-            $replaceArguments = array();
+            $replaceArguments = [];
             foreach ($definition->getArguments() as $i => $arg) {
                 if (!$this->dynamicSettingParser->isDynamicSetting($arg)) {
                     continue;
@@ -78,7 +76,7 @@ class ConfigResolverParameterPass implements CompilerPassInterface
                     $callHasDynamicSetting = true;
                 }
 
-                $call = array($method, $callArgs);
+                $call = [$method, $callArgs];
                 if ($callHasDynamicSetting) {
                     // We only support single dynamic setting injection for updatable services.
                     if (count($callArgs) == 1) {

@@ -47,24 +47,16 @@ class NameSchemaService
      */
     const META_STRING = 'EZMETAGROUP_';
 
-    /**
-     * @var \eZ\Publish\SPI\Persistence\Content\Type\Handler
-     */
+    /** @var \eZ\Publish\SPI\Persistence\Content\Type\Handler */
     protected $contentTypeHandler;
 
-    /**
-     * @var ContentTypeDomainMapper
-     */
+    /** @var ContentTypeDomainMapper */
     protected $contentTypeDomainMapper;
 
-    /**
-     * @var NameableFieldTypeRegistry
-     */
+    /** @var NameableFieldTypeRegistry */
     protected $nameableFieldTypeRegistry;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $settings;
 
     /**
@@ -79,16 +71,16 @@ class NameSchemaService
         ContentTypeHandler $contentTypeHandler,
         ContentTypeDomainMapper $contentTypeDomainMapper,
         NameableFieldTypeRegistry $nameableFieldTypeRegistry,
-        array $settings = array())
+        array $settings = [])
     {
         $this->contentTypeHandler = $contentTypeHandler;
         $this->contentTypeDomainMapper = $contentTypeDomainMapper;
         $this->nameableFieldTypeRegistry = $nameableFieldTypeRegistry;
         // Union makes sure default settings are ignored if provided in argument
-        $this->settings = $settings + array(
+        $this->settings = $settings + [
             'limit' => 150,
             'sequence' => '...',
-        );
+        ];
     }
 
     /**
@@ -123,7 +115,7 @@ class NameSchemaService
      *
      * @return array
      */
-    public function resolveNameSchema(Content $content, array $fieldMap = array(), array $languageCodes = array(), ContentType $contentType = null)
+    public function resolveNameSchema(Content $content, array $fieldMap = [], array $languageCodes = [], ContentType $contentType = null)
     {
         if ($contentType === null) {
             $contentType = $this->contentTypeHandler->load($content->contentInfo->contentTypeId);
@@ -158,7 +150,7 @@ class NameSchemaService
             return $content->fields;
         }
 
-        $mergedFieldMap = array();
+        $mergedFieldMap = [];
 
         foreach ($content->fields as $fieldIdentifier => $fieldLanguageMap) {
             foreach ($languageCodes as $languageCode) {
@@ -187,7 +179,7 @@ class NameSchemaService
         $tokens = $this->extractTokens($filteredNameSchema);
         $schemaIdentifiers = $this->getIdentifiers($nameSchema);
 
-        $names = array();
+        $names = [];
 
         foreach ($languageCodes as $languageCode) {
             // Fetch titles for language code
@@ -228,7 +220,7 @@ class NameSchemaService
      */
     protected function getFieldTitles(array $schemaIdentifiers, $contentType, array $fieldMap, $languageCode)
     {
-        $fieldTitles = array();
+        $fieldTitles = [];
 
         foreach ($schemaIdentifiers as $fieldDefinitionIdentifier) {
             if (isset($fieldMap[$fieldDefinitionIdentifier][$languageCode])) {
@@ -394,7 +386,7 @@ class NameSchemaService
     {
         $retNamePattern = '';
         $foundGroups = preg_match_all('/[<|\\|](\\(.+\\))[\\||>]/U', $nameSchema, $groupArray);
-        $groupLookupTable = array();
+        $groupLookupTable = [];
 
         if ($foundGroups) {
             $i = 0;
@@ -406,7 +398,7 @@ class NameSchemaService
                 $retNamePattern = str_replace($group, $metaToken, $nameSchema);
 
                 // Remove the pattern "(" ")" from the tokens
-                $group = str_replace(array('(', ')'), '', $group);
+                $group = str_replace(['(', ')'], '', $group);
 
                 $groupLookupTable[$metaToken] = $group;
                 ++$i;
@@ -414,7 +406,7 @@ class NameSchemaService
             $nameSchema = $retNamePattern;
         }
 
-        return array($nameSchema, $groupLookupTable);
+        return [$nameSchema, $groupLookupTable];
     }
 
     /**
@@ -429,14 +421,14 @@ class NameSchemaService
         $allTokens = '#<(.*)>#U';
         $identifiers = '#\\W#';
 
-        $tmpArray = array();
+        $tmpArray = [];
         preg_match_all($allTokens, $schemaString, $matches);
 
         foreach ($matches[1] as $match) {
             $tmpArray[] = preg_split($identifiers, $match, -1, PREG_SPLIT_NO_EMPTY);
         }
 
-        $retArray = array();
+        $retArray = [];
         foreach ($tmpArray as $matchGroup) {
             if (is_array($matchGroup)) {
                 foreach ($matchGroup as $item) {

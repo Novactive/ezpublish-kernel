@@ -24,9 +24,7 @@ class TrashItem extends APITrashItem
      */
     protected $contentInfo;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $path;
 
     /**
@@ -50,7 +48,7 @@ class TrashItem extends APITrashItem
      *
      * @return array
      */
-    protected function getProperties($dynamicProperties = array('contentId', 'path'))
+    protected function getProperties($dynamicProperties = ['contentId', 'path'])
     {
         return parent::getProperties($dynamicProperties);
     }
@@ -75,7 +73,7 @@ class TrashItem extends APITrashItem
                     return $this->path = explode('/', trim($this->pathString, '/'));
                 }
 
-                return $this->path = array();
+                return $this->path = [];
         }
 
         return parent::__get($property);

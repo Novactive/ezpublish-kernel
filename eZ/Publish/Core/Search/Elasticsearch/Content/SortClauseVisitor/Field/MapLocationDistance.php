@@ -9,7 +9,6 @@
 namespace eZ\Publish\Core\Search\Elasticsearch\Content\SortClauseVisitor\Field;
 
 use eZ\Publish\Core\Search\Elasticsearch\Content\SortClauseVisitor\FieldBase;
-use eZ\Publish\Core\Search\Elasticsearch\Content\SortClauseVisitor;
 use eZ\Publish\API\Repository\Values\Content\Query\SortClause;
 use eZ\Publish\Core\Base\Exceptions\InvalidArgumentException;
 use eZ\Publish\Core\Search\Common\FieldNameResolver;
@@ -80,19 +79,19 @@ class MapLocationDistance extends FieldBase
         /** @var \eZ\Publish\API\Repository\Values\Content\Query\SortClause\Target\MapLocationTarget $target */
         $target = $sortClause->targetData;
 
-        return array(
-            '_geo_distance' => array(
+        return [
+            '_geo_distance' => [
                 'nested_path' => 'fields_doc',
-                'nested_filter' => array(
+                'nested_filter' => [
                     'term' => $this->getNestedFilterTerm(null),
-                ),
+                ],
                 'order' => $this->getDirection($sortClause),
-                "fields_doc.{$fieldName}" => array(
+                "fields_doc.{$fieldName}" => [
                     'lat' => $target->latitude,
                     'lon' => $target->longitude,
-                ),
+                ],
                 'unit' => 'km',
-            ),
-        );
+            ],
+        ];
     }
 }

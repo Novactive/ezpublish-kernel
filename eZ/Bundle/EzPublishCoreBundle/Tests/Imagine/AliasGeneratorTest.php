@@ -33,64 +33,40 @@ use Psr\Log\LoggerInterface;
 
 class AliasGeneratorTest extends TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|\Liip\ImagineBundle\Binary\Loader\LoaderInterface
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\Liip\ImagineBundle\Binary\Loader\LoaderInterface */
     private $dataLoader;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|\Liip\ImagineBundle\Imagine\Filter\FilterManager
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\Liip\ImagineBundle\Imagine\Filter\FilterManager */
     private $filterManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|\Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface */
     private $ioResolver;
 
-    /**
-     * @var \Liip\ImagineBundle\Imagine\Filter\FilterConfiguration
-     */
+    /** @var \Liip\ImagineBundle\Imagine\Filter\FilterConfiguration */
     private $filterConfiguration;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|\Psr\Log\LoggerInterface
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\Psr\Log\LoggerInterface */
     private $logger;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|\Imagine\Image\ImagineInterface
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\Imagine\Image\ImagineInterface */
     private $imagine;
 
-    /**
-     * @var \eZ\Bundle\EzPublishCoreBundle\Imagine\AliasGenerator
-     */
+    /** @var \eZ\Bundle\EzPublishCoreBundle\Imagine\AliasGenerator */
     private $aliasGenerator;
 
-    /**
-     * @var \eZ\Publish\SPI\Variation\VariationHandler
-     */
+    /** @var \eZ\Publish\SPI\Variation\VariationHandler */
     private $decoratedAliasGenerator;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|\Imagine\Image\BoxInterface
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\Imagine\Image\BoxInterface */
     private $box;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|\Imagine\Image\ImageInterface
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\Imagine\Image\ImageInterface */
     private $image;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|\eZ\Publish\Core\IO\IOServiceInterface
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\eZ\Publish\Core\IO\IOServiceInterface */
     private $ioService;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|\eZ\Bundle\EzPublishCoreBundle\Imagine\VariationPathGenerator
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|\eZ\Bundle\EzPublishCoreBundle\Imagine\VariationPathGenerator */
     private $variationPathGenerator;
 
     protected function setUp()
@@ -158,7 +134,7 @@ class AliasGeneratorTest extends TestCase
      */
     public function testGetVariationWrongValue()
     {
-        $field = new Field(array('value' => $this->createMock(FieldTypeValue::class)));
+        $field = new Field(['value' => $this->createMock(FieldTypeValue::class)]);
         $this->aliasGenerator->getVariation($field, new VersionInfo(), 'foo');
     }
 
@@ -171,7 +147,7 @@ class AliasGeneratorTest extends TestCase
     {
         $originalPath = 'foo/bar/image.jpg';
         $variationName = 'my_variation';
-        $this->filterConfiguration->set($variationName, array());
+        $this->filterConfiguration->set($variationName, []);
         $imageId = '123-45';
         $imageWidth = 300;
         $imageHeight = 300;
@@ -249,7 +225,7 @@ class AliasGeneratorTest extends TestCase
             ->will($this->returnValue($expectedUrl));
 
         $expected = new ImageVariation(
-            array(
+            [
                 'name' => $variationName,
                 'fileName' => 'image.jpg',
                 'dirPath' => 'http://localhost/foo/bar',
@@ -257,7 +233,7 @@ class AliasGeneratorTest extends TestCase
                 'imageId' => $imageId,
                 'height' => $imageHeight,
                 'width' => $imageWidth,
-            )
+            ]
         );
         $this->assertEquals($expected, $this->decoratedAliasGenerator->getVariation($field, new VersionInfo(), $variationName));
     }
@@ -273,9 +249,9 @@ class AliasGeneratorTest extends TestCase
         $variationName = 'my_variation';
         $reference1 = 'reference1';
         $reference2 = 'reference2';
-        $configVariation = array('reference' => $reference1);
-        $configReference1 = array('reference' => $reference2);
-        $configReference2 = array();
+        $configVariation = ['reference' => $reference1];
+        $configReference1 = ['reference' => $reference2];
+        $configReference2 = [];
         $this->filterConfiguration->set($variationName, $configVariation);
         $this->filterConfiguration->set($reference1, $configReference1);
         $this->filterConfiguration->set($reference2, $configReference2);
@@ -387,7 +363,7 @@ class AliasGeneratorTest extends TestCase
             ->method('find')
             ->will($this->throwException(new NotLoadableException()));
 
-        $field = new Field(array('value' => new ImageValue()));
+        $field = new Field(['value' => new ImageValue()]);
         $this->aliasGenerator->getVariation($field, new VersionInfo(), 'foo');
     }
 
@@ -399,8 +375,8 @@ class AliasGeneratorTest extends TestCase
         $originalPath = 'foo/bar/image.jpg';
         $variationName = 'my_variation';
         $imageId = '123-45';
-        $imageValue = new ImageValue(array('id' => $originalPath, 'imageId' => $imageId));
-        $field = new Field(array('value' => $imageValue));
+        $imageValue = new ImageValue(['id' => $originalPath, 'imageId' => $imageId]);
+        $field = new Field(['value' => $imageValue]);
 
         $this->ioResolver
             ->expects($this->once())

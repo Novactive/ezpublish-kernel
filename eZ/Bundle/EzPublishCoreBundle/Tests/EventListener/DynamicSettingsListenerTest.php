@@ -22,14 +22,10 @@ use Symfony\Component\DependencyInjection\ExpressionLanguage;
 
 class DynamicSettingsListenerTest extends TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $expressionLanguage;
 
     protected function setUp()
@@ -42,11 +38,11 @@ class DynamicSettingsListenerTest extends TestCase
     public function testGetSubscribedEvents()
     {
         $this->assertSame(
-            array(
-                MVCEvents::SITEACCESS => array('onSiteAccessMatch', 254),
-                MVCEvents::CONFIG_SCOPE_CHANGE => array('onConfigScopeChange', 90),
-                MVCEvents::CONFIG_SCOPE_RESTORE => array('onConfigScopeChange', 90),
-            ),
+            [
+                MVCEvents::SITEACCESS => ['onSiteAccessMatch', 254],
+                MVCEvents::CONFIG_SCOPE_CHANGE => ['onConfigScopeChange', 90],
+                MVCEvents::CONFIG_SCOPE_RESTORE => ['onConfigScopeChange', 90],
+            ],
             DynamicSettingsListener::getSubscribedEvents()
         );
     }
@@ -54,11 +50,11 @@ class DynamicSettingsListenerTest extends TestCase
     public function testOnSiteAccessMatchSubRequest()
     {
         $event = new PostSiteAccessMatchEvent(new SiteAccess('test'), new Request(), HttpKernelInterface::SUB_REQUEST);
-        $resettableServices = array('foo', 'bar.baz');
-        $updateableServices = array(
-            'some_service' => array(array('method' => 'some_expression')),
-            'another_service' => array(array('method' => 'another_expression')),
-        );
+        $resettableServices = ['foo', 'bar.baz'];
+        $updateableServices = [
+            'some_service' => [['method' => 'some_expression']],
+            'another_service' => [['method' => 'another_expression']],
+        ];
 
         $this->container
             ->expects($this->never())
@@ -75,11 +71,11 @@ class DynamicSettingsListenerTest extends TestCase
     public function testOnSiteAccessMatch()
     {
         $event = new PostSiteAccessMatchEvent(new SiteAccess('test'), new Request(), HttpKernelInterface::MASTER_REQUEST);
-        $resettableServices = array('foo', 'bar.baz');
-        $updateableServices = array(
-            'some_service' => array(array('someMethod', 'some_expression')),
-            'another_service' => array(array('someMethod', 'another_expression')),
-        );
+        $resettableServices = ['foo', 'bar.baz'];
+        $updateableServices = [
+            'some_service' => [['someMethod', 'some_expression']],
+            'another_service' => [['someMethod', 'another_expression']],
+        ];
 
         $this->container
             ->expects($this->at(0))
@@ -115,7 +111,7 @@ class DynamicSettingsListenerTest extends TestCase
             ->with($dynamicSetting1);
 
         $updateableService2 = $this->createMock(FooServiceInterface::class);
-        $dynamicSetting2 = array('foo' => 'bar');
+        $dynamicSetting2 = ['foo' => 'bar'];
         $this->container
             ->expects($this->at(6))
             ->method('initialized')
@@ -134,10 +130,10 @@ class DynamicSettingsListenerTest extends TestCase
             ->expects($this->exactly(count($updateableServices)))
             ->method('evaluate')
             ->willReturnMap(
-                array(
-                    array('some_expression', array('container' => $this->container), $dynamicSetting1),
-                    array('another_expression', array('container' => $this->container), $dynamicSetting2),
-                )
+                [
+                    ['some_expression', ['container' => $this->container], $dynamicSetting1],
+                    ['another_expression', ['container' => $this->container], $dynamicSetting2],
+                ]
             );
 
         $listener = new DynamicSettingsListener($resettableServices, $updateableServices, $this->expressionLanguage);
@@ -149,11 +145,11 @@ class DynamicSettingsListenerTest extends TestCase
     {
         $siteAccess = new SiteAccess('test');
         $event = new ScopeChangeEvent($siteAccess);
-        $resettableServices = array('foo', 'bar.baz');
-        $updateableServices = array(
-            'some_service' => array(array('someMethod', 'some_expression')),
-            'another_service' => array(array('someMethod', 'another_expression')),
-        );
+        $resettableServices = ['foo', 'bar.baz'];
+        $updateableServices = [
+            'some_service' => [['someMethod', 'some_expression']],
+            'another_service' => [['someMethod', 'another_expression']],
+        ];
 
         $this->container
             ->expects($this->at(0))
@@ -189,7 +185,7 @@ class DynamicSettingsListenerTest extends TestCase
             ->with($dynamicSetting1);
 
         $updateableService2 = $this->createMock(FooServiceInterface::class);
-        $dynamicSetting2 = array('foo' => 'bar');
+        $dynamicSetting2 = ['foo' => 'bar'];
         $this->container
             ->expects($this->at(6))
             ->method('initialized')
@@ -208,10 +204,10 @@ class DynamicSettingsListenerTest extends TestCase
             ->expects($this->exactly(count($updateableServices)))
             ->method('evaluate')
             ->willReturnMap(
-                array(
-                    array('some_expression', array('container' => $this->container), $dynamicSetting1),
-                    array('another_expression', array('container' => $this->container), $dynamicSetting2),
-                )
+                [
+                    ['some_expression', ['container' => $this->container], $dynamicSetting1],
+                    ['another_expression', ['container' => $this->container], $dynamicSetting2],
+                ]
             );
 
         $listener = new DynamicSettingsListener($resettableServices, $updateableServices, $this->expressionLanguage);

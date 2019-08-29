@@ -27,9 +27,7 @@ use eZ\Publish\SPI\Limitation\Type as SPILimitationTypeInterface;
  */
 class BlockingLimitationType implements SPILimitationTypeInterface
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $identifier;
 
     /**
@@ -77,14 +75,14 @@ class BlockingLimitationType implements SPILimitationTypeInterface
      */
     public function validate(APILimitationValue $limitationValue)
     {
-        $validationErrors = array();
+        $validationErrors = [];
         if (empty($limitationValue->limitationValues)) {
             $validationErrors[] = new ValidationError(
                 "\$limitationValue->limitationValues => '%value%' can not be empty",
                 null,
-                array(
+                [
                     'value' => $limitationValue->limitationValues,
-                )
+                ]
             );
         }
 

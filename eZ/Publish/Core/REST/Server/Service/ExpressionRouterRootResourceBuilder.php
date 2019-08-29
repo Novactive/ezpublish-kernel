@@ -34,19 +34,13 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class ExpressionRouterRootResourceBuilder implements RootResourceBuilderInterface
 {
-    /**
-     * @var \Symfony\Component\Routing\RouterInterface
-     */
+    /** @var \Symfony\Component\Routing\RouterInterface */
     protected $router;
 
-    /**
-     * @var \Symfony\Component\Routing\RouterInterface
-     */
+    /** @var \Symfony\Component\Routing\RouterInterface */
     protected $templateRouter;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $resourceConfig;
 
     /**
@@ -72,7 +66,7 @@ class ExpressionRouterRootResourceBuilder implements RootResourceBuilderInterfac
     {
         $language = new ExpressionLanguage();
 
-        $resources = array();
+        $resources = [];
         foreach ($this->resourceConfig as $name => $resource) {
             $resources[] = new Values\Resource(
                 $name,

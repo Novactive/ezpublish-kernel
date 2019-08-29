@@ -14,6 +14,7 @@ use eZ\Publish\Core\MVC\Symfony\SiteAccess\SiteAccessAware;
 use eZ\Publish\Core\MVC\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * This class will help you get settings for a specific scope.
@@ -42,30 +43,23 @@ class ConfigResolver implements VersatileScopeInterface, SiteAccessAware, Contai
     const UNDEFINED_STRATEGY_EXCEPTION = 1;
     const UNDEFINED_STRATEGY_NULL = 2;
 
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\SiteAccess
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\SiteAccess */
     protected $siteAccess;
 
-    /**
-     * @var array Siteaccess groups, indexed by siteaccess name
-     */
+    /** @var array Siteaccess groups, indexed by siteaccess name */
     protected $groupsBySiteAccess;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $defaultNamespace;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $defaultScope;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     protected $undefinedStrategy;
+
+    /** @var array[] List of blame => [params] loaded while siteAccess->matchingType was 'uninitialized' */
+    private $tooEarlyLoadedList = [];
 
     /**
      * @param array $groupsBySiteAccess SiteAccess groups, indexed by siteaccess.
@@ -165,9 +159,11 @@ class ConfigResolver implements VersatileScopeInterface, SiteAccessAware, Contai
      */
     public function getParameter($paramName, $namespace = null, $scope = null)
     {
+        $this->logTooEarlyLoadedListIfNeeded($paramName);
+
         $namespace = $namespace ?: $this->defaultNamespace;
         $scope = $scope ?: $this->getDefaultScope();
-        $triedScopes = array();
+        $triedScopes = [];
 
         // Global scope
         $globalScopeParamName = "$namespace." . self::SCOPE_GLOBAL . ".$paramName";
@@ -237,8 +233,123 @@ class ConfigResolver implements VersatileScopeInterface, SiteAccessAware, Contai
         return $this->defaultScope ?: $this->siteAccess->name;
     }
 
+    /**
+     * @param string $scope The default "scope" aka siteaccess name, as opposed to the self::SCOPE_DEFAULT.
+     */
     public function setDefaultScope($scope)
     {
         $this->defaultScope = $scope;
+
+        // On scope change check if siteaccess has been updated so we can log warnings if there are any
+        if ($this->siteAccess->matchingType !== 'uninitialized') {
+            $this->warnAboutTooEarlyLoadedParams();
+        }
+    }
+
+    private function warnAboutTooEarlyLoadedParams()
+    {
+        if (empty($this->tooEarlyLoadedList)) {
+            return;
+        }
+
+        $logger = $this->container->get('logger');
+        foreach ($this->tooEarlyLoadedList as $blame => $params) {
+            $logger->warning(sprintf(
+                'ConfigResolver was used by "%s" before SiteAccess was initialized, loading parameter(s) '
+                . '%s. As this can cause very hard to debug issues, '
+                . 'try to use ConfigResolver lazily, '
+                . (PHP_SAPI === 'cli' ? 'make the affected commands lazy, ' : '')
+                . 'make the service lazy or see if you can inject another lazy service.',
+                $blame,
+                '"$' . implode('$", "$', array_unique($params)) . '$"'
+            ));
+        }
+
+        $this->tooEarlyLoadedList = [];
+    }
+
+    /**
+     * If in run-time debug mode, before SiteAccess is initialized, log getParameter() usages when considered "unsafe".
+     *
+     * @return string
+     */
+    private function logTooEarlyLoadedListIfNeeded($paramName)
+    {
+        if ($this->container instanceof ContainerBuilder) {
+            return;
+        }
+
+        if ($this->siteAccess->matchingType !== 'uninitialized') {
+            return;
+        }
+
+        // So we are in a state where we need to warn about unsafe use of config resolver parameters...
+        // .. it's a bit costly to do so, so we only do it in debug mode
+        $container = $this->container;
+        if (!$container->getParameter('kernel.debug')) {
+            return;
+        }
+
+        $serviceName = '??';
+        $firstService = '??';
+        $commandName = null;
+        $resettableServiceIds = $container->getParameter('ezpublish.config_resolver.resettable_services');
+        $updatableServices = $container->getParameter('ezpublish.config_resolver.updateable_services');
+
+        // Lookup trace to find last service being loaded as possible blame for eager loading
+        // Abort if one of the earlier services is detected to be "safe", aka updatable
+        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 35) as $t) {
+            if (!isset($t['function']) || $t['function'] === 'getParameter' || $t['function'] === __FUNCTION__) {
+                continue;
+            }
+
+            // Extract service name from first service matching getXXService pattern
+            if (\strpos($t['function'], 'get') === 0 && \strrpos($t['function'], 'Service') === \strlen($t['function']) - 7) {
+                $potentialClassName = \substr($t['function'], 3, -7);
+                $serviceName = \strtolower(\preg_replace('/\B([A-Z])/', '_$1', \str_replace('_', '.', $potentialClassName)));
+
+                // This (->setter('$dynamic_param$')) is safe as the system is able to update it on scope changes, abort
+                if (isset($updatableServices[$serviceName])) {
+                    return;
+                }
+
+                // !! The remaining cases are most likely "not safe", typically:
+                // - ctor('$dynamic_param$') => this should be avoided, use setter or use config resolver instead
+                // - config resolver use in service factory => the service (or decorator, if any) should be marked lazy
+
+                // Possible exception: Class name based services, can't be resolved as namespace is omitted from
+                // compiled function. In this case we won't know if it was updateable and "safe", so we warn to be sure
+                if (!in_array($serviceName, $resettableServiceIds, true) && !$container->has($serviceName)) {
+                    $serviceName = $potentialClassName;
+                } else {
+                    $serviceName = '@' . $serviceName;
+                }
+
+                // Keep track of the first service loaded
+                if ($firstService === '??') {
+                    $firstService = $serviceName;
+                }
+
+                // Detect if we found the command loading the service, if we track that as lasts service
+                if (PHP_SAPI === 'cli' && isset($t['file']) && \stripos($t['file'], 'CommandService.php') !== false) {
+                    $path = explode(DIRECTORY_SEPARATOR, $t['file']);
+                    $commandName = \substr($path[count($path) - 1], 3, -11);
+                    break;
+                }
+            }
+        }
+
+        // Skip service name if same as first service
+        if ($serviceName === $firstService) {
+            $serviceName = '';
+        }
+
+        // Add command name if present as the trigger
+        if ($commandName) {
+            $blame = "$commandName($serviceName) -> $firstService";
+        } else {
+            $blame = ($serviceName ? $serviceName . ' -> ' : '') . $firstService;
+        }
+        $this->tooEarlyLoadedList[$blame][] = $paramName;
     }
 }

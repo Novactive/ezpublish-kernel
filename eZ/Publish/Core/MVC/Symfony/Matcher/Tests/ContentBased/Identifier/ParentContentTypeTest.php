@@ -17,9 +17,7 @@ use eZ\Publish\API\Repository\Repository;
 
 class ParentContentTypeTest extends BaseTest
 {
-    /**
-     * @var \eZ\Publish\Core\MVC\Symfony\Matcher\ContentBased\Identifier\ParentContentType
-     */
+    /** @var \eZ\Publish\Core\MVC\Symfony\Matcher\ContentBased\Identifier\ParentContentType */
     private $matcher;
 
     protected function setUp()
@@ -37,7 +35,7 @@ class ParentContentTypeTest extends BaseTest
      */
     private function generateRepositoryMockForContentTypeIdentifier($contentTypeIdentifier)
     {
-        $parentContentInfo = $this->getContentInfoMock(array('contentTypeId' => 42));
+        $parentContentInfo = $this->getContentInfoMock(['contentTypeId' => 42]);
         $parentLocation = $this->getLocationMock();
         $parentLocation->expects($this->once())
             ->method('getContentInfo')
@@ -67,9 +65,9 @@ class ParentContentTypeTest extends BaseTest
                     $this
                         ->getMockBuilder(ContentType::class)
                         ->setConstructorArgs(
-                            array(
-                                array('identifier' => $contentTypeIdentifier),
-                            )
+                            [
+                                ['identifier' => $contentTypeIdentifier],
+                            ]
                         )
                         ->getMockForAbstractClass()
                 )
@@ -114,28 +112,28 @@ class ParentContentTypeTest extends BaseTest
 
     public function matchLocationProvider()
     {
-        return array(
-            array(
+        return [
+            [
                 'foo',
                 $this->generateRepositoryMockForContentTypeIdentifier('foo'),
                 true,
-            ),
-            array(
+            ],
+            [
                 'foo',
                 $this->generateRepositoryMockForContentTypeIdentifier('bar'),
                 false,
-            ),
-            array(
-                array('foo', 'baz'),
+            ],
+            [
+                ['foo', 'baz'],
                 $this->generateRepositoryMockForContentTypeIdentifier('bar'),
                 false,
-            ),
-            array(
-                array('foo', 'baz'),
+            ],
+            [
+                ['foo', 'baz'],
                 $this->generateRepositoryMockForContentTypeIdentifier('baz'),
                 true,
-            ),
-        );
+            ],
+        ];
     }
 
     /**

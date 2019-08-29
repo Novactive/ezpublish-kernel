@@ -24,9 +24,7 @@ use eZ\Publish\Core\MVC\Symfony\View\Manager as ViewManager;
 
 class UrlAliasRouterTest extends BaseUrlAliasRouterTest
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $configResolver;
 
     protected function setUp()
@@ -37,11 +35,11 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
             ->method('getParameter')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('url_alias_router', null, null, true),
-                        array('content.tree_root.location_id', null, null, null),
-                        array('content.tree_root.excluded_uri_prefixes', null, null, array()),
-                    )
+                    [
+                        ['url_alias_router', null, null, true],
+                        ['content.tree_root.location_id', null, null, null],
+                        ['content.tree_root.excluded_uri_prefixes', null, null, []],
+                    ]
                 )
             );
         parent::setUp();
@@ -76,9 +74,9 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
             ->method('getParameter')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('url_alias_router', null, null, false),
-                    )
+                    [
+                        ['url_alias_router', null, null, false],
+                    ]
                 )
             );
         $this->router->matchRequest($this->getRequestByPathInfo('/foo'));
@@ -93,9 +91,9 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
             ->method('getParameter')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('url_alias_router', null, null, true),
-                    )
+                    [
+                        ['url_alias_router', null, null, true],
+                    ]
                 )
             );
         $this->router->setRootLocationId($rootLocationId);
@@ -110,12 +108,12 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
         $locationId = 789;
         $path = '/foo/bar';
         $urlAlias = new URLAlias(
-            array(
+            [
                 'destination' => $locationId,
                 'path' => $prefix . $path,
                 'type' => URLAlias::LOCATION,
                 'isHistory' => false,
-            )
+            ]
         );
         $this->urlAliasService
             ->expects($this->once())
@@ -126,16 +124,16 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
         $this->urlALiasGenerator
             ->expects($this->once())
             ->method('loadLocation')
-            ->will($this->returnValue(new Location(array('contentInfo' => new ContentInfo(array('id' => 456))))));
+            ->will($this->returnValue(new Location(['contentInfo' => new ContentInfo(['id' => 456])])));
 
-        $expected = array(
+        $expected = [
             '_route' => UrlAliasRouter::URL_ALIAS_ROUTE_NAME,
             '_controller' => UrlAliasRouter::VIEW_ACTION,
             'locationId' => $locationId,
             'contentId' => 456,
             'viewType' => ViewManager::VIEW_TYPE_FULL,
             'layout' => true,
-        );
+        ];
         $request = $this->getRequestByPathInfo($path);
         $this->assertEquals($expected, $this->router->matchRequest($request));
     }
@@ -149,9 +147,9 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
             ->method('getParameter')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('url_alias_router', null, null, true),
-                    )
+                    [
+                        ['url_alias_router', null, null, true],
+                    ]
                 )
             );
         $this->router->setRootLocationId($rootLocationId);
@@ -165,18 +163,18 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
         $this->urlALiasGenerator
             ->expects($this->once())
             ->method('loadLocation')
-            ->will($this->returnValue(new Location(array('contentInfo' => new ContentInfo(array('id' => 456))))));
+            ->will($this->returnValue(new Location(['contentInfo' => new ContentInfo(['id' => 456])])));
 
         $locationId = 789;
         $path = '/foo/bar';
         $requestedPath = '/Foo/Bar';
         $urlAlias = new URLAlias(
-            array(
+            [
                 'destination' => $locationId,
                 'path' => $prefix . $path,
                 'type' => URLAlias::LOCATION,
                 'isHistory' => false,
-            )
+            ]
         );
         $this->urlAliasService
             ->expects($this->once())
@@ -184,7 +182,7 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
             ->with($prefix . $requestedPath)
             ->will($this->returnValue($urlAlias));
 
-        $expected = array(
+        $expected = [
             '_route' => UrlAliasRouter::URL_ALIAS_ROUTE_NAME,
             '_controller' => UrlAliasRouter::VIEW_ACTION,
             'locationId' => $locationId,
@@ -193,7 +191,7 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
             'layout' => true,
             'semanticPathinfo' => $path,
             'needsRedirect' => true,
-        );
+        ];
         $request = $this->getRequestByPathInfo($requestedPath);
         $this->assertEquals($expected, $this->router->matchRequest($request));
     }
@@ -207,9 +205,9 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
             ->method('getParameter')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('url_alias_router', null, null, true),
-                    )
+                    [
+                        ['url_alias_router', null, null, true],
+                    ]
                 )
             );
         $this->router->setRootLocationId($rootLocationId);
@@ -225,12 +223,12 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
         $path = '/foo/bar';
         $requestedPath = '/Foo/Bar';
         $urlAlias = new URLAlias(
-            array(
+            [
                 'destination' => $locationId,
                 'path' => $path,
                 'type' => URLAlias::LOCATION,
                 'isHistory' => false,
-            )
+            ]
         );
         $this->urlAliasService
             ->expects($this->once())
@@ -240,9 +238,9 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
         $this->urlALiasGenerator
             ->expects($this->once())
             ->method('loadLocation')
-            ->will($this->returnValue(new Location(array('contentInfo' => new ContentInfo(array('id' => 456))))));
+            ->will($this->returnValue(new Location(['contentInfo' => new ContentInfo(['id' => 456])])));
 
-        $expected = array(
+        $expected = [
             '_route' => UrlAliasRouter::URL_ALIAS_ROUTE_NAME,
             '_controller' => UrlAliasRouter::VIEW_ACTION,
             'locationId' => $locationId,
@@ -251,7 +249,7 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
             'layout' => true,
             'semanticPathinfo' => $path,
             'needsRedirect' => true,
-        );
+        ];
         $request = $this->getRequestByPathInfo($requestedPath);
         $this->assertEquals($expected, $this->router->matchRequest($request));
     }
@@ -265,9 +263,9 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
             ->method('getParameter')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('url_alias_router', null, null, true),
-                    )
+                    [
+                        ['url_alias_router', null, null, true],
+                    ]
                 )
             );
         $this->router->setRootLocationId($rootLocationId);
@@ -282,12 +280,12 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
         $path = '/foo/bar';
         $requestedPath = '/Foo/Bar';
         $urlAlias = new URLAlias(
-            array(
+            [
                 'destination' => '/content/search',
                 'path' => $prefix . $path,
                 'type' => URLAlias::RESOURCE,
                 'isHistory' => false,
-            )
+            ]
         );
         $this->urlAliasService
             ->expects($this->once())
@@ -295,11 +293,11 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
             ->with($prefix . $requestedPath)
             ->will($this->returnValue($urlAlias));
 
-        $expected = array(
+        $expected = [
             '_route' => UrlAliasRouter::URL_ALIAS_ROUTE_NAME,
             'semanticPathinfo' => $path,
             'needsRedirect' => true,
-        );
+        ];
         $request = $this->getRequestByPathInfo($requestedPath);
         $this->assertEquals($expected, $this->router->matchRequest($request));
     }
@@ -313,9 +311,9 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
             ->method('getParameter')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('url_alias_router', null, null, true),
-                    )
+                    [
+                        ['url_alias_router', null, null, true],
+                    ]
                 )
             );
         $this->router->setRootLocationId($rootLocationId);
@@ -330,10 +328,10 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
         $path = '/foo/bar';
         $requestedPath = '/Foo/Bar';
         $urlAlias = new URLAlias(
-            array(
+            [
                 'path' => $prefix . $path,
                 'type' => URLAlias::VIRTUAL,
-            )
+            ]
         );
         $this->urlAliasService
             ->expects($this->once())
@@ -341,11 +339,11 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
             ->with($prefix . $requestedPath)
             ->will($this->returnValue($urlAlias));
 
-        $expected = array(
+        $expected = [
             '_route' => UrlAliasRouter::URL_ALIAS_ROUTE_NAME,
             'semanticPathinfo' => $path,
             'needsRedirect' => true,
-        );
+        ];
         $request = $this->getRequestByPathInfo($requestedPath);
         $this->assertEquals($expected, $this->router->matchRequest($request));
     }
@@ -358,11 +356,11 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
             ->method('getParameter')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('url_alias_router', null, null, true),
-                        array('content.tree_root.location_id', null, null, 123),
-                        array('content.tree_root.excluded_uri_prefixes', null, null, array('/shared/content')),
-                    )
+                    [
+                        ['url_alias_router', null, null, true],
+                        ['content.tree_root.location_id', null, null, 123],
+                        ['content.tree_root.excluded_uri_prefixes', null, null, ['/shared/content']],
+                    ]
                 )
             );
         $this->router->setRootLocationId(123);
@@ -376,12 +374,12 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
             ->will($this->returnValue(true));
 
         $urlAlias = new URLAlias(
-            array(
+            [
                 'path' => $pathInfo,
                 'type' => UrlAlias::LOCATION,
                 'destination' => $destinationId,
                 'isHistory' => false,
-            )
+            ]
         );
         $request = $this->getRequestByPathInfo($pathInfo);
         $this->urlAliasService
@@ -392,16 +390,16 @@ class UrlAliasRouterTest extends BaseUrlAliasRouterTest
         $this->urlALiasGenerator
             ->expects($this->once())
             ->method('loadLocation')
-            ->will($this->returnValue(new Location(array('contentInfo' => new ContentInfo(array('id' => 456))))));
+            ->will($this->returnValue(new Location(['contentInfo' => new ContentInfo(['id' => 456])])));
 
-        $expected = array(
+        $expected = [
             '_route' => UrlAliasRouter::URL_ALIAS_ROUTE_NAME,
             '_controller' => UrlAliasRouter::VIEW_ACTION,
             'locationId' => $destinationId,
             'contentId' => 456,
             'viewType' => ViewManager::VIEW_TYPE_FULL,
             'layout' => true,
-        );
+        ];
         $this->assertEquals($expected, $this->router->matchRequest($request));
     }
 }

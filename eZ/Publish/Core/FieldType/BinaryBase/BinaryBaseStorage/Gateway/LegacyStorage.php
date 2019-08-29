@@ -20,9 +20,7 @@ use eZ\Publish\Core\Persistence\Database\InsertQuery;
  */
 abstract class LegacyStorage extends Gateway
 {
-    /**
-     * @var \eZ\Publish\Core\Persistence\Database\DatabaseHandler
-     */
+    /** @var \eZ\Publish\Core\Persistence\Database\DatabaseHandler */
     protected $dbHandler;
 
     public function __construct(DatabaseHandler $dbHandler)
@@ -48,20 +46,20 @@ abstract class LegacyStorage extends Gateway
      */
     protected function getPropertyMapping()
     {
-        return array(
-            'filename' => array(
+        return [
+            'filename' => [
                 'name' => 'id',
                 'cast' => 'strval',
-            ),
-            'mime_type' => array(
+            ],
+            'mime_type' => [
                 'name' => 'mimeType',
                 'cast' => 'strval',
-            ),
-            'original_filename' => array(
+            ],
+            'original_filename' => [
                 'name' => 'fileName',
                 'cast' => 'strval',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -208,7 +206,7 @@ abstract class LegacyStorage extends Gateway
             return null;
         }
 
-        $convertedResult = array();
+        $convertedResult = [];
         foreach (reset($result) as $column => $value) {
             $convertedResult[$this->toPropertyName($column)] = $this->castToPropertyValue($value, $column);
         }
@@ -336,7 +334,7 @@ abstract class LegacyStorage extends Gateway
     public function getReferencedFiles(array $fieldIds, $versionNo)
     {
         if (empty($fieldIds)) {
-            return array();
+            return [];
         }
 
         $connection = $this->getConnection();
@@ -383,7 +381,7 @@ abstract class LegacyStorage extends Gateway
     public function countFileReferences(array $files)
     {
         if (empty($files)) {
-            return array();
+            return [];
         }
 
         $connection = $this->getConnection();
@@ -402,7 +400,7 @@ abstract class LegacyStorage extends Gateway
             $selectQuery->expr->in(
                 $connection->quoteColumn('filename'),
                 array_map(
-                    array($this, 'removeMimeFromPath'),
+                    [$this, 'removeMimeFromPath'],
                     $files
                 )
             )
@@ -414,7 +412,7 @@ abstract class LegacyStorage extends Gateway
         $statement = $selectQuery->prepare();
         $statement->execute();
 
-        $countMap = array();
+        $countMap = [];
         foreach ($statement->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             $path = $this->prependMimeToPath($row['filename'], $row['mime_type']);
             $countMap[$path] = (int)$row['count'];

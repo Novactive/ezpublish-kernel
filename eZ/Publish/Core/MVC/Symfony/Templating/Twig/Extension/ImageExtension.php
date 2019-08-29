@@ -20,14 +20,10 @@ use Twig_SimpleFunction;
 
 class ImageExtension extends Twig_Extension
 {
-    /**
-     * @var VariationHandler
-     */
+    /** @var VariationHandler */
     private $imageVariationService;
 
-    /**
-     * @var \eZ\Publish\Core\FieldType\ImageAsset\AssetMapper
-     */
+    /** @var \eZ\Publish\Core\FieldType\ImageAsset\AssetMapper */
     protected $assetMapper;
 
     public function __construct(VariationHandler $imageVariationService, AssetMapper $assetMapper)
@@ -43,18 +39,18 @@ class ImageExtension extends Twig_Extension
 
     public function getFunctions()
     {
-        return array(
+        return [
             new Twig_SimpleFunction(
                 'ez_image_alias',
-                array($this, 'getImageVariation'),
-                array('is_safe' => array('html'))
+                [$this, 'getImageVariation'],
+                ['is_safe' => ['html']]
             ),
             new Twig_SimpleFunction(
                 'ez_image_asset_content_field_identifier',
-                array($this, 'getImageAssetContentFieldIdentifier'),
-                array('is_safe' => array('html'))
+                [$this, 'getImageAssetContentFieldIdentifier'],
+                ['is_safe' => ['html']]
             ),
-        );
+        ];
     }
 
     /**

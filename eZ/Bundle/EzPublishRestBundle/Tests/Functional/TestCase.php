@@ -28,14 +28,10 @@ class TestCase extends BaseTestCase
         'COPY' => 'POST',
     ];
 
-    /**
-     * @var \Buzz\Client\BuzzClientInterface
-     */
+    /** @var \Buzz\Client\BuzzClientInterface */
     private $httpClient;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $httpHost;
 
     /**
@@ -46,9 +42,7 @@ class TestCase extends BaseTestCase
 
     protected static $testSuffix;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $headers = [];
 
     /**
@@ -74,7 +68,7 @@ class TestCase extends BaseTestCase
      *
      * @var array
      */
-    private static $createdContent = array();
+    private static $createdContent = [];
 
     protected function setUp()
     {
@@ -282,14 +276,19 @@ EOF;
     }
 
     /**
-     * @param string $parentLocationId The REST id of the parent location
+     * @param string $string The value of the folders name field
+     * @param string $parentLocationId The REST resource id of the parent location
+     * @param string|null $remoteId
      *
      * @return array created Content, as an array
      */
-    protected function createFolder($string, $parentLocationId)
-    {
+    protected function createFolder(
+        string $string,
+        string $parentLocationId,
+        ?string $remoteId = null
+    ): array {
         $string = $this->addTestSuffix($string);
-        $remoteId = md5(uniqid($string, true));
+        $remoteId = $remoteId ?? md5(uniqid($string, true));
         $xml = <<< XML
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentCreate>

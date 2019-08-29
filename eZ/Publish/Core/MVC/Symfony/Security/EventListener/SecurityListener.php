@@ -41,29 +41,19 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class SecurityListener implements EventSubscriberInterface
 {
-    /**
-     * @var \eZ\Publish\API\Repository\Repository
-     */
+    /** @var \eZ\Publish\API\Repository\Repository */
     protected $repository;
 
-    /**
-     * @var \eZ\Publish\Core\MVC\ConfigResolverInterface
-     */
+    /** @var \eZ\Publish\Core\MVC\ConfigResolverInterface */
     protected $configResolver;
 
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
+    /** @var \Symfony\Component\EventDispatcher\EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /**
-     * @var \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
-     */
+    /** @var \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface */
     protected $tokenStorage;
 
-    /**
-     * @var \Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface
-     */
+    /** @var \Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
     /**
@@ -91,14 +81,14 @@ class SecurityListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
-            SecurityEvents::INTERACTIVE_LOGIN => array(
-                array('onInteractiveLogin', 10),
-                array('checkSiteAccessPermission', 9),
-            ),
+        return [
+            SecurityEvents::INTERACTIVE_LOGIN => [
+                ['onInteractiveLogin', 10],
+                ['checkSiteAccessPermission', 9],
+            ],
             // Priority 7, so that it occurs just after firewall (priority 8)
-            KernelEvents::REQUEST => array('onKernelRequest', 7),
-        );
+            KernelEvents::REQUEST => ['onKernelRequest', 7],
+        ];
     }
 
     /**

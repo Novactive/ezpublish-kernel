@@ -15,15 +15,11 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * @var ConfigurationFactory[]|ArrayObject
-     */
-    private $metadataHandlerFactories = array();
+    /** @var ConfigurationFactory[]|ArrayObject */
+    private $metadataHandlerFactories = [];
 
-    /**
-     * @var ConfigurationFactory[]|ArrayObject
-     */
-    private $binarydataHandlerFactories = array();
+    /** @var ConfigurationFactory[]|ArrayObject */
+    private $binarydataHandlerFactories = [];
 
     public function setMetadataHandlerFactories(ArrayObject $factories)
     {

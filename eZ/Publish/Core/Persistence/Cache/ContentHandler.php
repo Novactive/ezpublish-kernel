@@ -25,19 +25,13 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
 {
     const ALL_TRANSLATIONS_KEY = '0';
 
-    /**
-     * @var callable
-     */
+    /** @var callable */
     private $getContentInfoTags;
 
-    /**
-     * @var callable
-     */
+    /** @var callable */
     private $getContentInfoKeys;
 
-    /**
-     * @var callable
-     */
+    /** @var callable */
     private $getContentTags;
 
     protected function init(): void
@@ -81,7 +75,7 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
     public function create(CreateStruct $struct)
     {
         // Cached on demand when published or loaded
-        $this->logger->logCall(__METHOD__, array('struct' => $struct));
+        $this->logger->logCall(__METHOD__, ['struct' => $struct]);
 
         return $this->persistenceHandler->contentHandler()->create($struct);
     }
@@ -91,7 +85,7 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
      */
     public function createDraftFromVersion($contentId, $srcVersion, $userId)
     {
-        $this->logger->logCall(__METHOD__, array('content' => $contentId, 'version' => $srcVersion, 'user' => $userId));
+        $this->logger->logCall(__METHOD__, ['content' => $contentId, 'version' => $srcVersion, 'user' => $userId]);
         $draft = $this->persistenceHandler->contentHandler()->createDraftFromVersion($contentId, $srcVersion, $userId);
         $this->cache->invalidateTags(["content-{$contentId}-version-list"]);
 
@@ -103,11 +97,11 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
      */
     public function copy($contentId, $versionNo = null, $newOwnerId = null)
     {
-        $this->logger->logCall(__METHOD__, array(
+        $this->logger->logCall(__METHOD__, [
             'content' => $contentId,
             'version' => $versionNo,
             'newOwner' => $newOwnerId,
-        ));
+        ]);
 
         return $this->persistenceHandler->contentHandler()->copy($contentId, $versionNo, $newOwnerId);
     }
@@ -233,7 +227,7 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
      */
     public function loadDraftsForUser($userId)
     {
-        $this->logger->logCall(__METHOD__, array('user' => $userId));
+        $this->logger->logCall(__METHOD__, ['user' => $userId]);
 
         return $this->persistenceHandler->contentHandler()->loadDraftsForUser($userId);
     }
@@ -243,7 +237,7 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
      */
     public function setStatus($contentId, $status, $versionNo)
     {
-        $this->logger->logCall(__METHOD__, array('content' => $contentId, 'status' => $status, 'version' => $versionNo));
+        $this->logger->logCall(__METHOD__, ['content' => $contentId, 'status' => $status, 'version' => $versionNo]);
         $return = $this->persistenceHandler->contentHandler()->setStatus($contentId, $status, $versionNo);
 
         if ($status === VersionInfo::STATUS_PUBLISHED) {
@@ -260,7 +254,7 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
      */
     public function updateMetadata($contentId, MetadataUpdateStruct $struct)
     {
-        $this->logger->logCall(__METHOD__, array('content' => $contentId, 'struct' => $struct));
+        $this->logger->logCall(__METHOD__, ['content' => $contentId, 'struct' => $struct]);
         $contentInfo = $this->persistenceHandler->contentHandler()->updateMetadata($contentId, $struct);
         $this->cache->invalidateTags(['content-' . $contentId]);
 
@@ -272,7 +266,7 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
      */
     public function updateContent($contentId, $versionNo, UpdateStruct $struct)
     {
-        $this->logger->logCall(__METHOD__, array('content' => $contentId, 'version' => $versionNo, 'struct' => $struct));
+        $this->logger->logCall(__METHOD__, ['content' => $contentId, 'version' => $versionNo, 'struct' => $struct]);
         $content = $this->persistenceHandler->contentHandler()->updateContent($contentId, $versionNo, $struct);
         $this->cache->invalidateTags(["content-{$contentId}-version-{$versionNo}"]);
 
@@ -284,7 +278,7 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
      */
     public function deleteContent($contentId)
     {
-        $this->logger->logCall(__METHOD__, array('content' => $contentId));
+        $this->logger->logCall(__METHOD__, ['content' => $contentId]);
 
         // Load reverse field relations first
         $reverseRelations = $this->persistenceHandler->contentHandler()->loadReverseRelations(
@@ -316,7 +310,7 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
      */
     public function deleteVersion($contentId, $versionNo)
     {
-        $this->logger->logCall(__METHOD__, array('content' => $contentId, 'version' => $versionNo));
+        $this->logger->logCall(__METHOD__, ['content' => $contentId, 'version' => $versionNo]);
         $return = $this->persistenceHandler->contentHandler()->deleteVersion($contentId, $versionNo);
         $this->cache->invalidateTags(["content-{$contentId}-version-{$versionNo}"]);
 
@@ -353,7 +347,7 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
      */
     public function addRelation(RelationCreateStruct $relation)
     {
-        $this->logger->logCall(__METHOD__, array('struct' => $relation));
+        $this->logger->logCall(__METHOD__, ['struct' => $relation]);
 
         return $this->persistenceHandler->contentHandler()->addRelation($relation);
     }
@@ -363,7 +357,7 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
      */
     public function removeRelation($relationId, $type)
     {
-        $this->logger->logCall(__METHOD__, array('relation' => $relationId, 'type' => $type));
+        $this->logger->logCall(__METHOD__, ['relation' => $relationId, 'type' => $type]);
         $this->persistenceHandler->contentHandler()->removeRelation($relationId, $type);
     }
 
@@ -374,11 +368,11 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
     {
         $this->logger->logCall(
             __METHOD__,
-            array(
+            [
                 'content' => $sourceContentId,
                 'version' => $sourceContentVersionNo,
                 'type' => $type,
-            )
+            ]
         );
 
         return $this->persistenceHandler->contentHandler()->loadRelations($sourceContentId, $sourceContentVersionNo, $type);
@@ -389,7 +383,7 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
      */
     public function loadReverseRelations($destinationContentId, $type = null)
     {
-        $this->logger->logCall(__METHOD__, array('content' => $destinationContentId, 'type' => $type));
+        $this->logger->logCall(__METHOD__, ['content' => $destinationContentId, 'type' => $type]);
 
         return $this->persistenceHandler->contentHandler()->loadReverseRelations($destinationContentId, $type);
     }
@@ -399,7 +393,7 @@ class ContentHandler extends AbstractInMemoryPersistenceHandler implements Conte
      */
     public function publish($contentId, $versionNo, MetadataUpdateStruct $struct)
     {
-        $this->logger->logCall(__METHOD__, array('content' => $contentId, 'version' => $versionNo, 'struct' => $struct));
+        $this->logger->logCall(__METHOD__, ['content' => $contentId, 'version' => $versionNo, 'struct' => $struct]);
         $content = $this->persistenceHandler->contentHandler()->publish($contentId, $versionNo, $struct);
         $this->cache->invalidateTags(['content-' . $contentId]);
 
