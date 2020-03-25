@@ -48,6 +48,7 @@ class Image extends AbstractParser implements SuggestionCollectorAwareInterface
                 ->example(
                     [
                         'my_image_variation' => [
+                            'expose' => true,
                             'reference' => '~',
                             'filters' => [
                                 [
@@ -78,6 +79,9 @@ class Image extends AbstractParser implements SuggestionCollectorAwareInterface
                         ->scalarNode('reference')
                             ->info('Tells the system which original variation to use as reference image. Defaults to original')
                             ->example(['reference' => 'large'])
+                        ->end()
+                        ->booleanNode('expose')
+                            ->defaultTrue()
                         ->end()
                         ->arrayNode('filters')
                             ->info('A list of filters to run, each filter must be supported by the active image converters')
