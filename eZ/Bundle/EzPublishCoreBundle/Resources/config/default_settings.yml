@@ -120,6 +120,7 @@ parameters:
     ezsettings.default.content.tree_root.excluded_uri_prefixes: [] # URI prefixes that are allowed to be outside the content tree
     ezsettings.default.content.field_groups.list: ['content', 'metadata']
     ezsettings.default.content.field_groups.default: 'content'
+    ezsettings.default.content.edit.draft_conflict_resolution: 'manual'
 
     # FieldType settings
 

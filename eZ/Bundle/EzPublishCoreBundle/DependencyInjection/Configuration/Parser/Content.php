@@ -29,6 +29,17 @@ class Content extends AbstractParser
                     ->booleanNode('view_cache')->end()
                     ->booleanNode('ttl_cache')->end()
                     ->scalarNode('default_ttl')->info('Default value for TTL cache, in seconds')->end()
+                    ->arrayNode('edit')
+                        ->canBeUnset()
+                        ->children()
+                            ->enumNode('draft_conflict_resolution')
+                                ->defaultValue('manual')
+                                ->values(['manual', 'new_draft'])
+                                ->example("manual (let the user select a version) | new_draft (automaticaly create new draft)")
+                                ->info('When editing a content and there is a version conflict, define how the conflict should be resolved : automaticaly create new draft or let the user select a version.')
+                            ->end()
+                        ->end()
+                    ->end()
                     ->arrayNode('tree_root')
                         ->canBeUnset()
                         ->children()
@@ -50,6 +61,11 @@ class Content extends AbstractParser
     public function mapConfig(array &$scopeSettings, $currentScope, ContextualizerInterface $contextualizer)
     {
         if (!empty($scopeSettings['content'])) {
+
+            if (isset($scopeSettings['content']['edit']['draft_conflict_resolution'])) {
+                $contextualizer->setContextualParameter('content.edit.draft_conflict_resolution', $currentScope, $scopeSettings['content']['edit']['draft_conflict_resolution']);
+            }
+
             if (isset($scopeSettings['content']['view_cache'])) {
                 $contextualizer->setContextualParameter('content.view_cache', $currentScope, $scopeSettings['content']['view_cache']);
             }
